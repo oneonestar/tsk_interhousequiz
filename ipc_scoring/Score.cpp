@@ -3,8 +3,14 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/types.h>
-#include <string.h>
 #include <time.h>
+#include <netinet/in.h>
+#include <netdb.h>
+#include <sys/types.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+
 #include "score.h"
 #define UPDATE 0
 #define ADD 1
@@ -163,7 +169,30 @@ void dumpLine(FILE *stream)
 	while((c=getc(stream))!=EOF&&c!='\n');
 }
 
-int main(void)
+void pushScore(char house, char address[])
+{
+	int sock;
+	int n=0;
+	char recvBuff[5];
+	struct sockaddr_in serv_addr;
+	int buff;
+
+	memset(recvBuff, 0, sizeof(recvBuff));
+	sock = socket(AF_INET, SOCK_STREAM, 0);
+	memset(&serv_addr, '0', sizeof(serv_addr));
+	serv_addr.sin_family = AF_INET;
+	serv_addr.sin_port = htons(8888);
+	inet_pton(AF_INET, address, &serv_addr.sin_addr);
+	connect(sock, (struct sockaddr*)&serv_addr, sizeof(serv_addr));
+
+	sprintf(recvBuff, "%d", get_score(house));
+	printf("pushScore(): score(%c) = %s\n", house, recvBuff);
+	if((n=write(sock, recvBuff, sizeof(recvBuff)))<0) {
+		printf("error\n");
+	}
+}
+
+int main(int argc, char *argv[])
 {
 	//create pipes
 	pipe(server2score);
@@ -196,6 +225,11 @@ int main(void)
 
 			//exit if enter 00
 			if(strcmp(temp, "00")==0) {
+				pushScore('A', argv[1]);
+				pushScore('D', argv[1]);
+				pushScore('H', argv[1]);
+				pushScore('M', argv[1]);
+				pushScore('J', argv[1]);
 				//tell child to stop
 				close(server2score[0]);
 				write(server2score[1], "ex", sizeof("ex"));
