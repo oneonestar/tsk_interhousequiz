@@ -1,19 +1,36 @@
-from twisted.web.resource import Resource
+from twisted.internet import protocol, reactor, stdio
+from twisted.protocols import basic
 from twisted.web import server, resource
+from twisted.web.resource import Resource
 from twisted.web.server import NOT_DONE_YET
-import twisted
-from twisted.internet import protocol, reactor
-
-f = open("html_content.html")
 
 
-htmlData=f.read()
-f.close()
 
+
+#Global variables
 teststr=""
 connections=[]
 
-class Echo(protocol.Protocol):
+
+
+#Stdio
+class StdinInputHandler(basic.LineReceiver):
+	from os import linesep as delimiter
+
+	def connectionMade(self):
+		self.transport.write('>>> ')
+
+	def lineReceived(self, line):
+		self.sendLine('Echo: ' + line)
+		try:
+			exec(line)
+		except:
+			print("Input Error")	
+		self.transport.write('>>> ')
+
+#Web
+#Ctrl server connection port 8889
+class CtrlConnection(protocol.Protocol):
 	def dataReceived(self,data):
 		global teststr
 		global connections
@@ -24,21 +41,20 @@ class Echo(protocol.Protocol):
 			for i in connections:
 				cycle(i.write)
 
-class EchoFactory(protocol.Factory):
+class CtrlConnectionFactory(protocol.Factory):
 	def buildProtocol(self, addr):
-		return Echo()
-
+		return CtrlConnection()
 
 def cycle(echo):
 	global teststr
 	echo("event: userlogon\n")
 	print("CYCLE"+teststr)
-#	echo('data: {"username":"star"}')
 	echo('data: {"username":"' + teststr + '"}')
 	echo("\n\n")
 
 
-class MyResource2(Resource):
+#web server 8080
+class MyResource(Resource):
 	isLeaf = True
 	def render_GET(self, request):
 		global connections
@@ -51,10 +67,18 @@ class MyResource2(Resource):
 			#lc.start(1)
 			#request.notifyFinish().addBoth(lambda _: lc.stop())
 			return NOT_DONE_YET
+		f = open("html_content.html")
+		htmlData=f.read()
+		f.close()
 		return htmlData
+
+
 		
-root=MyResource2()
+#stdin
+stdio.StandardIO(StdinInputHandler())
+#server
+root=MyResource()
 site = server.Site(root)
-reactor.listenTCP(8889,EchoFactory())
+reactor.listenTCP(8889,CtrlConnectionFactory())
 reactor.listenTCP(8080,site)
 reactor.run()
