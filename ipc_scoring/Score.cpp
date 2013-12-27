@@ -15,6 +15,7 @@
 #define UPDATE 0
 #define ADD 1
 #define MIN 2
+#define PORT 8888		//port for connecting to web server
 
 using namespace std;
 
@@ -23,6 +24,7 @@ int score2server[2];
 
 score::score(int initscore)
 {
+	//initialize scores
 	for(int i=0; i<6; i++) {
 		score_table[i]=initscore; 
 	}
@@ -69,46 +71,64 @@ int score::getscore(int house)
         return score_table[house];
 }
 
+//daemon of the scoring module process
 void score::scoring()
 {
-	char signal[2];
+	char signal[2];			//signal of (action)(house letter)
 	char house;
 	int value;
 
 	while(1) {
+		//check if the parent process is still there
 		if(getppid()==1) {
 			printf("parent terminated, exit...\n");
 			exit(1);
 		}
+
+		//close pipe, start reading 
 		close(server2score[1]);
 		while(read(server2score[0], &signal, 3)>0) {
 			printf("DEBUG:Scoring2: signal = %s\n", signal);
 			house = signal[1];
+
+			//update
 			if(signal[0]=='U') {
+				//read from parent for value to update
 				close(server2score[1]);
 				read(server2score[0], &value, sizeof(int));
                                 int houseIndex=house_to_index(house);
                                 update(houseIndex,value);
 				//printf("DEBUG:update, house %c, value = %d\n", house, value);		//to be replaced by invoking method inside the object
 			}
+			//add
 			else if(signal[0]=='A') {
+				//read from parent the value to add to
 				close(server2score[1]);
 				read(server2score[0], &value, sizeof(int));
+
+				//add score to defined house
 				int houseIndex=house_to_index(house);
                                 add(houseIndex,value);
 //printf("DEBUG:add, house %c, value = %d\n", house, value);		//to be replaced by invoking mdthod inside the object
 			}
+			//minus
 			else if(signal[0]=='M') {
+				//read value to minus
 				close(server2score[1]);
 				read(server2score[0], &value, sizeof(int));
+
+				//minus from defined house
                                 int houseIndex=house_to_index(house);
                                 minus(houseIndex,value);
 				//printf("DEBUG:minus, house %c, value = %d\n", house, value);
 			}
+			//get
 			else if(signal[0]=='G') {
 				//get score
 				int houseIndex=house_to_index(house);
 				int score_result = getscore(houseIndex);
+
+				//write score to parent
 				close(score2server[0]);
 				write(score2server[1], &score_result, sizeof(int));
 			}
@@ -169,29 +189,34 @@ void dumpLine(FILE *stream)
 	while((c=getc(stream))!=EOF&&c!='\n');
 }
 
+//push score to web server for updating
 void pushScore(char house, char address[])
 {
-	int sock;
-	int n=0;
-	char recvBuff[5];
-	struct sockaddr_in serv_addr;
-	int buff;
+	//setup variables
+	int sock;			//socket
+	int n=0;			//error check value
+	char recvBuff[5];		//buffer
+	struct sockaddr_in serv_addr;	//server address
 
-	memset(recvBuff, 0, sizeof(recvBuff));
-	sock = socket(AF_INET, SOCK_STREAM, 0);
-	memset(&serv_addr, '0', sizeof(serv_addr));
-	serv_addr.sin_family = AF_INET;
-	serv_addr.sin_port = htons(8888);
-	inet_pton(AF_INET, address, &serv_addr.sin_addr);
-	connect(sock, (struct sockaddr*)&serv_addr, sizeof(serv_addr));
-
+	//get score and convert to character from integer
 	sprintf(recvBuff, "%d", get_score(house));
+
+	//setup socket
+	memset(recvBuff, 0, sizeof(recvBuff));					//clean buffer
+	sock = socket(AF_INET, SOCK_STREAM, 0);					//new socket stream
+	memset(&serv_addr, '0', sizeof(serv_addr));				//clean address structure
+	serv_addr.sin_family = AF_INET;						//internet
+	serv_addr.sin_port = htons(PORT);					//port = N ie 8888
+	inet_pton(AF_INET, address, &serv_addr.sin_addr);			//combine
+	connect(sock, (struct sockaddr*)&serv_addr, sizeof(serv_addr));		//connect
+
 	printf("pushScore(): score(%c) = %s\n", house, recvBuff);
-	if((n=write(sock, recvBuff, sizeof(recvBuff)))<0) {
+	if((n=write(sock, recvBuff, sizeof(recvBuff)))<0) {			//write score to socket to python web server
 		printf("error\n");
 	}
 }
 
+//dummy main
 int main(int argc, char *argv[])
 {
 	//create pipes

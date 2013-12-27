@@ -1,3 +1,0 @@
-3/10/2013, completed pipe, process generation, IPC, by Steven
-4/10/2013, integrated into C++ class, storage of variables, fully functional object, by Charlie, Steven, Star
-5/10/2013, minor error correction, modified error of calling getscore without first calling house_to_index() for conversion
