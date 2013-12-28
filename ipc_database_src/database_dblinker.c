@@ -4,6 +4,10 @@
 #include <mysql.h>
 #include <string.h>
 #include <stdbool.h>
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 typedef struct stucture
 {
@@ -84,22 +88,53 @@ void update_track(int track[40], int item)
 	printf("%s\n", "The track is already full");
 }
 
-int get_id()
+void get_id(char id[3])
 {
-	int id;
+	int fd[2];
+	//char* myfifo = "/tmp/myfifo";
+    //	char buf[3];
+    	 if(pipe(fd) == -1)
+    	 {
+    	        exit(-1);
+    	 }
+	
 	while(true)
 	{
-		id = 1;
-		if(id <= 40)
+		close (fd[0]);
+		while(read(fd[1], id, 3)>0)
+		{
+		if(strcmp(id,"40") == 0 | strcmp(id,"40") == -1)
 		{
 			printf("%s\n", "The id has been retrieved successfully");
-			break;
+			close(fd[1]);
+			return;
 		}
-		printf("%i is an unvalid id for query", id);
+		printf("%s is an unvalid id for query", id);
 		printf("%s\n", "Please wait for another valid id");		
+		}
 	}
-	return id;
 }
+
+void sending(data* a)
+{
+	int fd[2];
+
+    /* write to the pipe */
+    	pipe(fd);
+	close(fd[1]);
+    	write(fd[0], a->question, sizeof(a->question));
+	write(fd[0], a->answer, sizeof(a->answer));
+	
+	int index;
+	for(index = 0; index < 4; index++)
+	{
+		write(fd[0], a->option[index], sizeof(a->option[index]));
+	}
+	write(fd[0], a->path, sizeof(a->path));
+    	close(fd[0]);
+
+}
+
 
 void init_con(MYSQL *con)
 {
@@ -136,11 +171,11 @@ MYSQL_RES* get_result(MYSQL* con, char* query)
 int main()
 {
 	data* a;	
-	int id;
+//	int id;
 	MYSQL_RES *result;
 	MYSQL_ROW row;
 	char query[100] = "Select * from data where id = ";
-	char tid[3];
+	char id[3];
 	int track[40];
 
 	MYSQL *con = mysql_init(NULL);
@@ -149,10 +184,10 @@ int main()
 
 	//The program starts with successful connection
 	//items retreiving
-	id = get_id();
+	get_id(id);
 	
-	sprintf(tid, "%d", id);//convert id to cstring
-	strcat (query, tid);//concatenation of the id and the query
+//	sprintf(tid, "%d", id);//convert id to cstring
+	strcat (query, id);//concatenation of the id and the query
 
 	result = get_result(con, query);
 
@@ -162,6 +197,7 @@ int main()
 	}
 	//initialization above
 	
+	sending(a);	
 	//testing and printing
 	printf("Question: %s\n", a->question);
 	printf("The answer is : %s\n", a->answer);
