@@ -18,7 +18,7 @@ typedef struct stucture
 	char path[30];
 }data;
 
-void init_item(data* a, int track[40])
+void init_data(data* a)
 {
 	strcpy(a->question, "\n");
         strcpy(a->answer, "\n");
@@ -30,8 +30,11 @@ void init_item(data* a, int track[40])
 	}
 	
 	strcpy(a->path, "\n");
+}
 
-	index = 0;
+void init_track(int track[40])
+{
+	int index = 0;
 	while(index < 40)
 	{
 		track[index] = 0;
@@ -88,51 +91,67 @@ void update_track(int track[40], int item)
 	printf("%s\n", "The track is already full");
 }
 
-void get_id(char id[3])
+void get_id(char id[3], int fd[2], int pid)
 {
-	int fd[2];
-	//char* myfifo = "/tmp/myfifo";
-    //	char buf[3];
-    	 if(pipe(fd) == -1)
-    	 {
-    	        exit(-1);
-    	 }
-	
-	while(true)
+	char cid[] = "1";
+	if (pid != 0)
 	{
-		close (fd[0]);
-		while(read(fd[1], id, 3)>0)
-		{
-		if(strcmp(id,"40") == 0 | strcmp(id,"40") == -1)
-		{
-			printf("%s\n", "The id has been retrieved successfully");
-			close(fd[1]);
-			return;
-		}
-		printf("%s is an unvalid id for query", id);
-		printf("%s\n", "Please wait for another valid id");		
-		}
+		close (fd[1]);
+		read(fd[0], id, 3);
+		printf("Child: I have receieved the id: %s\n", id);
+		close(fd[0]);
+	}
+	else
+	{
+		close(fd[0]);
+		printf("Parent: I have sent the id: %s\n", cid);
+		write(fd[1], cid, sizeof(cid));
+		close(fd[1]);
 	}
 }
 
-void sending(data* a)
+void sending(data* a, int fd[2], int pid)
 {
-	int fd[2];
-
-    /* write to the pipe */
-    	pipe(fd);
-	close(fd[1]);
-    	write(fd[0], a->question, sizeof(a->question));
-	write(fd[0], a->answer, sizeof(a->answer));
-	
-	int index;
-	for(index = 0; index < 4; index++)
+    	/* write through the pipe */
+	if(pid == 0)
 	{
-		write(fd[0], a->option[index], sizeof(a->option[index]));
-	}
-	write(fd[0], a->path, sizeof(a->path));
-    	close(fd[0]);
+		data* parent;
+		init_data(parent); 
 
+		close(fd[1]);
+		read(fd[0], parent->question, 50);
+		read(fd[0], parent->answer, 200);
+		read(fd[0], parent->option[0], 50);
+		read(fd[0], parent->option[1], 50);
+		read(fd[0], parent->option[2], 50);
+		read(fd[0], parent->option[3], 50);
+		read(fd[0], parent->path, 30);
+		close(fd[0]);
+		
+		printf("Parent: The question is: %s\n", parent->question);
+		printf("Parent: The answer is: %s\n", parent->answer);
+		printf("Parent: Option A = %s\n", parent->option[0]);
+		printf("Parent: Option B = %s\n", parent->option[1]);
+		printf("Parent: Option C = %s\n", parent->option[2]);
+		printf("Parent: Option D = %s\n", parent->option[3]);
+		printf("Parent: Path = %s\n", parent->path);
+	}
+	else
+	{
+		close(fd[0]);
+		
+		printf("Child: The question is: %s\n", a->question);
+    		write(fd[1], a->question, sizeof(a->question));
+		write(fd[1], a->answer, sizeof(a->answer));
+	
+		int index;
+		for(index = 0; index < 4; index++)
+		{
+			write(fd[1], a->option[index], sizeof(a->option[index]));
+		}
+		write(fd[1], a->path, sizeof(a->path));
+    		close(fd[1]);
+	}
 }
 
 
@@ -156,7 +175,6 @@ void init_con(MYSQL *con)
 MYSQL_RES* get_result(MYSQL* con, char* query)
 {
 	MYSQL_RES* result;
-	printf("Query: %s\n\n", query);
 	mysql_query(con, query);
 	
 	result = mysql_store_result(con);
@@ -168,15 +186,22 @@ MYSQL_RES* get_result(MYSQL* con, char* query)
 	return result;
 }
 
-void db_module()
+int main()
 {
 	data* a;	
-//	int id;
 	MYSQL_RES *result;
 	MYSQL_ROW row;
 	char query[100] = "Select * from data where id = ";
 	char id[3];
 	int track[40];
+	init_track(track);
+	int intid;
+
+	int send[2];
+	int get[2];
+	pipe(send);
+	pipe(get);
+	int pid = fork();
 
 	MYSQL *con = mysql_init(NULL);
 	init_con(con);
@@ -184,48 +209,28 @@ void db_module()
 
 	//The program starts with successful connection
 	//items retreiving
-<<<<<<< HEAD
-	while((id = get_id())!=0) {
+	get_id(id, get, pid);
 	
-		sprintf(tid, "%d", id);//convert id to cstring
-		strcat (query, tid);//concatenation of the id and the query
-=======
-	get_id(id);
+	if(pid != 0)
+	{
+	intid = atoi(id);
+	update_track(track, intid);
 	
-//	sprintf(tid, "%d", id);//convert id to cstring
 	strcat (query, id);//concatenation of the id and the query
->>>>>>> f2a15607167fe4c87a19065811f90949624f0ec2
 
-		result = get_result(con, query);
+	result = get_result(con, query);
 
-		while((row = mysql_fetch_row(result)))
-		{
-			update_data(a, row);
-		}
-		//initialization above
-	
-<<<<<<< HEAD
-		//testing and printing
-		printf("Question: %s\n", a->question);
-		printf("The answer is : %s\n", a->answer);
-		printf("A: %s\n", a->option[0]);
-		printf("B: %s\n", a->option[1]);
-		printf("C: %s\n", a->option[2]);
-		printf("D: %s\n", a->option[3]);
-
-		mysql_free_result(result);
+	while((row = mysql_fetch_row(result)))
+	{
+		update_data(a, row);
 	}
-=======
-	sending(a);	
-	//testing and printing
-	printf("Question: %s\n", a->question);
-	printf("The answer is : %s\n", a->answer);
-	printf("A: %s\n", a->option[0]);
-	printf("B: %s\n", a->option[1]);
-	printf("C: %s\n", a->option[2]);
-	printf("D: %s\n", a->option[3]);
+	//initialization above
+	}
+	sending(a, send, pid);	
+	//testing and printing in sending function
 
 	mysql_free_result(result);
->>>>>>> f2a15607167fe4c87a19065811f90949624f0ec2
 	mysql_close(con);
+
+	return 0;
 }
