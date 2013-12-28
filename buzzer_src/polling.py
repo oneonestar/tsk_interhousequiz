@@ -24,7 +24,7 @@ def readButton(s):
 	for index in range(len(buttonState)):
 		if (s&1==1) and buttonState[index]!=1:
 			buttonState[index] = 1
-			conn.send(str(index))
+			conn.send(str(index+1))
 			print "button ", index+1, " pressed"
 		s = s>>1
 

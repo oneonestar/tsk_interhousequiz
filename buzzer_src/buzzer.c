@@ -4,12 +4,40 @@
 #include <sys/types.h>
 #include <string.h>
 #include <sys/socket.h>
+#include <time.h>
+
+#define PORT 8888
+
+int houseToChar(int house)
+{
+	switch(house) {
+		case 1:
+			return 'A';
+			break;
+		case 2:
+			return 'D';
+			break;
+		case 3:
+			return 'H';
+			break;
+		case 4:
+			return 'J';
+			break;
+		case 5:
+			return 'L';
+			break;
+		case 6:
+			return 'M';
+			break;
+	}
+}
 
 int main(int argc, char *argv[])
 {
 	int sock, sock1;
 	int n=0;
 	char recvBuff[5];
+	char sendBuff[20];
 	struct sockaddr_in serv_addr;
 	struct sockaddr_in serv_addr1;
 	int buff;
@@ -18,27 +46,27 @@ int main(int argc, char *argv[])
 	sock = socket(AF_INET, SOCK_STREAM, 0);
 	memset(&serv_addr, '0', sizeof(serv_addr));
 	serv_addr.sin_family = AF_INET;
-	serv_addr.sin_port = htons(8888);
+	serv_addr.sin_port = htons(PORT);
 	inet_pton(AF_INET, argv[1], &serv_addr.sin_addr);
 	connect(sock, (struct sockaddr*)&serv_addr, sizeof(serv_addr));
-/*
+
 	sock1 = socket(AF_INET, SOCK_STREAM, 0);
 	memset(&serv_addr1, '0', sizeof(serv_addr1));
 	serv_addr1.sin_family = AF_INET;
 	serv_addr1.sin_port = htons(8889);
 	inet_pton(AF_INET, argv[2], &serv_addr1.sin_addr);
 	connect(sock1, (struct sockaddr*)&serv_addr1, sizeof(serv_addr1));
-*/
-	while((n = read(sock, recvBuff, sizeof(recvBuff)-1))>0) {
+
+	while((n = read(sock, recvBuff, sizeof(recvBuff)))>0) {
 		printf("n=%d\n", n);
-		recvBuff[strlen(recvBuff)] = 0;
-		printf("%s\n", recvBuff);
-		buff = atoi(recvBuff);
-/*		if((n=write(sock1, recvBuff, sizeof(recvBuff-1)))<0) {
+		sprintf(sendBuff, "buzzer:%c:%d", houseToChar(atoi(recvBuff)), time(NULL));
+		printf("sending: %s\n", sendBuff);
+		if((n=write(sock1, sendBuff, sizeof(sendBuff)))<0) {
 			printf("error\n");
-		}*/
+		}
 		printf("button %s pressed and printed\n", recvBuff);
 		memset(recvBuff, 0, sizeof(recvBuff));
+		memset(sendBuff, 0, sizeof(sendBuff));
 	}
 	return 0;
 }

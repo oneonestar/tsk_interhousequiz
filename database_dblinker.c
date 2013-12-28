@@ -133,7 +133,7 @@ MYSQL_RES* get_result(MYSQL* con, char* query)
 	return result;
 }
 
-void db_module()
+int main()
 {
 	data* a;	
 	int id;
@@ -149,28 +149,29 @@ void db_module()
 
 	//The program starts with successful connection
 	//items retreiving
-	while((id = get_id())!=0) {
+	id = get_id();
 	
-		sprintf(tid, "%d", id);//convert id to cstring
-		strcat (query, tid);//concatenation of the id and the query
+	sprintf(tid, "%d", id);//convert id to cstring
+	strcat (query, tid);//concatenation of the id and the query
 
-		result = get_result(con, query);
+	result = get_result(con, query);
 
-		while((row = mysql_fetch_row(result)))
-		{
-			update_data(a, row);
-		}
-		//initialization above
-	
-		//testing and printing
-		printf("Question: %s\n", a->question);
-		printf("The answer is : %s\n", a->answer);
-		printf("A: %s\n", a->option[0]);
-		printf("B: %s\n", a->option[1]);
-		printf("C: %s\n", a->option[2]);
-		printf("D: %s\n", a->option[3]);
-
-		mysql_free_result(result);
+	while((row = mysql_fetch_row(result)))
+	{
+		update_data(a, row);
 	}
+	//initialization above
+	
+	//testing and printing
+	printf("Question: %s\n", a->question);
+	printf("The answer is : %s\n", a->answer);
+	printf("A: %s\n", a->option[0]);
+	printf("B: %s\n", a->option[1]);
+	printf("C: %s\n", a->option[2]);
+	printf("D: %s\n", a->option[3]);
+
+	mysql_free_result(result);
 	mysql_close(con);
+
+	return 0;
 }
