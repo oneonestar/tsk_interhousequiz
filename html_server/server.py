@@ -49,7 +49,7 @@ def pushToClient(echo):
 	echo("event: %s\n" % arr[0])
 	print("PPPPP:")
 	print(arr)
-	print("Push"+teststr)
+	#print("Push"+teststr)
 	print(arr[1])
 	print(arr[2])
 	echo('data: {"%s":"%s"}'% (arr[1], arr[2]))
