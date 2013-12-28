@@ -15,7 +15,7 @@
 #define UPDATE 0
 #define ADD 1
 #define MIN 2
-#define PORT 8889		//port for connecting to web server
+#define PORT 8888		//port for connecting to web server
 
 using namespace std;
 
@@ -195,15 +195,14 @@ void pushScore(char house, char address[])
 	//setup variables
 	int sock;			//socket
 	int n=0;			//error check value
-	char recvBuff[20];		//buffer
+	char recvBuff[5];		//buffer
 	struct sockaddr_in serv_addr;	//server address
 
 	//get score and convert to character from integer
-	memset(recvBuff, 0, sizeof(recvBuff));					//clean buffer
-	sprintf(recvBuff, "score:%c:%d", house, get_score(house));
-	printf("DEBUG: pushScore(): recvBuff = %s\n", recvBuff);
+	sprintf(recvBuff, "%d", get_score(house));
 
 	//setup socket
+	memset(recvBuff, 0, sizeof(recvBuff));					//clean buffer
 	sock = socket(AF_INET, SOCK_STREAM, 0);					//new socket stream
 	memset(&serv_addr, '0', sizeof(serv_addr));				//clean address structure
 	serv_addr.sin_family = AF_INET;						//internet
@@ -252,11 +251,10 @@ int main(int argc, char *argv[])
 			//exit if enter 00
 			if(strcmp(temp, "00")==0) {
 				pushScore('A', argv[1]);
-				pushScore('M', argv[1]);
-				pushScore('H', argv[1]);
-				pushScore('J', argv[1]);
-				pushScore('L', argv[1]);
 				pushScore('D', argv[1]);
+				pushScore('H', argv[1]);
+				pushScore('M', argv[1]);
+				pushScore('J', argv[1]);
 				//tell child to stop
 				close(server2score[0]);
 				write(server2score[1], "ex", sizeof("ex"));
