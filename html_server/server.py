@@ -29,31 +29,34 @@ class StdinInputHandler(basic.LineReceiver):
 		self.transport.write('>>> ')
 
 #Web
-#Ctrl server connection port 8889
+#Ctrl server connection
 class CtrlConnection(protocol.Protocol):
 	def dataReceived(self,data):
 		global teststr
 		global connections
 		print(data)
-		teststr1=data.rstrip("\0")
-		for j in teststr1:
-			teststr = j	
-			for i in connections:
-				cycle(i.write)
+		teststr=data.rstrip("\0")
+		for i in connections:
+			pushToClient(i.write)
 
 class CtrlConnectionFactory(protocol.Factory):
 	def buildProtocol(self, addr):
 		return CtrlConnection()
 
-def cycle(echo):
+def pushToClient(echo):
 	global teststr
-	echo("event: userlogon\n")
-	print("CYCLE"+teststr)
-	echo('data: {"username":"' + teststr + '"}')
+	arr = teststr.split(':')
+	echo("event: %s\n" % arr[0])
+	print("PPPPP:")
+	print(arr)
+	print("Push"+teststr)
+	print(arr[1])
+	print(arr[2])
+	echo('data: {"%s":"%s"}'% (arr[1], arr[2]))
 	echo("\n\n")
 
 
-#web server 8080
+#web server
 class MyResource(Resource):
 	isLeaf = True
 	def render_GET(self, request):
@@ -66,6 +69,7 @@ class MyResource(Resource):
 #			lc = twisted.internet.task.LoopingCall(cycle,request.write)
 			#lc.start(1)
 			#request.notifyFinish().addBoth(lambda _: lc.stop())
+			request.write("\n")
 			return NOT_DONE_YET
 		f = open("html_content.html")
 		htmlData=f.read()
@@ -79,6 +83,19 @@ stdio.StandardIO(StdinInputHandler())
 #server
 root=MyResource()
 site = server.Site(root)
-reactor.listenTCP(8889,CtrlConnectionFactory())
-reactor.listenTCP(8080,site)
+
+
+#command line change port support
+import argparse
+parser = argparse.ArgumentParser(description='Twisted web server.')
+parser.add_argument('--ctrlport', nargs='?',default='8889', const='8889', type=int, help='Port to control server')
+parser.add_argument('--webport', nargs='?',default='80', const='80', type=int, help='Port to control server')
+args = parser.parse_args()
+
+#ctrl connection (8889)
+reactor.listenTCP(args.ctrlport,CtrlConnectionFactory())
+#web connection (80)
+reactor.listenTCP(args.webport,site)
+
+
 reactor.run()
