@@ -107,25 +107,3 @@ char **question_parser(char *json_string)
 
 	return question;
 }
-
-int main(void)
-{
-	//dummy: create a new json string
-	char *aString = json_create("test", "123", "223", "323", "423", "123", "abc");
-	printf("json-string generated: %s\n", aString);
-
-	//dummy: create parse the quesion, answer and path
-	char **question = question_parser(aString);
-	printf("Question\n");
-	for(int i=0; i<3; i++) {
-		printf("%s\n", question[i]);
-	}
-
-	//dummy: create parse the options
-	char **answer = answer_parser(aString);
-	printf("Answer\n");
-	for(int i=0; i<4; i++) {
-		printf("%s\n", answer[i]);
-	}
-	return 0;
-}
