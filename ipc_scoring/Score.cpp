@@ -43,8 +43,11 @@ int house_to_index(char house)
 		return 3;
 	else if(house=='L')
 		return 4;
-	else if(house=='M');
+	else if(house=='M')
 		return 5;
+
+	//error
+	return -1;
 }
 
 void score::add(int house, int add)
@@ -74,8 +77,9 @@ int score::getscore(int house)
 //daemon of the scoring module process
 void score::scoring()
 {
-	char signal[2];			//signal of (action)(house letter)
+	char signal[10];			//signal of (action)(house letter)
 	char house;
+	char action;
 	int value;
 
 	while(1) {
@@ -87,58 +91,37 @@ void score::scoring()
 
 		//close pipe, start reading 
 		close(server2score[1]);
-		while(read(server2score[0], &signal, 3)>0) {
-			printf("DEBUG:Scoring2: signal = %s\n", signal);
-			house = signal[1];
-
-			//update
-			if(signal[0]=='U') {
-				//read from parent for value to update
-				close(server2score[1]);
-				read(server2score[0], &value, sizeof(int));
-                                int houseIndex=house_to_index(house);
-                                update(houseIndex,value);
-				//printf("DEBUG:update, house %c, value = %d\n", house, value);		//to be replaced by invoking method inside the object
-			}
-			//add
-			else if(signal[0]=='A') {
-				//read from parent the value to add to
-				close(server2score[1]);
-				read(server2score[0], &value, sizeof(int));
-
-				//add score to defined house
-				int houseIndex=house_to_index(house);
-                                add(houseIndex,value);
-//printf("DEBUG:add, house %c, value = %d\n", house, value);		//to be replaced by invoking mdthod inside the object
-			}
-			//minus
-			else if(signal[0]=='M') {
-				//read value to minus
-				close(server2score[1]);
-				read(server2score[0], &value, sizeof(int));
-
-				//minus from defined house
-                                int houseIndex=house_to_index(house);
-                                minus(houseIndex,value);
-				//printf("DEBUG:minus, house %c, value = %d\n", house, value);
-			}
-			//get
-			else if(signal[0]=='G') {
-				//get score
-				int houseIndex=house_to_index(house);
-				int score_result = getscore(houseIndex);
-
-				//write score to parent
-				close(score2server[0]);
-				write(score2server[1], &score_result, sizeof(int));
-			}
-			else if(strcmp(signal, "ex")==0)
+		while(read(server2score[0], &signal, sizeof(signal))>0) {
+			if(strcmp(signal, "ex")==0)
 				//exit
 				exit(0);
+
+			house = signal[1];
+
+			sscanf(signal, "%c:%c:%d", &action, &house, &value);
+
+			switch(action) {
+				case 'U':
+					update(house_to_index(house), value);
+					break;
+				case 'A':
+					add(house_to_index(house), value);
+					break;
+				case 'M':
+					minus(house_to_index(house), value);		
+					break;
+				case 'G':
+					int score_result = getscore(house_to_index(house));
+					close(score2server[0]);
+					write(score2server[1], &score_result, sizeof(int));
+					break;
+			}
+
 			printf("DEBUG: scoring: value = %d\n", value);
 		}
 
 		//clear data
+		house = 0;
 		signal[0] = 0;
 		value = 0;
 	}
@@ -148,32 +131,30 @@ void score::scoring()
 void change_score(char action, char house, int value)
 {
 	//command string to send over
-	char cmd[3];
+	char cmd[10];
 
 	//setup the string
-	cmd[0] = action;
-	cmd[1] = house;
-	cmd[2] = 0;
+	sprintf(cmd, "%c:%c:%d", action, house, value);
+	printf("change_score(): cmd = %s\n", cmd);
 
 	//send data over
 	close(server2score[0]);
-	write(server2score[1], &cmd, 3);
-	write(server2score[1], &value, sizeof(int));
+	write(server2score[1], &cmd, sizeof(cmd));
 }
 
 //communicate with score server to get score
 int get_score(char house)
 {
 	//setup instruction to get score
-	char signal[3] = { 'G', house };
-	//append null character
-	signal[2] = 0;
-	//return value
-	int result_score;
+	char cmd[5];
+	sprintf(cmd, "%c:%c:%d\n", 'G', house, 0);
+
+	//setup variable to receive score
+	int result_score = 0;
 
 	//ask score server for score
 	close(server2score[0]);
-	write(server2score[1], &signal, 3);
+	write(server2score[1], &cmd, sizeof(cmd));
 
 	//read return value
 	close(score2server[1]);
@@ -250,7 +231,7 @@ int main(int argc, char *argv[])
 			if((int)strlen(temp) == 1) continue;
 
 			//exit if enter 00
-			if(strcmp(temp, "00")==0) {
+			if(strcmp(temp, "00")==0) { 
 				pushScore('A', argv[1]);
 				pushScore('M', argv[1]);
 				pushScore('H', argv[1]);
