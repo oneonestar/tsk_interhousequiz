@@ -19,7 +19,8 @@
 void init_track(int track[40])
 {
     int index = 0;
-    while(index < 40) {
+    while(index < 40)
+    {
         track[index] = 0;
         index++;
     }
@@ -28,7 +29,8 @@ void init_track(int track[40])
 bool is_track(int track[40], int item)
 {
     int index = 0;
-    while(index < 40) {
+    while(index < 40)
+    {
         if(track[index] == 0) break;
         if(track[index] == item) return true;
         index++;
@@ -39,12 +41,15 @@ bool is_track(int track[40], int item)
 void update_track(int track[40], int item)
 {
     int index = 0;
-    while(index < 40) {
-        if(track[index] == item) {
+    while(index < 40)
+    {
+        if(track[index] == item)
+        {
             printf("%s\n", "The item is already in the track");
             break;
         }
-        if(track[index] == 0) {
+        if(track[index] == 0)
+        {
             printf("%s\n", "The track has been updated");
             track[index] = item;
             return;
@@ -93,7 +98,7 @@ void get_string(int fd[2])
     printf("Parent: Option C = %s\n", answer[2]);
     printf("Parent: Option D = %s\n", answer[3]);
     printf("Parent: Path = %s\n", question[2]);
-
+	
 //return string;
 }
 
@@ -108,13 +113,15 @@ void send_string(char* json_string, int fd[2])
 
 void init_con(MYSQL *con)
 {
-    if (con == NULL) {
+    if (con == NULL)
+    {
         printf("%s", "The connection failed, Please try again.\n");
         exit(-1);
     }
 
     //(localhost, name of user, password, database)
-    if (mysql_real_connect(con, "localhost", "testing", "testing", "interhouse", 0, NULL, 0) == NULL) {
+    if (mysql_real_connect(con, "localhost", "testing", "testing", "interhouse", 0, NULL, 0) == NULL)
+    {
         printf("%s", "The connection failed, Please enter the correct password again\n");
         mysql_close(con);
         exit(-1);
@@ -127,7 +134,8 @@ MYSQL_RES* get_result(MYSQL* con, char* query)
     mysql_query(con, query);
 
     result = mysql_store_result(con);
-    if (!result) {
+    if (!result)
+    {
         printf("%s\n", "Result");
         exit(-1);
     }
@@ -136,23 +144,24 @@ MYSQL_RES* get_result(MYSQL* con, char* query)
 
 void pushresult(char address[], char sendBuff[600])
 {
-    int point;
-    int trap;
-    struct sockaddr_in serv_addr;
+	int point;
+	int trap;
+	struct sockaddr_in serv_addr;
 
-    point = socket(AF_INET, SOCK_STREAM, 0);
-    memset(&serv_addr, '0', sizeof(serv_addr));
-    memset(sendBuff, '0', sizeof(sendBuff));
+	point = socket(AF_INET, SOCK_STREAM, 0);
+	memset(&serv_addr, '0', sizeof(serv_addr));
+	memset(sendBuff, '0', sizeof(sendBuff));
 
-    serv_addr.sin_family = AF_INET;
-    serv_addr.sin_port = htons(8889);
-    inet_pton(AF_INET, address, &serv_addr.sin_addr);
+	serv_addr.sin_family = AF_INET;
+	serv_addr.sin_port = htons(8889);
+	inet_pton(AF_INET, address, &serv_addr.sin_addr);
 
-    connect(point, (struct sockaddr*)&serv_addr, sizeof(serv_addr));
-
-    if((trap = write(point, sendBuff, sizeof(sendBuff)))<0) {
-        printf("error\n");
-    }
+	connect(point, (struct sockaddr*)&serv_addr, sizeof(serv_addr));
+	
+	if((trap = write(point, sendBuff, sizeof(sendBuff)))<0)
+	{
+		printf("error\n");
+	} 
 }
 
 int main(int argc, char* argv[])
@@ -165,8 +174,8 @@ int main(int argc, char* argv[])
     init_track(track);
     int intid;
     char* pushstring;
-    char* pullstring[600];
-
+	char* pullstring[600];
+	
 
     int send[2];//pipe for sending and receiveng result(json_string)
     int get[2];//pipe for sending and receiving id
@@ -181,16 +190,18 @@ int main(int argc, char* argv[])
     //The program starts with successful connection
     //items retreiving
 
-    if(pid != 0) {
-        get_id(id, get);
-        intid = atoi(id);
+    if(pid != 0)
+    {
+	get_id(id, get);        
+	intid = atoi(id);
         update_track(track, intid);
 
         strcat (query, id);//concatenation of the id and the query
+        
+	result = get_result(con, query);
 
-        result = get_result(con, query);
-
-        while((row = mysql_fetch_row(result))) {
+        while((row = mysql_fetch_row(result)))
+        {
             //update_data(json_string, row);
             pushstring = json_create(row[1], row[4], row[5], row[6], row[7], row[3], row[9]);
         }
@@ -199,11 +210,13 @@ int main(int argc, char* argv[])
         printf("Created: %s\n", pushstring);
         send_string(pushstring, send);
         //testing and printing in sending function
-    } else {
-        send_id(get);
-        get_string(send);
-        printf("Parent: %s\n", pullstring);
-        pushresult((char*)argv, pullstring);
+    }
+    else
+    {
+	send_id(get);        
+	get_string(send);
+	printf("Parent: %s\n", pullstring);
+	pushresult((char*)argv, pullstring);
     }
     mysql_free_result(result);
     mysql_close(con);
