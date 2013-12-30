@@ -107,10 +107,11 @@ char **question_parser(char *json_string)
 
 	return question;
 }
-
+/*
 int main(void)
 {
 	char *question = json_create("question", "A", "B", "C", "D", "correct", "path");
 	printf("%s\n", question);
 	return 0;
 }
+*/

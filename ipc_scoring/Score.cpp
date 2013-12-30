@@ -22,11 +22,22 @@ using namespace std;
 int server2score[2];
 int score2server[2];
 
-score::score(int initscore)
+score::score(int initscore, char *address)
 {
-	//initialize scores
-	for(int i=0; i<6; i++) {
-		score_table[i]=initscore; 
+	if(access(address, F_OK)!=-1) {
+		char temp[7];
+		FILE *fd = fopen(address, "r");
+		fgets(temp, 7, fd);
+		fclose(fd);
+		for(int i=0; i<6; i++) {
+			score_table[i] = temp[i] - 48;
+		}
+	}
+	else {
+		//initialize scores
+		for(int i=0; i<6; i++) {
+			score_table[i]=initscore; 
+		}
 	}
 }
 
@@ -171,17 +182,17 @@ void dumpLine(FILE *stream)
 }
 
 //push score to web server for updating
-void pushScore(char house, char address[])
+void pushScore(char address[])
 {
 	//setup variables
 	int sock;			//socket
 	int n=0;			//error check value
-	char recvBuff[20];		//buffer
+	char recvBuff[100];		//buffer
 	struct sockaddr_in serv_addr;	//server address
 
 	//get score and convert to character from integer
 	memset(recvBuff, 0, sizeof(recvBuff));					//clean buffer
-	sprintf(recvBuff, "score:%c:%d", house, get_score(house));
+	sprintf(recvBuff, "score:A:%d\nscore:D:%d\nscore:H:%d\nscore:J:%d\nscore:L:%d\nscore:M:%d\n", get_score('A'), get_score('D'), get_score('H'), get_score('J'), get_score('L'), get_score('M'));
 	printf("DEBUG: pushScore(): recvBuff = %s\n", recvBuff);
 
 	//setup socket
@@ -192,7 +203,6 @@ void pushScore(char house, char address[])
 	inet_pton(AF_INET, address, &serv_addr.sin_addr);			//combine
 	connect(sock, (struct sockaddr*)&serv_addr, sizeof(serv_addr));		//connect
 
-	printf("pushScore(): score(%c) = %s\n", house, recvBuff);
 	if((n=write(sock, recvBuff, sizeof(recvBuff)))<0) {			//write score to socket to python web server
 		printf("error\n");
 	}
@@ -211,7 +221,7 @@ int main(int argc, char *argv[])
 	//assign jobs
 	if(pid==0) {
 		//run daemon
-                score *score1=new score(0);
+                score *score1=new score(0, "backup.dat");
 		cout<<"constructed new obj"<<endl;
 		score1->scoring();
 		
@@ -232,12 +242,7 @@ int main(int argc, char *argv[])
 
 			//exit if enter 00
 			if(strcmp(temp, "00")==0) { 
-				pushScore('A', argv[1]);
-				pushScore('M', argv[1]);
-				pushScore('H', argv[1]);
-				pushScore('J', argv[1]);
-				pushScore('L', argv[1]);
-				pushScore('D', argv[1]);
+				pushScore(argv[1]);
 				//tell child to stop
 				close(server2score[0]);
 				write(server2score[1], "ex", sizeof("ex"));

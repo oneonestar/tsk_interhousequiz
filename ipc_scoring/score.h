@@ -5,7 +5,7 @@ class score{
 		int score_table[6];
 	
 	public:
-		score(int initscore);
+		score(int initscore, char *address);
 		void add(int house, int add);
 		void minus(int house, int minus);
 		void update(int house, int newscore);
