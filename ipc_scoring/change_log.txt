@@ -2,3 +2,4 @@
 4/10/2013, integrated into C++ class, storage of variables, fully functional object, by Charlie, Steven, Star
 5/10/2013, minor error correction, modified error of calling getscore without first calling house_to_index() for conversion
 24/12/2013, attempt to add network function pushScore(), does not work.
+31/12/2013, added error recovery, refactor to C code

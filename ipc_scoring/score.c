@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <iostream>
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/types.h>
@@ -17,26 +16,36 @@
 #define MIN 2
 #define PORT 8889		//port for connecting to web server
 
-using namespace std;
-
+//pipes
 int server2score[2];
 int score2server[2];
 
-score::score(int initscore, char address[])
-{
-	strcpy(this->address, address);
+//structure for score
+struct Score score;
 
-	if(access(address, F_OK)!=-1) {
+//initialize structure and load from file
+void score_init(int initscore, char address[])
+{
+	strcpy(score.address, address);
+
+	if(access(score.address, F_OK)!=-1) {
+		printf("%s found, loading data for initialization...\n", score.address);
 		char temp[50];
-		FILE *fd = fopen(address, "r");
+		FILE *fd = fopen(score.address, "r");
 		fgets(temp, 49, fd);
-		sscanf(temp, "%d:%d:%d:%d:%d:%d", &score_table[0], &score_table[1], &score_table[2], &score_table[3], &score_table[4], &score_table[5]);
+		sscanf(temp, "%d:%d:%d:%d:%d:%d", &score.score_table[0], &score.score_table[1], &score.score_table[2], &score.score_table[3], &score.score_table[4], &score.score_table[5]);
 		fclose(fd);
+
+		printf("Scores loaded...\n");
+		for(int i=0; i<6; i++) {
+			printf("house %d: %d\n", i, score.score_table[i]);
+		}
+		printf("\n");
 	}
 	else {
 		//initialize scores
 		for(int i=0; i<6; i++) {
-			score_table[i]=initscore; 
+			score.score_table[i]=initscore; 
 		}
 	}
 }
@@ -61,47 +70,51 @@ int house_to_index(char house)
 	return -1;
 }
 
-void score::save()
+//save scores to file
+void save(char *address)
 {
-	FILE *file = fopen(this->address, "w");
-	char string[50];
+	//open file
+	FILE *file = fopen(address, "w");
 
-	sprintf(string, "%d:%d:%d:%d:%d:%d", score_table[0], score_table[1], score_table[2], score_table[3], score_table[4], score_table[5]);
+	//prepare string to save
+	char string[50];
+	sprintf(string, "%d:%d:%d:%d:%d:%d", score.score_table[0], score.score_table[1], score.score_table[2], score.score_table[3], score.score_table[4], score.score_table[5]);
 	fprintf(file, "%s", string);
 	fclose(file);
 }
 
-void score::add(int house, int add)
+void add(int house, int add)
 {
-	score_table[house]+=add;
-	printf("%d added to %d, score_table[%d] = %d\n", add, house, house, score_table[house]);
+	score.score_table[house]+=add;
+	printf("%d added to %d, score_table[%d] = %d\n", add, house, house, score.score_table[house]);
 }
 	 
-void score::minus(int house, int minus)
+void minus(int house, int minus)
 {
-	score_table[house]-=minus; 
-	printf("%d deducted to %d, score_table[%d] = %d\n", minus, house, house, score_table[house]);
+	score.score_table[house]-=minus; 
+	printf("%d deducted to %d, score_table[%d] = %d\n", minus, house, house, score.score_table[house]);
 }
 	 
-void score::update(int house, int newscore)
+void update(int house, int newscore)
 {
-	score_table[house]=newscore;
-	printf("%d updated to %d, score_table[%d] = %d\n", newscore, house, house, score_table[house]);
+	score.score_table[house]=newscore;
+	printf("%d updated to %d, score_table[%d] = %d\n", newscore, house, house, score.score_table[house]);
 }
 	
-int score::getscore(int house)
+int getscore(int house)
 {
-	printf("requested score for %d, return %d\n", house, score_table[house]);
-        return score_table[house];
+	printf("requested score for %d, return %d\n", house, score.score_table[house]);
+        return score.score_table[house];
 }
 
 //daemon of the scoring module process
-void score::scoring()
+void scoring()
 {
 	char signal[10];			//signal of (action)(house letter)
 	char house;
 	char action;
 	int value;
+	int score_result = 0;
 
 	while(1) {
 		//check if the parent process is still there
@@ -132,14 +145,14 @@ void score::scoring()
 					minus(house_to_index(house), value);		
 					break;
 				case 'G':
-					int score_result = getscore(house_to_index(house));
+					score_result = getscore(house_to_index(house));
 					close(score2server[0]);
 					write(score2server[1], &score_result, sizeof(int));
 					break;
 			}
 
 			//save score to file
-			save();
+			save(score.address);
 
 		}
 
@@ -147,6 +160,7 @@ void score::scoring()
 		house = 0;
 		signal[0] = 0;
 		value = 0;
+		score_result = 0;
 	}
 }
 
@@ -232,9 +246,9 @@ int main(int argc, char *argv[])
 	//assign jobs
 	if(pid==0) {
 		//run daemon
-                score *score1 = new score(0, "backup.dat");
+		score_init(0, "backup.dat");
 		printf("daemon started...\n");
-		score1->scoring();
+		scoring();
 	}
 	else if(pid>0) {
 		//testing variables
