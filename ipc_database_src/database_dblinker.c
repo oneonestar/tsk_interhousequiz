@@ -71,7 +71,7 @@ void send_id(int fd[2])
     close(fd[1]);
 }
 
-void get_string(int fd[2])
+char* get_string(int fd[2])
 {
     /* write through the pipe */
     char* string[600];
@@ -81,7 +81,7 @@ void get_string(int fd[2])
     close(fd[0]);
 
     printf("Received: %s\n", string);
-//	strcmp(res_string, string);
+    //strcmp(res_string, string);
 
     char** question = question_parser(string);
     char** answer = answer_parser(string);
@@ -94,7 +94,7 @@ void get_string(int fd[2])
     printf("Parent: Option D = %s\n", answer[3]);
     printf("Parent: Path = %s\n", question[2]);
 
-//return string;
+return string;
 }
 
 void send_string(char* json_string, int fd[2])
@@ -134,15 +134,18 @@ MYSQL_RES* get_result(MYSQL* con, char* query)
     return result;
 }
 
-void pushresult(char address[], char sendBuff[600])
+void pushresult(char address[], char sendBuff[])
 {
     int point;
     int trap;
     struct sockaddr_in serv_addr;
 
+	char send[600] = "question:";
+	
+    strcat(send, sendBuff);
     point = socket(AF_INET, SOCK_STREAM, 0);
     memset(&serv_addr, '0', sizeof(serv_addr));
-    memset(sendBuff, '0', sizeof(sendBuff));
+   // memset(sendBuff, '0', sizeof(sendBuff));
 
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(8889);
@@ -150,7 +153,7 @@ void pushresult(char address[], char sendBuff[600])
 
     connect(point, (struct sockaddr*)&serv_addr, sizeof(serv_addr));
 
-    if((trap = write(point, sendBuff, sizeof(sendBuff)))<0) {
+    if((trap = write(point, send, strlen(send)+1))<0) {
         printf("error\n");
     }
 }
@@ -201,9 +204,9 @@ int main(int argc, char* argv[])
         //testing and printing in sending function
     } else {
         send_id(get);
-        get_string(send);
+        strcpy(pullstring, get_string(send));
         printf("Parent: %s\n", pullstring);
-        pushresult((char*)argv, pullstring);
+        pushresult("192.168.0.102", pullstring);
     }
     mysql_free_result(result);
     mysql_close(con);
