@@ -77,7 +77,7 @@ char buzzer(char *buzzerAddress, int buzzerPort, char *webServer, int webServerP
 			recvBuff[strlen(recvBuff)] = 0;
 			sprintf(sendBuff, "buzzer:%c:%ld\n", houseToChar(recvBuff[i]-48), time(NULL));	//instruction for web server
 			printf("sending: %s\n", sendBuff);
-			if((n=write(sock1, sendBuff, sizeof(sendBuff)-1))<0) {	//write to web server
+			if((n=write(sock1, sendBuff, sizeof(sendBuff)+1))<0) {	//write to web server
 				printf("error\n");
 			}
 			printf("button %s pressed and printed\n", recvBuff);

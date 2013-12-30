@@ -24,7 +24,7 @@ def readButton(s):
 	for index in range(len(buttonState)):
 		if (s&1==1) and buttonState[index]!=1:
 			buttonState[index] = 1
-			conn.send(str(index+1))
+			conn.send(str(index))
 			print "button ", index+1, " pressed"
 		s = s>>1
 
@@ -38,7 +38,10 @@ while True:
 	#start listening from client
 	s.listen(1)
 	conn, addr = s.accept()
-	print 'connection accepted from ' + str(addr)
+	print 'connection accepted from ' + str(addr) + " at " + str(time.localtime())
+
+	start = time.time()
+	end = start + 5
 
 	#start polling
 	while True:
@@ -47,11 +50,11 @@ while True:
 		readButton(signal)
 
 		#check if all buttons were pushed
-		if buttonState[0]==1 and buttonState[1]==1 and buttonState[2]==1 and buttonState[3]==1 and buttonState[4]==1 and buttonState[5]==1:
+		if (buttonState[0]==1 and buttonState[1]==1 and buttonState[2]==1 and buttonState[3]==1 and buttonState[4]==1 and buttonState[5]==1) or (time.time()==end or time.time()>end):
 			break;
 
 	#end of polling, close connection and reset buttonState
-	print "All button pressed, the End!"
+	print "Polling Ends at " + str(time.localtime()) + " !"
 	conn.close()
 	buttonState = [0, 0, 0, 0, 0, 0]
 
