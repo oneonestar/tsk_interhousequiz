@@ -37,11 +37,12 @@ char buzzer(char *buzzerAddress, int buzzerPort, char *webServer, int webServerP
 	int sock, sock1;
 	int n = 0;
 	char recvBuff[5];
-	char sendBuff[20];
+	char sendBuff[50];
 	struct sockaddr_in serv_addr;	//addr data structure for buzzer
 	struct sockaddr_in serv_addr1;	//addr data structure for web server
-	int flag;			//indidate if the received button is first one
+	int flag = 0;			//indidate if the received button is first one
 	char winner = 0;		//winning house in the buzz
+	int i;
 
 	//setup socket to the buzzer
 	sock = socket(AF_INET, SOCK_STREAM, 0);
@@ -66,12 +67,15 @@ char buzzer(char *buzzerAddress, int buzzerPort, char *webServer, int webServerP
 	//start reading from buzzer
 	while((n = read(sock, recvBuff, sizeof(recvBuff)))>0) {
 		//if it is the first button being pressed, set winner
-		if(flag==0)
+		if(flag==0) {
 			winner = houseToChar(recvBuff[0]-48);
+			printf("winner %c\n", winner);
+			flag++;
+		}
 		//when multiple houses press the button in short interval and two characters are received
-		for(int i=0; i<strlen(recvBuff); i++) {
+		for(i=0; i<strlen(recvBuff); i++) {
 			recvBuff[strlen(recvBuff)] = 0;
-			sprintf(sendBuff, "buzzer:%c:%ld", houseToChar(recvBuff[i]-48), time(NULL));	//instruction for web server
+			sprintf(sendBuff, "buzzer:%c:%ld\n", houseToChar(recvBuff[i]-48), time(NULL));	//instruction for web server
 			printf("sending: %s\n", sendBuff);
 			if((n=write(sock1, sendBuff, sizeof(sendBuff)-1))<0) {	//write to web server
 				printf("error\n");
