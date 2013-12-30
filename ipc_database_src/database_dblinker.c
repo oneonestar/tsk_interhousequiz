@@ -195,7 +195,7 @@ int main(int argc, char* argv[])
 
         while((row = mysql_fetch_row(result))) {
             //update_data(json_string, row);
-            pushstring = json_create(row[1], row[4], row[5], row[6], row[7], row[3], row[9]);
+            pushstring = json_create(id, row[1], row[4], row[5], row[6], row[7], row[3], row[9]);
         }
         //initialization above
 

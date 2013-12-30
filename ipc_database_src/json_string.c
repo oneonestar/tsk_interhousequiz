@@ -3,7 +3,7 @@
 #include <string.h>
 #include <json/json.h>
 
-char *json_create(char *question, char *A, char *B, char *C, char *D, char *correct, char *path)
+char *json_create(int id, char *question, char *A, char *B, char *C, char *D, char *correct, char *path)
 {
 	//new json structures
 	struct json_object *root;
@@ -13,7 +13,8 @@ char *json_create(char *question, char *A, char *B, char *C, char *D, char *corr
 	root = json_object_new_object();
 	option = json_object_new_array();
 
-	//add question as string
+	//add question id as int and questionas string
+	json_object_object_add(root, "ID", json_object_new_int(id));
 	json_object_object_add(root, "Question", json_object_new_string(question));
 
 	//add options to array
