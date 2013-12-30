@@ -22,16 +22,16 @@ using namespace std;
 int server2score[2];
 int score2server[2];
 
-score::score(int initscore, char *address)
+score::score(int initscore, char address[])
 {
+	strcpy(this->address, address);
+
 	if(access(address, F_OK)!=-1) {
-		char temp[7];
+		char temp[50];
 		FILE *fd = fopen(address, "r");
-		fgets(temp, 7, fd);
+		fgets(temp, 49, fd);
+		sscanf(temp, "%d:%d:%d:%d:%d:%d", &score_table[0], &score_table[1], &score_table[2], &score_table[3], &score_table[4], &score_table[5]);
 		fclose(fd);
-		for(int i=0; i<6; i++) {
-			score_table[i] = temp[i] - 48;
-		}
 	}
 	else {
 		//initialize scores
@@ -61,27 +61,37 @@ int house_to_index(char house)
 	return -1;
 }
 
+void score::save()
+{
+	FILE *file = fopen(this->address, "w");
+	char string[50];
+
+	sprintf(string, "%d:%d:%d:%d:%d:%d", score_table[0], score_table[1], score_table[2], score_table[3], score_table[4], score_table[5]);
+	fprintf(file, "%s", string);
+	fclose(file);
+}
+
 void score::add(int house, int add)
 {
 	score_table[house]+=add;
-	printf("DEBUG: score::add: score_table[%d] = %d\n", house, score_table[house]);
+	printf("%d added to %d, score_table[%d] = %d\n", add, house, house, score_table[house]);
 }
 	 
 void score::minus(int house, int minus)
 {
 	score_table[house]-=minus; 
-	printf("DEBUG: score::minus: score_table[%d] = %d\n", house, score_table[house]);
+	printf("%d deducted to %d, score_table[%d] = %d\n", minus, house, house, score_table[house]);
 }
 	 
 void score::update(int house, int newscore)
 {
 	score_table[house]=newscore;
-	printf("DEBUG: score::update: score_table[%d] = %d\n", house, score_table[house]);
+	printf("%d updated to %d, score_table[%d] = %d\n", newscore, house, house, score_table[house]);
 }
 	
 int score::getscore(int house)
 {
-	printf("DEBUG: score::getscore: house = %d, score_table[] = %d\n", house, score_table[house]);
+	printf("requested score for %d, return %d\n", house, score_table[house]);
         return score_table[house];
 }
 
@@ -107,10 +117,10 @@ void score::scoring()
 				//exit
 				exit(0);
 
-			house = signal[1];
-
+			//decompose signal
 			sscanf(signal, "%c:%c:%d", &action, &house, &value);
 
+			//act according to instruction
 			switch(action) {
 				case 'U':
 					update(house_to_index(house), value);
@@ -128,7 +138,9 @@ void score::scoring()
 					break;
 			}
 
-			printf("DEBUG: scoring: value = %d\n", value);
+			//save score to file
+			save();
+
 		}
 
 		//clear data
@@ -146,7 +158,6 @@ void change_score(char action, char house, int value)
 
 	//setup the string
 	sprintf(cmd, "%c:%c:%d", action, house, value);
-	printf("change_score(): cmd = %s\n", cmd);
 
 	//send data over
 	close(server2score[0]);
@@ -169,7 +180,7 @@ int get_score(char house)
 
 	//read return value
 	close(score2server[1]);
-	read(score2server[0], &result_score, sizeof(result_score));
+	read(score2server[0], &result_score, sizeof(int));
 
 	//return requested score
 	return result_score;
@@ -204,7 +215,7 @@ void pushScore(char address[])
 	connect(sock, (struct sockaddr*)&serv_addr, sizeof(serv_addr));		//connect
 
 	if((n=write(sock, recvBuff, sizeof(recvBuff)))<0) {			//write score to socket to python web server
-		printf("error\n");
+		printf("socket write error\n");
 	}
 }
 
@@ -221,10 +232,9 @@ int main(int argc, char *argv[])
 	//assign jobs
 	if(pid==0) {
 		//run daemon
-                score *score1=new score(0, "backup.dat");
-		cout<<"constructed new obj"<<endl;
+                score *score1 = new score(0, "backup.dat");
+		printf("daemon started...\n");
 		score1->scoring();
-		
 	}
 	else if(pid>0) {
 		//testing variables
@@ -232,7 +242,6 @@ int main(int argc, char *argv[])
 		int instruction;
 		int result;
 		int value = 10;
-                cout<<"Hello World"<<endl;
 
 		//waiting for instructions eg "UA", "AA"....
 		printf("Enter instruction and house: ");
