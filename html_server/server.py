@@ -8,7 +8,7 @@ from twisted.web.server import NOT_DONE_YET
 
 
 #Global variables
-teststr=""
+ctrlstr=""
 connections=[]
 
 
@@ -32,31 +32,43 @@ class StdinInputHandler(basic.LineReceiver):
 #Ctrl server connection
 class CtrlConnection(protocol.Protocol):
 	def dataReceived(self,data):
-		global teststr
+		global ctrlstr
 		global connections
 		print(data)
-		teststr=data.rstrip("\0")
-		for i in connections:
-			pushToClient(i.write)
+		ctrlstr+=data
+		if ctrlstr[-1] == '\0':
+			for i in connections:
+				pushToClient(i.write)
+
+	def connectionLost(self, reason):
+		print "LOST:"+ reason.getErrorMessage()
 
 class CtrlConnectionFactory(protocol.Factory):
 	def buildProtocol(self, addr):
 		return CtrlConnection()
 
 def pushToClient(echo):
-	global teststr
-	print("pushToClient: "+repr(teststr))
-	ctrlList = teststr.split('\n')
+	global ctrlstr
+	print("pushToClient: "+repr(ctrlstr))
+	ctrlList = ctrlstr.split('\0')
 	for i in ctrlList:
 		if not i:
 			continue	#empty command
 		print(repr(i))
 		arr = i.split(':')
-		echo("event: %s\n" % arr[0])
-		print(arr)
-		echo('data: {"%s":"%s"}'% (arr[1], arr[2]))
-		echo("\n\n")
-
+		if arr[0] == "score" or arr[0] == "buzzer":
+			#form json string and send
+			echo("event: %s\n" % arr[0])
+			print(arr)
+			echo('data: {"%s":"%s"}'% (arr[1], arr[2]))
+			echo("\n\n")
+		if arr[0] == "question":
+			#already a json string
+			print("QUESTION:"+i[i.find(':')+1:])
+			echo("event: question\n")
+			echo('data:' + i[i.find(':')+1:].replace('\n','<br>'))
+			echo("\n\n")
+	ctrlstr = ""
 
 #web server
 class MyResource(Resource):

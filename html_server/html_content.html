@@ -125,6 +125,9 @@ button[disabled] {
 <p>Justus:<input type="number" id="J"></p>
 <p>Laurentius:<input type="number" id="L"></p>
 <p>Mellitus:<input type="number" id="M"></p>
+<p><b>Question:</b></p>
+<p>Question no:<input type="text" id="Question_no"></p>
+<p>Question:<input type="text" id="Question"></p>
 <p>
   <button onclick="logger.clear()">Clear log</button>
   <button onclick="closeConnection()">Stop reconnections</button>
@@ -243,6 +246,15 @@ source.addEventListener('buzzer', function(e){
 	}
 });
 source.addEventListener('score', function(e){
+	var data = JSON.parse(e.data);
+	for(var k in data)
+	{
+		logger.log('>Score:' + k + data[k]);
+ 	 	document.getElementById(k).value = data[k];
+	}
+});
+source.addEventListener('question', function(e){
+	logger.log('>>Score:' + e.data);
 	var data = JSON.parse(e.data);
 	for(var k in data)
 	{
