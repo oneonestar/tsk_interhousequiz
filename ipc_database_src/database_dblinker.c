@@ -204,7 +204,7 @@ int main(int argc, char* argv[])
         //testing and printing in sending function
     } else {
         send_id(get);
-        strcpy(pullstring, get_string(send));
+	sprintf(pullstring, "Question:%s\0", get_string(send));
         printf("Parent: %s\n", pullstring);
         pushresult("192.168.0.102", pullstring);
     }
