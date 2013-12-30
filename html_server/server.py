@@ -45,15 +45,17 @@ class CtrlConnectionFactory(protocol.Factory):
 
 def pushToClient(echo):
 	global teststr
-	arr = teststr.split(':')
-	echo("event: %s\n" % arr[0])
-	print("PPPPP:")
-	print(arr)
-	#print("Push"+teststr)
-	print(arr[1])
-	print(arr[2])
-	echo('data: {"%s":"%s"}'% (arr[1], arr[2]))
-	echo("\n\n")
+	print("pushToClient: "+repr(teststr))
+	ctrlList = teststr.split('\n')
+	for i in ctrlList:
+		if not i:
+			continue	#empty command
+		print(repr(i))
+		arr = i.split(':')
+		echo("event: %s\n" % arr[0])
+		print(arr)
+		echo('data: {"%s":"%s"}'% (arr[1], arr[2]))
+		echo("\n\n")
 
 
 #web server
