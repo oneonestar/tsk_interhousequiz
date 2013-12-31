@@ -1,7 +1,7 @@
 from twisted.internet import protocol, reactor, stdio
 from twisted.protocols import basic
-from twisted.web import server, resource
-from twisted.web.resource import Resource
+from twisted.web import server, resource, static
+from twisted.web.resource import Resource, NoResource
 from twisted.web.server import NOT_DONE_YET
 
 
@@ -83,31 +83,31 @@ class MyResource(Resource):
 	isLeaf = True
 	def render_GET(self, request):
 		global connections
-		if request.postpath.pop(0)!='':
-			request.setHeader("Content-Type", "text/event-stream")
-			request.setHeader("Cache-Control", "no-cache")
-			request.setHeader("Connection", "keep-alive")
-			request.notifyFinish().addErrback(myConnectionLost, request)
-			connections.append(request)		
-			request.write("\n")
-			return NOT_DONE_YET
+		request.setHeader("Content-Type", "text/event-stream")
+		request.setHeader("Cache-Control", "no-cache")
+		request.setHeader("Connection", "keep-alive")
+		request.notifyFinish().addErrback(myConnectionLost, request)
+		connections.append(request)		
+		request.write("\n")
 		print("New HTTP connection (HTTP GET):")
 		print(request.client)
 		print(request.getHeader("user-agent"))
 		print('\n')
-		f = open("html_content.html")
-		htmlData=f.read()
-		f.close()
-		return htmlData
-
-		#if thing in some_list:
-			#connections.remove(thing)
+		return NOT_DONE_YET
 
 		
 #stdin
 stdio.StandardIO(StdinInputHandler())
-#server
-root=MyResource()
+#server index
+root=resource.Resource()
+root.putChild("", static.File("html_content.html"))
+#imgs
+newResources = static.File("./imgs")
+newResources.childNotFound = NoResource()
+factory = server.Site(newResources)
+root.putChild("imgs/", factory)
+#server send events
+root.putChild("events",MyResource())
 site = server.Site(root)
 
 
