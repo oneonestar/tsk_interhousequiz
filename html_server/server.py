@@ -39,14 +39,15 @@ class CtrlConnection(protocol.Protocol):
 		if ctrlstr[-1] == '\0':
 			for i in connections:
 				pushToClient(i.write)
-
+		ctrlstr = ""
 	def connectionLost(self, reason):
-		print "LOST:"+ reason.getErrorMessage()
+		print "Ctrl close:"+ reason.getErrorMessage()
 
 class CtrlConnectionFactory(protocol.Factory):
 	def buildProtocol(self, addr):
 		return CtrlConnection()
 
+#web server
 def pushToClient(echo):
 	global ctrlstr
 	print("pushToClient: "+repr(ctrlstr))
@@ -68,9 +69,16 @@ def pushToClient(echo):
 			echo("event: question\n")
 			echo('data:' + i[i.find(':')+1:].replace('\n','<br>'))
 			echo("\n\n")
-	ctrlstr = ""
 
-#web server
+def myConnectionLost(reason, request): 
+	print("Close HTTP connection:\n"+reason.getErrorMessage())
+	print(request.client)
+	print(request.getHeader("user-agent"))
+	print('\n')
+	global connections
+	if request in connections:
+		connections.remove(request)
+
 class MyResource(Resource):
 	isLeaf = True
 	def render_GET(self, request):
@@ -79,17 +87,21 @@ class MyResource(Resource):
 			request.setHeader("Content-Type", "text/event-stream")
 			request.setHeader("Cache-Control", "no-cache")
 			request.setHeader("Connection", "keep-alive")
+			request.notifyFinish().addErrback(myConnectionLost, request)
 			connections.append(request)		
-#			lc = twisted.internet.task.LoopingCall(cycle,request.write)
-			#lc.start(1)
-			#request.notifyFinish().addBoth(lambda _: lc.stop())
 			request.write("\n")
 			return NOT_DONE_YET
+		print("New HTTP connection (HTTP GET):")
+		print(request.client)
+		print(request.getHeader("user-agent"))
+		print('\n')
 		f = open("html_content.html")
 		htmlData=f.read()
 		f.close()
 		return htmlData
 
+		#if thing in some_list:
+			#connections.remove(thing)
 
 		
 #stdin

@@ -128,6 +128,15 @@ button[disabled] {
 <p><b>Question:</b></p>
 <p>Question no:<input type="text" id="Question_no"></p>
 <p>Question:<input type="text" id="Question"></p>
+
+
+
+<p id="OptionContainer"></p>
+
+
+
+<p>Answer:<input type="text" id="Answer"></p>
+<p>Path:<input type="text" id="Path"></p>
 <p>
   <button onclick="logger.clear()">Clear log</button>
   <button onclick="closeConnection()">Stop reconnections</button>
@@ -175,7 +184,7 @@ Logger.prototype.log = function(msg, opt_class) {
 
 Logger.prototype.clear = function() {
   this.el.textContent = '';
-  var house = ["A","D","H","J","L","M"];
+  var house = ["A","D","H","J","L","M", "Question", "Answer", "Path"];
   house.forEach(function(house){
 	document.getElementById(house).style.backgroundColor="#FFFFFF";
 	document.getElementById(house).value = 0;
@@ -258,8 +267,25 @@ source.addEventListener('question', function(e){
 	var data = JSON.parse(e.data);
 	for(var k in data)
 	{
-		logger.log('>Score:' + k + data[k]);
- 	 	document.getElementById(k).value = data[k];
+		logger.log('>Score:' + k+ " value:"+ data[k]);
+		if(k != "Options")
+	 	 	document.getElementById(k).value = data[k];
+		else
+		{
+			var option_container = document.getElementById("OptionContainer");
+			for (var s in data[k])
+			{
+				logger.log("array: " + data[k][s]);
+				var label = document.createElement("label");
+				label.innerHTML = data[k][s];
+				var input = document.createElement("input");
+				input.type = "radio";
+				label.appendChild(input);
+	//			input.className = "css-class-name"; // set the CSS class
+				option_container.appendChild(label); // put it into the DOM
+//			<p id="OptionContainer"><input type="radio" id="Options4"></p>
+			}
+		}
 	}
 });
 </script>
