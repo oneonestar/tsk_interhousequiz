@@ -232,7 +232,7 @@ void pushScore(char address[])
 		printf("socket write error\n");
 	}
 }
-/*
+
 //dummy main
 int main(int argc, char *argv[])
 {
@@ -292,4 +292,3 @@ int main(int argc, char *argv[])
 
 	return 0;
 }
-*/

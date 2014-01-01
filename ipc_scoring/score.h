@@ -6,6 +6,9 @@ struct Score{
 	char address[10];
 };
 
+int server2score[2];
+int score2server[2];
+
 void score_init(int, char[]);
 void add(int, int);
 void minus(int, int);
