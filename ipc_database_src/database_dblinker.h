@@ -11,6 +11,6 @@ void send_string(char* json_string, int fd[2]);
 void init_con(MYSQL *con);
 MYSQL_RES* get_result(MYSQL* con, char* query);
 void pushresult(char address[], char sendBuff[]);
-void database(int argc, char* argv[]);
+void database(void);
 
 #endif

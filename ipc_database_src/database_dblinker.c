@@ -158,7 +158,7 @@ void pushresult(char address[], char sendBuff[])
     }
 }
 
-void database(int argc, char* argv[])
+void database(void)
 {
     MYSQL_RES *result;
     MYSQL_ROW row;
