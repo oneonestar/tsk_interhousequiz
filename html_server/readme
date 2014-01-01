@@ -1,2 +1,12 @@
 need python-twisted
 (apt-get install python-twisted)
+
+Known issue:
+warning from firefox:
+"""SyntaxError: Using //@ to indicate source map URL pragmas is deprecated. Use //# instead jquery-2.0.3.min.js:1"""
+casued by jquery 2.0.3, can be fixed by using jquery 2.1, but 2.1 is still in developmeng.
+
+
+warning from firefox:
+"""Unknown property 'box-sizing'.  Declaration dropped."""
+caused by jquery, it seems like a firefox bug.
