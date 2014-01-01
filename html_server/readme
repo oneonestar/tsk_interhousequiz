@@ -1,6 +1,13 @@
 need python-twisted
 (apt-get install python-twisted)
 
+commands:
+score:[House]:[Score int]
+buzzer:[House]:[Time]
+question:[json string of question]
+img:path:[path of the image]
+
+
 Known issue:
 warning from firefox:
 """SyntaxError: Using //@ to indicate source map URL pragmas is deprecated. Use //# instead jquery-2.0.3.min.js:1"""
