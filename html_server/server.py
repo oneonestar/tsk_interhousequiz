@@ -1,6 +1,6 @@
 from twisted.internet import protocol, reactor, stdio
 from twisted.protocols import basic
-from twisted.web import server, resource, static
+from twisted.web import server, resource, static, script
 from twisted.web.resource import Resource, NoResource
 from twisted.web.server import NOT_DONE_YET
 
@@ -36,7 +36,7 @@ class CtrlConnection(protocol.Protocol):
 		global connections
 		print(data)
 		ctrlstr+=data
-		if ctrlstr[-1] == '\0':
+		if ctrlstr[-1] == '\n':
 			for i in connections:
 				pushToClient(i.write)
 		ctrlstr = ""
@@ -51,13 +51,13 @@ class CtrlConnectionFactory(protocol.Factory):
 def pushToClient(echo):
 	global ctrlstr
 	print("pushToClient: "+repr(ctrlstr))
-	ctrlList = ctrlstr.split('\0')
+	ctrlList = ctrlstr.split('\n')
 	for i in ctrlList:
 		if not i:
 			continue	#empty command
 		print(repr(i))
 		arr = i.split(':')
-		if arr[0] == "score" or arr[0] == "buzzer":
+		if arr[0] == "score" or arr[0] == "buzzer" or arr[0]=="img":
 			#form json string and send
 			echo("event: %s\n" % arr[0])
 			print(arr)
@@ -95,17 +95,19 @@ class MyResource(Resource):
 		print('\n')
 		return NOT_DONE_YET
 
+
+#disable static.File listing directory function
+class FileNoDir(static.File):
+	def directoryListing(self):
+		return self.childNotFound
+
 		
 #stdin
 stdio.StandardIO(StdinInputHandler())
-#server index
-root=resource.Resource()
-root.putChild("", static.File("html_content.html"))
-#imgs
-newResources = static.File("./imgs")
-newResources.childNotFound = NoResource()
-factory = server.Site(newResources)
-root.putChild("imgs/", factory)
+#server root directory 
+root = FileNoDir(".")
+root.childNotFound = NoResource()
+root.indexName=["index.html"]
 #server send events
 root.putChild("events",MyResource())
 site = server.Site(root)

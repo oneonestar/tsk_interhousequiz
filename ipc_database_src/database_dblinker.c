@@ -158,7 +158,7 @@ void pushresult(char address[], char sendBuff[])
     }
 }
 
-int main(int argc, char* argv[])
+void database(void)
 {
     MYSQL_RES *result;
     MYSQL_ROW row;
@@ -210,6 +210,4 @@ int main(int argc, char* argv[])
     }
     mysql_free_result(result);
     mysql_close(con);
-
-    return 0;
 }
