@@ -13,8 +13,10 @@ void score_init(int, char[]);
 void add(int, int);
 void minus(int, int);
 void update(int, int);
-int getscore(int);
 void save(char*);
 void scoring(void);
+void pushScore(char*);
+int get_score(char);
+void change_score(char, char, int);
 
 #endif
