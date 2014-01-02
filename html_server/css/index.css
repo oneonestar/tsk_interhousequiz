@@ -108,3 +108,39 @@ button:not([disabled]):active {
 button[disabled] {
   color: #ccc;
 }
+.house_container p {
+	width:250px;
+	height:50px;
+	padding:10px;
+	border:5px solid;
+	display:inline-block;
+	vertical-align: top;
+	margin:5px; 
+}
+.house_container span {
+	font-size:50px;
+	color:black;
+	font-weight:bold;
+	vertical-align: top;
+	margin-left:50px;
+	margin-top:-2px;
+	display:inline-block;
+}
+.house_container #A_score_box {
+	border-color: red;
+}
+.house_container #D_score_box {
+	border-color: Yellow;
+}
+.house_container #H_score_box {
+	border-color: brown;
+}
+.house_container #J_score_box {
+	border-color: green;
+}
+.house_container #L_score_box {
+	border-color: purple;
+}
+.house_container #M_score_box {
+	border-color: blue;
+}
