@@ -101,6 +101,7 @@ void server_module(char *webServer, char *buzzingServer)
 			}
 		}
 		else {
+			//invaid instruction
 			printf("Error, invalue instruction or option!\n");
 		}
 	}
