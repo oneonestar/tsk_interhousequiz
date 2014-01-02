@@ -9,10 +9,12 @@ class Startpage : public QWidget{
 
 public:
     Startpage(QWidget * parent);
-private:
     QPushButton * comp;
     QPushButton * chal;
     QHBoxLayout * layout;
+
+
+
 
 
 };

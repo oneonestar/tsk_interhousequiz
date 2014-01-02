@@ -7,12 +7,17 @@
 <script type="text/javascript" src="js/jquery-2.0.3.min.js"></script>
 </head>
 <body>
-<p>Augustin:<input type="text" id="A" /></p>
-<p>Deusdedit:<input type="text" id="D" /></p>
-<p>Honorious:<input type="text" id="H" /></p>
-<p>Justus:<input type="text" id="J" /></p>
-<p>Laurentius:<input type="text" id="L" /></p>
-<p>Mellitus:<input type="text" id="M" /></p>
+<!--House score-->
+<div class="house_container">
+	<p id="A_score_box">Augustin:<span id="A"></span></p>
+	<p id="D_score_box">Deusdedit:<span id="D"></span></p>
+	<p id="H_score_box">Honorious:<span id="H"></span></p>
+	<p id="J_score_box">Justus:<span id="J"></span></p>
+	<p id="L_score_box">Laurentius:<span id="L"></span></p>
+	<p id="M_score_box">Mellitus:<span id="M"></span></p>
+</div>
+
+<!--Questions-->
 <p><b>Question:</b></p>
 <p>Question no:<input type="text" id="Question_no" /></p>
 <p>Question:<input type="text" id="Question" /></p>
@@ -21,6 +26,23 @@
 
 <p>Answer:<input type="text" id="Answer" /></p>
 <p>Path:<input type="text" id="Path" /></p>
+<p>Image: <img id="myImage" src="" /></p>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
 <p>
   <button onclick="logger.clear()">Clear log</button>
   <button onclick="closeConnection()">Stop reconnections</button>
@@ -131,7 +153,7 @@ source.addEventListener('buzzer', function(e){
 	for(var k in data)
 	{
 		logger.log('>Buzzer:' + k + data[k]);
-		document.getElementById(k).style.backgroundColor="#FF0000";
+		$("#"+k+"_score_box").fadeIn(300).fadeOut(300).fadeIn(300).fadeOut(300).fadeIn(300);
 	}
 });
 source.addEventListener('score', function(e){
@@ -139,8 +161,12 @@ source.addEventListener('score', function(e){
 	for(var k in data)
 	{
 		logger.log('>Score:' + k + data[k]);
- 	 	document.getElementById(k).value = data[k];
+		$("#"+k).html(data[k]); //change score according to house ID
 	}
+});
+source.addEventListener('img', function(e){
+	var data = JSON.parse(e.data);
+	$("#myImage").attr("src", data.path);
 });
 source.addEventListener('question', function(e){
 	logger.log('>>Question:' + e.data);

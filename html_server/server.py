@@ -57,7 +57,7 @@ def pushToClient(echo):
 			continue	#empty command
 		print(repr(i))
 		arr = i.split(':')
-		if arr[0] == "score" or arr[0] == "buzzer":
+		if arr[0] == "score" or arr[0] == "buzzer" or arr[0]=="img":
 			#form json string and send
 			echo("event: %s\n" % arr[0])
 			print(arr)
