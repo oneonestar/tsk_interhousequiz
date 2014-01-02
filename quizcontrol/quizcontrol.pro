@@ -14,9 +14,11 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    startpage.cpp
+    startpage.cpp \
+    questionsPage.cpp
 
 HEADERS  += mainwindow.h \
-    startpage.h
+    startpage.h \
+    questionsPage.h
 
 FORMS    += mainwindow.ui
