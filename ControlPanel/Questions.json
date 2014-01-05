@@ -1,0 +1,31 @@
+{
+    "Total":2,
+    "Questions": [
+        {
+            "id": 1,
+            "Question": "How old are you?",
+            "isMC": false,
+            "option": {
+                "A": "null",
+                "B": "null",
+                "C": "null",
+                "D": "null"
+            },
+            "CorrectAns": "100",
+            "imgPath": "null"
+        },
+        {
+            "id": 2,
+            "Question": "When TSK is founded?",
+            "isMC": true,
+            "option": {
+                "A": "1960",
+                "B": "1961",
+                "C": "1962",
+                "D": "1963"
+            },
+            "CorrectAns": "C",
+            "imgPath": "null"
+        }
+    ]
+}
