@@ -1,6 +1,12 @@
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonObject;
+import javax.json.JsonReader;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.*;
+import java.util.ArrayList;
 
 public class MainWindow {
     JFrame mainframe;
@@ -56,6 +62,45 @@ public class MainWindow {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
         new MainWindow().go();
+	}
+	public void parseQuestions(File f){
+		try {
+			FileInputStream in=new FileInputStream(f);
+			JsonReader jsonReader = Json.createReader(in);
+			JsonObject jsonObject = jsonReader.readObject();
+			jsonReader.close();
+	        in.close();
+	        int total=jsonObject.getInt("Total");
+	        JsonArray questionArray = jsonObject.getJsonArray("Questions");
+	        ArrayList<Question> qArray=new ArrayList<Question>();
+	        qArray.add(new Question());
+	        qArray.add(new Question());
+	        
+	        int index=0;
+	        for(;index<total;index++){
+	        	JsonObject jo=questionArray.getJsonObject(index);
+	        	qArray.get(index).setID(jo.getInt("id"));
+	        	qArray.get(index).setQuestion(jo.getString("Question"));
+	        	qArray.get(index).setMCstate(jo.getBoolean("isMC"));
+	        
+	        	JsonObject option=jo.getJsonObject("option");
+	        
+	      
+	        	qArray.get(index).setOption(option.getString("A"),0);
+	        	qArray.get(index).setOption(option.getString("B"),1);
+	        	qArray.get(index).setOption(option.getString("C"),2);
+	        	qArray.get(index).setOption(option.getString("D"),3);
+	        
+	        	qArray.get(index).setCorrectAns(jo.getString("CorrectAns"));
+	        	qArray.get(index).setImgPath(jo.getString("imgPath"));
+	        
+	        	System.out.println(qArray.get(index));
+	        }
+	        
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }

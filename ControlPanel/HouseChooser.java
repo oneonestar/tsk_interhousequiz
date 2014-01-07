@@ -2,6 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
+
 public class HouseChooser extends JPanel implements ActionListener{
    JButton A;
    JButton D;
@@ -64,7 +65,7 @@ public class HouseChooser extends JPanel implements ActionListener{
 
 @Override
 public void actionPerformed(ActionEvent e) {
-	CardLayout cl=(CardLayout)(window.cardstack.getLayout());
+	RXCardLayout cl=(RXCardLayout)(window.cardstack.getLayout());
 	if(e.getSource()==back){
 		cl.show(window.cardstack, "WELCOME");
 	}

@@ -30,7 +30,7 @@ public class WelcomePanel extends JPanel implements ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
-		CardLayout cl=(CardLayout)(window.cardstack.getLayout());
+		RXCardLayout cl=(RXCardLayout)(window.cardstack.getLayout());
 		if(e.getSource()==comp){
 			cl.show(window.cardstack, "HOUSE" );
 			isChallenge=false;
