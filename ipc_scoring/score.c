@@ -126,9 +126,11 @@ void scoring()
 		//close pipe, start reading 
 		close(server2score[1]);
 		while(read(server2score[0], &signal, sizeof(signal))>0) {
-			if(strcmp(signal, "ex")==0)
+			if(strcmp(signal, "ex")==0) {
+				save(score.address);
 				//exit
 				exit(0);
+			}
 
 			//decompose signal
 			sscanf(signal, "%c:%c:%d", &action, &house, &value);
@@ -178,6 +180,12 @@ void change_score(char action, char house, int value)
 	write(server2score[1], &cmd, sizeof(cmd));
 }
 
+//kill score server
+void kill_score()
+{
+	close(server2score[0]);
+	write(server2score[1], "ex", sizeof("ex"));
+}
 //communicate with score server to get score
 int get_score(char house)
 {
