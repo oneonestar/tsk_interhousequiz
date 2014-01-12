@@ -27,6 +27,7 @@ public class QuestionPage extends JPanel implements ActionListener{
    JTextField changeMarksL;
    JTextField changeMarksM;
    
+   
    JLabel Augustin=new JLabel("Augustin");
    JLabel Deusdedit=new JLabel("Deusdedit"); 
    JLabel Justus=new JLabel("Justus"); 
@@ -209,6 +210,14 @@ public void actionPerformed(ActionEvent e) {
 		clmain.show(window.cardstack,"HOUSE");
 	}
 	
+}
+public void setQuestion(Question q){
+	
+}
+class picturePanel extends JPanel{
+	public void paintComponent(Graphics g){
+		
+	}
 }
 }
 
