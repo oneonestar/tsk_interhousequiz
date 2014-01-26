@@ -8,7 +8,8 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include "json_string.h"
+#include <wchar.h>
+#include <locale.h>
 
 #include <sys/socket.h>
 #include <arpa/inet.h>
@@ -16,6 +17,18 @@
 #include <netinet/in.h>
 #include <sys/types.h>
 
+wchar_t* string_create(int id, wchar_t *question, wchar_t* A, wchar_t* B, wchar_t *C, wchar_t *D, wchar_t *correct, wchar_t *path)
+{	setlocale(LC_ALL, "");
+         //create a string with memory allocation
+         wchar_t* myStr;
+         myStr = (wchar_t*) malloc (6000);
+ 
+         //concatenate all objects required
+         swprintf(myStr, 600, L"{'%d','%s','%s','%s','%s','%s','%s','%s'}", id, question, A, B, C, D, correct, path);
+	wprintf(L"STRING_CREATE: %ls\n", myStr);
+         return myStr; 
+}
+   
 void init_track(int track[40])
 {
     int index = 0;
@@ -41,81 +54,71 @@ void update_track(int track[40], int item)
     int index = 0;
     while(index < 40) {
         if(track[index] == item) {
-            printf("%s\n", "The item is already in the track");
+            wprintf(L"%s\n", L"The item is already in the track");
             break;
         }
         if(track[index] == 0) {
-            printf("%s\n", "The track has been updated");
+            wprintf(L"%s\n", L"The track has been updated");
             track[index] = item;
             return;
         }
         index++;
     }
-    printf("%s\n", "The track is already full");
+    wprintf(L"%s\n", L"The track is already full");
 }
 
 void get_id(char id[3], int fd[2])
 {
     close (fd[1]);
     read(fd[0], id, 3);
-    printf("Child: I have receieved the id: %s\n", id);
+    wprintf(L"Child: I have receieved the id: %s\n", id);
     close(fd[0]);
 }
 
 void send_id(int fd[2])
 {
-    char cid[] = "1";
+    char cid[] = "2";
     close(fd[0]);
-    printf("Parent: I have sent the id: %s\n", cid);
+    wprintf(L"Parent: I have sent the id: %s\n", cid);
     write(fd[1], cid, sizeof(cid));
     close(fd[1]);
 }
 
-char* get_string(int fd[2])
+wchar_t* get_string(int fd[2])
 {
     /* write through the pipe */
-    char* string[600];
+    wchar_t* MyStr;
+    MyStr = (wchar_t*) malloc (6000);
 
     close(fd[1]);
-    read(fd[0], string, 600);
+    read(fd[0], MyStr, 600);
     close(fd[0]);
 
-    printf("Received: %s\n", string);
-    //strcmp(res_string, string);
-
-    char** question = question_parser(string);
-    char** answer = answer_parser(string);
-
-    printf("Parent: The question is: %s\n", question[0]);
-    printf("Parent: The answer is: %s\n", question[1]);
-    printf("Parent: Option A = %s\n", answer[0]);
-    printf("Parent: Option B = %s\n", answer[1]);
-    printf("Parent: Option C = %s\n", answer[2]);
-    printf("Parent: Option D = %s\n", answer[3]);
-    printf("Parent: Path = %s\n", question[2]);
-
-return string;
+    setlocale(LC_ALL, "");
+return MyStr;
 }
 
-void send_string(char* json_string, int fd[2])
+void send_string(wchar_t* json_string, int fd[2])
 {
     close(fd[0]);
 
-    printf("Child: The string is: %s\n", json_string);
-    write(fd[1], json_string, strlen(json_string)+1);
+    setlocale(LC_ALL, "");
+    wprintf(L"Child: The string is: %ls\n", json_string);
+    wprintf(L"Child: The string is: %d\n", wcslen(json_string));
+    write(fd[1], json_string, wcslen(json_string)*8+1);
     close(fd[1]);
 }
 
 void init_con(MYSQL *con)
 {
     if (con == NULL) {
-        printf("%s", "The connection failed, Please try again.\n");
+        wprintf(L"%s", L"The connection failed, Please try again.\n");
         exit(-1);
     }
 
     //(localhost, name of user, password, database)
-    if (mysql_real_connect(con, "localhost", "testing", "testing", "interhouse", 0, NULL, 0) == NULL) {
-        printf("%s", "The connection failed, Please enter the correct password again\n");
+    if (mysql_real_connect(con, "localhost", "testing", "testing", "test", 0, NULL, 0) == NULL) {
+        wprintf(L"%s", L"The connection failed, Please enter the correct password again\n");
         mysql_close(con);
         exit(-1);
     }
@@ -128,24 +131,24 @@ MYSQL_RES* get_result(MYSQL* con, char* query)
 
     result = mysql_store_result(con);
     if (!result) {
-        printf("%s\n", "Result");
+        wprintf(L"%s\n", L"Result");
         exit(-1);
     }
     return result;
 }
 
-void pushresult(char address[], char sendBuff[])
+void pushresult(char address[], wchar_t sendBuff[])
 {
+
     int point;
     int trap;
     struct sockaddr_in serv_addr;
 
-	char send[600] = "question:";
+    wchar_t send[600] = L"question:";
 	
     strcat(send, sendBuff);
     point = socket(AF_INET, SOCK_STREAM, 0);
     memset(&serv_addr, '0', sizeof(serv_addr));
-   // memset(sendBuff, '0', sizeof(sendBuff));
 
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(8889);
@@ -153,12 +156,12 @@ void pushresult(char address[], char sendBuff[])
 
     connect(point, (struct sockaddr*)&serv_addr, sizeof(serv_addr));
 
-    if((trap = write(point, send, strlen(send)+1))<0) {
-        printf("error\n");
+    if((trap = write(point, send, strlen(send)))<0) {
+        wprintf(L"error\n");
     }
 }
 
-void database(void)
+int main(void)
 {
     MYSQL_RES *result;
     MYSQL_ROW row;
@@ -167,9 +170,8 @@ void database(void)
     int track[40];
     init_track(track);
     int intid;
-    char* pushstring;
-    char* pullstring[600];
-
+    wchar_t* pushstring;
+    wchar_t pullstring[600];
 
     int send[2];//pipe for sending and receiveng result(json_string)
     int get[2];//pipe for sending and receiving id
@@ -179,11 +181,12 @@ void database(void)
 
     MYSQL *con = mysql_init(NULL);
     init_con(con);
-    printf("%s", "The connection succeeded\n");
+    wprintf(L"%s", L"The connection succeeded\n");
 
     //The program starts with successful connection
     //items retreiving
 
+   setlocale(LC_ALL, "");
     if(pid != 0) {
         get_id(id, get);
         intid = atoi(id);
@@ -194,20 +197,34 @@ void database(void)
         result = get_result(con, query);
 
         while((row = mysql_fetch_row(result))) {
-            //update_data(json_string, row);
-            pushstring = json_create(id, row[1], row[4], row[5], row[6], row[7], row[3], row[9]);
+
+	wprintf(L"Question: %ls\n", L"和");
+	    wchar_t me[600]= L"我是人\n";
+    wchar_t y[600];
+    wcscpy(y,me);
+    setlocale(LC_ALL, "");
+    wprintf(L"%ls\n", y);
+    wprintf(L"%ls\n", me);
+
+
+
+	pushstring = string_create(intid, row[2], row[5], row[6], row[7], row[8], row[3], row[10]);
+
         }
         //initialization above
 
-        printf("Created: %s\n", pushstring);
+        wprintf(L"Created: %ls\n", pushstring);
         send_string(pushstring, send);
         //testing and printing in sending function
     } else {
         send_id(get);
-	sprintf(pullstring, "Question:%s\0", get_string(send));
-        printf("Parent: %s\n", pullstring);
-        pushresult("192.168.0.102", pullstring);
+	//asking the result from the child and copy to the pullstring
+	swprintf(pullstring,600, L"Question:%ls\n", get_string(send));
+        //not yet done, how to deal with the concatenation of the string
+	wprintf(L"Parent: %ls\n", pullstring);
+        //pushresult("192.168.0.102", pullstring);
     }
-    mysql_free_result(result);
+    mysql_free_result(result); 
     mysql_close(con);
 }
+
