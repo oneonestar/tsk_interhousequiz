@@ -16,6 +16,9 @@
 #define MIN 2
 #define PORT 8889		//port for connecting to web server
 
+//pipes
+int server2score[2];
+int score2server[2];
 
 //structure for score
 struct Score score;
@@ -105,73 +108,104 @@ int getscore(int house)
 }
 
 //daemon of the scoring module process
-int scoring(char *signal)
+void scoring()
 {
+	char signal[10];			//signal of (action)(house letter)
 	char house;
 	char action;
 	int value;
 	int score_result = 0;
 
-	if(strcmp(signal, "ex")==0) {
-		save(score.address);
-		//exit
-		exit(0);
+	while(1) {
+		//check if the parent process is still there
+		if(getppid()==1) {
+			printf("parent terminated, exit...\n");
+			exit(1);
+		}
+
+		//close pipe, start reading 
+		close(server2score[1]);
+		while(read(server2score[0], &signal, sizeof(signal))>0) {
+			if(strcmp(signal, "ex")==0) {
+				save(score.address);
+				//exit
+				exit(0);
+			}
+
+			//decompose signal
+			sscanf(signal, "%c:%c:%d", &action, &house, &value);
+
+			//act according to instruction
+			switch(action) {
+				case 'U':
+					update(house_to_index(house), value);
+					break;
+				case 'A':
+					add(house_to_index(house), value);
+					break;
+				case 'M':
+					minus(house_to_index(house), value);		
+					break;
+				case 'G':
+					score_result = getscore(house_to_index(house));
+					close(score2server[0]);
+					write(score2server[1], &score_result, sizeof(int));
+					break;
+			}
+
+			//save score to file
+			save(score.address);
+
+		}
+
+		//clear data
+		house = 0;
+		signal[0] = 0;
+		value = 0;
+		score_result = 0;
 	}
-
-	//decompose signal
-	sscanf(signal, "%c:%c:%d", &action, &house, &value);
-
-	//act according to instruction
-	switch(action) {
-		case 'U':
-			update(house_to_index(house), value);
-			return 0;
-		case 'A':
-			add(house_to_index(house), value);
-			return 0;
-		case 'M':
-			minus(house_to_index(house), value);		
-			return 0;
-		case 'G':
-			score_result = getscore(house_to_index(house));
-			return score_result;
-			break;
-	}
-
-	//save score to file
-	save(score.address);
 }
 
 //request by main server
 void change_score(char action, char house, int value)
 {
 	//command string to send over
-	char *cmd = (char *)malloc(10);
+	char cmd[10];
 
 	//setup the string
 	sprintf(cmd, "%c:%c:%d", action, house, value);
 
 	//send data over
-	scoring(cmd);
+	close(server2score[0]);
+	write(server2score[1], &cmd, sizeof(cmd));
 }
 
 //kill score server
 void kill_score()
 {
-	scoring("ex");
+	close(server2score[0]);
+	write(server2score[1], "ex", sizeof("ex"));
 }
 //communicate with score server to get score
 int get_score(char house)
 {
 	//setup instruction to get score
-	char *cmd = (char *)malloc(5);
+	char cmd[5];
 	sprintf(cmd, "%c:%c:%d\n", 'G', house, 0);
 
 	//setup variable to receive score
 	int result_score = 0;
 
+	//ask score server for score
+	close(server2score[0]);
+	write(server2score[1], &cmd, sizeof(cmd));
+
+	//read return value
+	close(score2server[1]);
+	read(score2server[0], &result_score, sizeof(int));
+
 	//return requested score
-	return scoring(cmd);
+	return result_score;
 }
 
 void dumpLine(FILE *stream)
@@ -205,9 +239,8 @@ void pushScore(char address[])
 	if((n=write(sock, recvBuff, sizeof(recvBuff)))<0) {			//write score to socket to python web server
 		printf("socket write error\n");
 	}
-	printf("%d!!!!]n", n);
 }
-/*
+
 //dummy main
 int main(int argc, char *argv[])
 {
@@ -266,4 +299,4 @@ int main(int argc, char *argv[])
 	}
 
 	return 0;
-}*/
+}
