@@ -12,5 +12,7 @@ void init_con(MYSQL *con);
 MYSQL_RES* get_result(MYSQL* con, wchar* query);
 void pushresult(wchar address[], wchar sendBuff[]);
 void database(void);
+MYSQL* sql_connect();
+char* sql_get_result(MYSQL*, char*);
 
 #endif
