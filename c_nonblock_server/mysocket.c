@@ -79,8 +79,9 @@ int create_socket( int port )
     return listen_sd;
 }
 
-int poll_loop( int *sd_arr, int sd_arr_size , mycallback callbacks[])
+int poll_loop( int port, mycallback callbacks)
 {
+	int    sd;
     int    len, rc, on = 1;
     int    listen_sd = -1, new_sd = -1;
     int    desc_ready, end_server = FALSE, compress_array = FALSE;
@@ -90,7 +91,13 @@ int poll_loop( int *sd_arr, int sd_arr_size , mycallback callbacks[])
     struct sockaddr_in   addr_2;
     int    timeout;
     struct pollfd fds[200];
-    int    nfds = sd_arr_size+1, current_size = 0, i, j;
+    int    nfds = 2, current_size = 0, i, j;
+
+    /*************************************************************/
+    /* Create socket                                             */
+    /*************************************************************/
+	sd = create_socket(port);
+
     /*************************************************************/
     /* Initialize the pollfd structure                           */
     /*************************************************************/
@@ -99,11 +106,9 @@ int poll_loop( int *sd_arr, int sd_arr_size , mycallback callbacks[])
     /*************************************************************/
     /* Set up the initial listening socket                        */
     /*************************************************************/
-    for( i=0; i<sd_arr_size; i++ )
-    {
-        fds[i].fd = sd_arr[i];
-        fds[i].events = POLLIN;
-    }
+    fds[0].fd = sd;
+    fds[0].events = POLLIN;
+
     /*************************************************************/
     /* Initialize the timeout to 3 minutes. If no               */
     /* activity after 3 minutes this program will end.           */
@@ -166,9 +171,8 @@ int poll_loop( int *sd_arr, int sd_arr_size , mycallback callbacks[])
                 printf( "  Error! revents = %d\n", fds[i].revents );
                 end_server = TRUE;
                 break;
-
             }
-            if ( i <= sd_arr_size )
+            if ( i <= 1 )	//new connection to port
             {
                 /*******************************************************/
                 /* Listening descriptor is readable.                   */
@@ -281,8 +285,7 @@ int poll_loop( int *sd_arr, int sd_arr_size , mycallback callbacks[])
                     }
                     struct sockaddr_in guest;
                     socklen_t guest_len = sizeof( guest );
-                    /*getpeername( fds[i].fd, ( struct sockaddr * )&guest, &guest_len );*/
-                    getsockname( fds[i].fd, ( struct sockaddr * )&guest, &guest_len ); /* get server socket info */
+                    getpeername( fds[i].fd, ( struct sockaddr * )&guest, &guest_len );
                     char guest_ip[20];
                     inet_ntop( AF_INET, &guest.sin_addr, guest_ip, sizeof( guest_ip ) );
 					int port = ntohs(guest.sin_port);
@@ -290,7 +293,7 @@ int poll_loop( int *sd_arr, int sd_arr_size , mycallback callbacks[])
 					char *passing_str = malloc(sizeof(buffer));
 					strncpy(passing_str, buffer, len);
 					passing_str[len] = '\0';
-					callbacks[port-8888](fds[i].fd, passing_str);
+					callbacks(fds[i].fd, passing_str);
                     break;
 
                 }
