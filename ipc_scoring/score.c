@@ -225,7 +225,7 @@ void pushScore(char address[])
 
 	//get score and convert to character from integer
 	memset(recvBuff, 0, sizeof(recvBuff));					//clean buffer
-	sprintf(recvBuff, "score:A:%d\nscore:D:%d\nscore:H:%d\nscore:J:%d\nscore:L:%d\nscore:M:%d\n", get_score('A'), get_score('D'), get_score('H'), get_score('J'), get_score('L'), get_score('M'));
+	sprintf(recvBuff, "score:A:%d\nscore:D:%d\nscore:H:%d\nscore:J:%d\nscore:L:%d\nscore:M:%d\n\0", get_score('A'), get_score('D'), get_score('H'), get_score('J'), get_score('L'), get_score('M'));
 	printf("DEBUG: pushScore(): recvBuff = %s\n", recvBuff);
 
 	//setup socket
@@ -239,8 +239,9 @@ void pushScore(char address[])
 	if((n=write(sock, recvBuff, sizeof(recvBuff)))<0) {			//write score to socket to python web server
 		printf("socket write error\n");
 	}
+	printf("%d!!!!]n", n);
 }
-/*
+
 //dummy main
 int main(int argc, char *argv[])
 {
@@ -300,4 +301,3 @@ int main(int argc, char *argv[])
 
 	return 0;
 }
-*/
