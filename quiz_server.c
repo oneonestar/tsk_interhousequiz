@@ -11,10 +11,95 @@
 #include <arpa/inet.h>
 #include "ipc_scoring/score.h"
 //#include "buzzer.h"
-#include "ipc_database/json_string.h"
+#include "ipc_database_src/json_string.h"
+#include "c_nonblock_server/mysocket.h"
 
 int buzzerPort = 8888;
 int webPort = 8889;
+
+void mytimeout_callback()
+{
+	printf("timeout\n");
+	send_to_port(8887, "star");
+	/* Add your code here */
+}
+
+void myconn_callback(int port, char* msg)
+{
+	printf("callback:\n");
+	printf("message: %s\n\n", msg);
+	/* Add your code here */
+	
+	//buffer variables
+	char recvBuff[50];	//command from gui
+	char instruction[10], option[10], value[10], data;	//for sscanf
+	int intInstruction, intOption, intValue, intData;	//for parsing
+
+	int current_question_set[6] = {0};
+	int question_pointer[6] = {0};
+
+	strcpy(recvBuff, msg);
+	
+	recvBuff[strlen(recvBuff)] = 0;
+
+	//process instruction
+	sscanf(recvBuff, "%s %s %c %s", instruction, option, &data, value);
+	intInstruction = parse_instruction(instruction);			//read instructions
+	intOption = parse_option(intInstruction, option);			//read options
+
+	//error check
+	if(intInstruction==-1||intOption==-1) {
+		printf("invalid instruction\n");
+	}
+
+	//parse instructions and options
+	switch(intInstruction) {
+		case 0:
+			//end
+			printf("Exiting...\n");
+			kill_score();
+			exit(0);
+			return;
+		case 1:
+			//database process
+			switch(intOption) {
+				case 1:
+					//choose set and how many to output
+					//send instruction to dabase server and read one json at a time
+					//update current question pointer for respective house
+					break;
+				case 2:
+					//read from db module, increase question pointer
+					//write to gui and web server
+					break;
+			}
+			break;
+		case 2:
+			//score process
+			switch(intOption) {
+				case 1:
+					//call change score
+					change_score('A', data, atoi(value));
+					break;
+				case 2:
+					//call update to overwrite
+					change_score('U', data, atoi(value));
+					break;
+				case 3:
+					//call change score to minus scores
+					change_score('M', data, atoi(value));
+					break;
+			}
+			//push score to webserver
+			pushScore("127.0.0.1");
+			break;
+		case 3:
+			//buzzer
+			break;
+	}
+}
+
+
 
 int parse_instruction(char *instruction)
 {
@@ -106,103 +191,26 @@ void server_module(char *webServer, char *buzzingServer)
 		//receive instruction from GUI
 		//dummy, receive from stdin
 		printf("->");
-		fgets(recvBuff, 49, stdin);
-		recvBuff[strlen(recvBuff)] = 0;
-
-		//process instruction
-		sscanf(recvBuff, "%s %s %c %s", instruction, option, &data, value);
-		intInstruction = parse_instruction(instruction);			//read instructions
-		intOption = parse_option(intInstruction, option);			//read options
-
-		//error check
-		if(intInstruction==-1||intOption==-1) {
-			printf("invalid instruction\n");
-			continue;
-		}
-
-		//parse instructions and options
-		switch(intInstruction) {
-			case 0:
-				//end
-				printf("Exiting...\n");
-				kill_score();
-				exit(0);
-				break;
-			case 1:
-				//database process
-				switch(intOption) {
-					case 1:
-						//choose set and how many to output
-						//send instruction to dabase server and read one json at a time
-						//update current question pointer for respective house
-						break;
-					case 2:
-						//read from db module, increase question pointer
-						//write to gui and web server
-						break;
-				}
-				break;
-			case 2:
-				//score process
-				switch(intOption) {
-					case 1:
-						//call change score
-						change_score('A', data, atoi(value));
-						break;
-					case 2:
-						//call update to overwrite
-						change_score('U', data, atoi(value));
-						break;
-					case 3:
-						//call change score to minus scores
-						change_score('M', data, atoi(value));
-						break;
-				}
-				//push score to webserver
-				pushScore(webServer);
-				break;
-			case 3:
-				//buzzer
-				break;
-		}
+		int port = 9000;
+		poll_loop( port, myconn_callback, mytimeout_callback , 3*1000); //3 sec timeout 
+// 		fgets(recvBuff, 49, stdin);
+		
 	}
 }
 
 
 int main(int argc, char *argv[])
 {
-	pipe(score2server);
-	pipe(server2score);
+	//start score module
+	printf("printing score\n");
+	score_init(0, "back.dat");
+//		scoring();
 
-	pid_t pid;
+	printf("parent starting\n");
+	server_module(argv[1], argv[2]);
+	
+	
 
-	//forking of modules
-	for(int i=0; i<2; i++) {
-		if((pid=fork())>0) {
-			switch(i) {
-				case 0:
-					//start score module
-					printf("printing score\n");
-					score_init(0, "back.dat");
-					scoring();
-					break;
-				/*
-				case 1:
-					//start db
-					break;
-				case 2:
-					break;
-					*/
-			}
-			break;
-		}
-	}
-
-	//parent main server
-	if(pid!=0) {
-		printf("parent starting\n");
-		server_module(argv[1], argv[2]);
-	}
 
 	return 0;
 }

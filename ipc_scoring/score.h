@@ -15,7 +15,7 @@ void add(int, int);
 void minus(int, int);
 void update(int, int);
 void save(char*);
-void scoring(void);
+int scoring(char *signal);
 void pushScore(char*);
 int get_score(char);
 void change_score(char, char, int);

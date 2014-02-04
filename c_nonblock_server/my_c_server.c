@@ -17,7 +17,7 @@ void mytimeout_callback()
 	/* Add your code here */
 }
 
-void myconn_callback(int fd, char* msg)
+void myconn_callback(int port, char* msg)
 {
 	printf("callback:\n");
 	printf("message: %s\n\n", msg);

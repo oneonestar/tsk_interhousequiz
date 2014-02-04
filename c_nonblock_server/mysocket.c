@@ -305,7 +305,7 @@ int poll_loop( int port , conn_callback conn_cb, timeout_callback timeout_cb, in
                     char *passing_str = malloc( sizeof( buffer ) );
                     strncpy( passing_str, buffer, len );
                     passing_str[len] = '\0';
-                    conn_cb( fds[i].fd, passing_str );
+                    conn_cb( port, passing_str );
                     break;
 
                 }

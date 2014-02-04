@@ -4,7 +4,7 @@
 #define TRUE             1
 #define FALSE            0
 
-typedef void (*conn_callback)(int fd, char* msg);
+typedef void (*conn_callback)(int port, char* msg);
 typedef void (*timeout_callback)();
 int create_socket( int port );
 //Timeout base on millisecond
