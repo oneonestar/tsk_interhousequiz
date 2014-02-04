@@ -13,6 +13,9 @@
 //#include "buzzer.h"
 #include "ipc_database_src/json_string.h"
 #include "c_nonblock_server/mysocket.h"
+#include "ipc_database_src/database_dblinker.h"
+#include <mysql.h>
+#include <my_global.h>
 
 int buzzerPort = 8888;
 int webPort = 8889;
@@ -37,6 +40,9 @@ void myconn_callback(int port, char* msg)
 
 	int current_question_set[6] = {0};
 	int question_pointer[6] = {0};
+
+	MYSQL *con = sql_connect();
+	char* result;
 
 	strcpy(recvBuff, msg);
 	
@@ -71,6 +77,10 @@ void myconn_callback(int port, char* msg)
 				case 2:
 					//read from db module, increase question pointer
 					//write to gui and web server
+					
+					//result = sql_get_result(con, "2");
+					printf("Main: %s\n", "showing question");
+					//mysql_close(con);
 					break;
 			}
 			break;

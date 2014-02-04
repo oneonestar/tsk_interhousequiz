@@ -205,9 +205,9 @@ void pushScore(char address[])
 	if((n=write(sock, recvBuff, sizeof(recvBuff)))<0) {			//write score to socket to python web server
 		printf("socket write error\n");
 	}
-	printf("%d!!!!]n", n);
 }
 
+/*
 //dummy main
 int main(int argc, char *argv[])
 {
@@ -266,8 +266,4 @@ int main(int argc, char *argv[])
 	}
 
 	return 0;
-<<<<<<< HEAD
 }*/
-=======
-}
->>>>>>> de273a9d36a04ce8a16e15a5f544b1bd3b90f90b
