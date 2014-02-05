@@ -26,14 +26,14 @@ const char sql_pwd[] = "testing";
 const char sql_table_name[] = "test";
 
 
-char* string_create(char *id, char *question, char* A, char* B, char *C, char *D, char *correct, char *path)
+char* string_create(int id, char *question, char* A, char* B, char *C, char *D, char *correct, char *path)
 {	
          //create a string with memory allocation
          char* myStr;
          myStr = (char*) malloc (6000);
  
          //concatenate all objects required
-         sprintf(myStr, "{'%s','%s','%s','%s','%s','%s','%s','%s'}", id, question, A, B, C, D, correct, path);
+         sprintf(myStr, "{'%d','%s','%s','%s','%s','%s','%s','%s'}", id, question, A, B, C, D, correct, path);
 	 printf("STRING_CREATE: %s\n", myStr);
          return myStr; 
 }
@@ -176,40 +176,60 @@ char* sql_get_result(MYSQL* con, char* cid)
     MYSQL_RES *result;
     MYSQL_ROW row;
     char query[100] = "Select * from data where id = ";
+    char id[3];
     int track[40];
     init_track(track);
+    int intid;
     char* pushstring;
     char pullstring[600];
+
+    int send[2];//pipe for sending and receiveng result(json_string)
+    int get[2];//pipe for sending and receiving id
+    pipe(send);
+    pipe(get);
+    int pid = fork();
+
+  //  MYSQL *con = sql_connect();
+    //printf("%s", "The connection succeeded\n");
 
     //The program starts with successful connection
     //items retreiving
 
-        strcat (query, cid);//concatenation of the id and the query
+    if(pid == 0) {
+        get_id(id, get);
+        intid = atoi(id);
+        update_track(track, intid);
+
+        strcat (query, id);//concatenation of the id and the query
 
         result = get_result(con, query);
 	
         while((row = mysql_fetch_row(result))) {
 
-	pushstring = string_create(cid, row[2], row[5], row[6], row[7], row[8], row[3], row[10]);
+	pushstring = string_create(intid, row[2], row[5], row[6], row[7], row[8], row[3], row[10]);
 
+        printf("Created: %s\n", pushstring);
         }
         //initialization above
 
         printf("Created: %s\n", pushstring);
+        send_string(pushstring, send);
         //testing and printing in sending function
-	
+    } else 
+    //child
+    {
+        send_id(get, cid);
 	//asking the result from the child and copy to the pullstring
-	char sql_fetched []="Question:";
-	sprintf(sql_fetched, pushstring);
-	
-	printf("Parent: %s\n", sql_fetched);
-        pushresult(socket_addr, sql_fetched);
-    
-	mysql_free_result(result);
-	return sql_fetched;
+	sprintf(pullstring, "Question:%s\n", get_string(send));
+        //not yet done, how to deal with the concatenation of the string
+	printf("Parent: %s\n", pullstring);
+        pushresult(socket_addr, pullstring);
+	return pullstring;
+    }
+    mysql_free_result(result); 
+//    mysql_close(con);
 }
 
-/*
 int main()
 {
     MYSQL *con = sql_connect();
@@ -219,4 +239,3 @@ int main()
     mysql_close(con);
     return 0;
 }
-*/
