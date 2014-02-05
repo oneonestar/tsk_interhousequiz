@@ -39,9 +39,6 @@ class CtrlConnection(protocol.Protocol):
 		ctrlstr+=data
 		for i in connections:
 			pushToClient(i.write)
-		#if ctrlstr[-1] == '\n':
-			#for i in connections:
-				#pushToClient(i.write)
 		ctrlstr = ""
 	def connectionLost(self, reason):
 		print "Ctrl close:"+ reason.getErrorMessage()
@@ -135,7 +132,7 @@ def connection_to_main(host, port):
 #stdin
 stdio.StandardIO(StdinInputHandler())
 #server root directory 
-root = FileNoDir(".")
+root = FileNoDir("./www")
 root.childNotFound = NoResource()
 root.indexName=["index.html"]
 #server send events
