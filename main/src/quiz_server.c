@@ -11,14 +11,38 @@
 #include <arpa/inet.h>
 #include "score.h"
 //#include "buzzer.h"
-#include "ipc_database_src/json_string.h"
 #include "mysocket.h"
+#include "db_connector.h"
 
 int buzzerPort = 8888;
 int webPort = 8889;
 
 int parse_instruction(char *instruction);
 int parse_option(int instruction, char *option);
+
+int web_push(char *string)
+{
+	//setup socket to the web server
+	int n;
+	struct sockaddr_in web_serv_addr;	//addr data structure for buzzer
+	int webSock = socket(AF_INET, SOCK_STREAM, 0);
+	memset(&web_serv_addr, '0', sizeof(web_serv_addr));
+	web_serv_addr.sin_family = AF_INET;
+	web_serv_addr.sin_port = htons(webPort);
+	inet_pton(AF_INET, "127.0.0.1", &web_serv_addr.sin_addr);
+
+	if(connect(webSock, (struct sockaddr*)&web_serv_addr, sizeof(web_serv_addr))) {
+		return 1;
+	}
+	else {
+		if((n=write(webSock, string, strlen(string)+1))<0) {                     //write score to socket to python web server
+			printf("socket write error\n");
+			return 1;
+		}
+	}
+	return 0;
+}
+
 
 void mytimeout_callback()
 {
@@ -40,6 +64,8 @@ void myconn_callback(int port, char* msg)
 
 	int current_question_set[6] = {0};
 	int question_pointer[6] = {0};
+
+	char buffer[500];
 
 	strcpy(recvBuff, msg);
 	
@@ -74,6 +100,9 @@ void myconn_callback(int port, char* msg)
 				case 2:
 					//read from db module, increase question pointer
 					//write to gui and web server
+					printf("reading question %d\n", atoi(value));
+					sprintf(buffer, "question:%s\0", fetch_question(value));
+					web_push(buffer);
 					break;
 			}
 			break;
@@ -161,7 +190,7 @@ void server_module(char *webServer, char *buzzingServer)
 	int webSock = socket(AF_INET, SOCK_STREAM, 0);
 	memset(&web_serv_addr, '0', sizeof(web_serv_addr));
 	web_serv_addr.sin_family = AF_INET;
-	web_serv_addr.sin_port = htons(buzzerPort);
+	web_serv_addr.sin_port = htons(webPort);
 	inet_pton(AF_INET, webServer, &web_serv_addr.sin_addr);
 	connect(webSock, (struct sockaddr*)&web_serv_addr, sizeof(web_serv_addr));
 
@@ -169,7 +198,7 @@ void server_module(char *webServer, char *buzzingServer)
 	int buzzerSock = socket(AF_INET, SOCK_STREAM, 0);
 	memset(&buzzer_serv_addr, '0', sizeof(buzzer_serv_addr));
 	buzzer_serv_addr.sin_family = AF_INET;
-	buzzer_serv_addr.sin_port = htons(webPort);
+	buzzer_serv_addr.sin_port = htons(buzzerPort);
 	inet_pton(AF_INET, webServer, &buzzer_serv_addr.sin_addr);
 	connect(buzzerSock, (struct sockaddr*)&buzzer_serv_addr, sizeof(buzzer_serv_addr));
 

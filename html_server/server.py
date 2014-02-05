@@ -42,7 +42,6 @@ class CtrlConnection(protocol.Protocol):
 		if ctrlstr[-1] == '\n':
 			for i in connections:
 				pushToClient(i.write)
-=======
 		for i in connections:
 			pushToClient(i.write)
 		ctrlstr = ""
