@@ -39,6 +39,12 @@ class CtrlConnection(protocol.Protocol):
 		ctrlstr+=data
 		for i in connections:
 			pushToClient(i.write)
+		if ctrlstr[-1] == '\n':
+			for i in connections:
+				pushToClient(i.write)
+=======
+		for i in connections:
+			pushToClient(i.write)
 		ctrlstr = ""
 	def connectionLost(self, reason):
 		print "Ctrl close:"+ reason.getErrorMessage()
