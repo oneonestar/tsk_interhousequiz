@@ -4,6 +4,7 @@
 #include <sys/poll.h>
 #include <sys/socket.h>
 #include <sys/time.h>
+#include <arpa/inet.h>
 #include <netinet/in.h>
 #include <string.h>
 #include <unistd.h>
@@ -91,11 +92,13 @@ int send_to_port( int port, char *msg )
         getpeername( fds[i].fd, ( struct sockaddr * )&guest, &guest_len );
         char guest_ip[20];
         inet_ntop( AF_INET, &guest.sin_addr, guest_ip, sizeof( guest_ip ) );
-        int port = ntohs( guest.sin_port );
         printf( "guest %s:%d\n", guest_ip, ntohs( guest.sin_port ) );
 
-		if(port == ntohs(guest.sin_port))
-        send( fds[i].fd, msg, strlen( msg ), 0 );
+        if( port == ntohs( guest.sin_port ) )
+		{
+			printf("%d!!", i);
+            send( fds[i].fd, msg, strlen( msg ), 0 );
+		}
     }
 }
 int poll_loop( int port , conn_callback conn_cb, timeout_callback timeout_cb, int timeout )
@@ -303,7 +306,7 @@ int poll_loop( int port , conn_callback conn_cb, timeout_callback timeout_cb, in
                     char *passing_str = malloc( sizeof( buffer ) );
                     strncpy( passing_str, buffer, len );
                     passing_str[len] = '\0';
-                    conn_cb( fds[i].fd, passing_str );
+                    conn_cb( port, passing_str );
                     break;
 
                 }
