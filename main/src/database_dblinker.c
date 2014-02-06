@@ -33,7 +33,7 @@ char* string_create(char *id, char *question, char* A, char* B, char *C, char *D
          myStr = (char*) malloc (sizeof(char)*6000);
  
          //concatenate all objects required
-         sprintf(myStr, "{ID: \"%s\",Question:\"%s\",Answer:[\"%s\",\"%s\",\"%s\",\"%s\"],Correct:\"%s\",Path:\"%s\"}", id, question, A, B, C, D, correct, path);
+         sprintf(myStr, "{\"ID\":\"%s\",\"Question\":\"%s\",\"Options\":[\"%s\",\"%s\",\"%s\",\"%s\"],\"Answer\":\"%s\",\"Path\":\"%s\"}",id, question, A, B, C, D, correct, path);
 	 printf("STRING_CREATE: %s\n", myStr);
          return myStr; 
 }

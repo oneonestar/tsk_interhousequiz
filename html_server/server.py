@@ -39,16 +39,11 @@ class CtrlConnection(protocol.Protocol):
 		ctrlstr+=data
 		for i in connections:
 			pushToClient(i.write)
-		if ctrlstr[-1] == '\n':
-			for i in connections:
-				pushToClient(i.write)
-		for i in connections:
-			pushToClient(i.write)
-		ctrlstr = ""
+		trlstr = ""
 	def connectionLost(self, reason):
 		print "Ctrl close:"+ reason.getErrorMessage()
 
-class CtrlConnectionFactory(protocol.Factory):
+class CtrlConnectionFactory(ReconnectingClientFactory):
 	def buildProtocol(self, addr):
 		return CtrlConnection()
 
@@ -111,7 +106,7 @@ class FileNoDir(static.File):
 ################################
 class Echo(Protocol):
     def dataReceived(self, data):
-        stdout.write(data)
+        print(data)
 
 class EchoClientFactory(ReconnectingClientFactory):
     def startedConnecting(self, connector):
@@ -132,7 +127,7 @@ class EchoClientFactory(ReconnectingClientFactory):
         ReconnectingClientFactory.clientConnectionFailed(self, connector,
                                                          reason)
 def connection_to_main(host, port):
-	reactor.connectTCP(host, port, EchoClientFactory())
+	reactor.connectTCP(host, port, CtrlConnectionFactory(), bindAddress=("127.0.0.1", 8889))
 		
 #stdin
 stdio.StandardIO(StdinInputHandler())
@@ -148,13 +143,13 @@ site = server.Site(root)
 #command line change port support
 import argparse
 parser = argparse.ArgumentParser(description='Twisted web server.')
-parser.add_argument('--ctrlport', nargs='?',default='8889', const='8889', type=int, help='Port to control server')
+parser.add_argument('--ctrlport', nargs='?',default='8891', const='8891', type=int, help='Port to control server')
 parser.add_argument('--mainip', nargs='?',default='127.0.0.1', const='127.0.0.1', type=str, help='IP to main server')
 parser.add_argument('--mainport', nargs='?',default='9000', const='9000', type=int, help='Port to main server')
 parser.add_argument('--webport', nargs='?',default='80', const='80', type=int, help='Port to control server')
 args = parser.parse_args()
 
-#ctrl connection (8889)
+#ctrl connection (8891)
 reactor.listenTCP(args.ctrlport,CtrlConnectionFactory())
 #web connection (80)
 reactor.listenTCP(args.webport,site)

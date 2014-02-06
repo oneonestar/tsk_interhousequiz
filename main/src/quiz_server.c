@@ -23,30 +23,6 @@ int webPort = 8889;
 int parse_instruction(char *instruction);
 int parse_option(int instruction, char *option);
 
-int web_push(char *string)
-{
-	//setup socket to the web server
-	int n;
-	struct sockaddr_in web_serv_addr;	//addr data structure for buzzer
-	int webSock = socket(AF_INET, SOCK_STREAM, 0);
-	memset(&web_serv_addr, '0', sizeof(web_serv_addr));
-	web_serv_addr.sin_family = AF_INET;
-	web_serv_addr.sin_port = htons(webPort);
-	inet_pton(AF_INET, "127.0.0.1", &web_serv_addr.sin_addr);
-
-	if(connect(webSock, (struct sockaddr*)&web_serv_addr, sizeof(web_serv_addr))) {
-		return 1;
-	}
-	else {
-		if((n=write(webSock, string, strlen(string)+1))<0) {                     //write score to socket to python web server
-			printf("socket write error\n");
-			return 1;
-		}
-	}
-	return 0;
-}
-
-
 void mytimeout_callback()
 {
 	printf("timeout\n");
@@ -108,7 +84,8 @@ void myconn_callback(int port, char* msg)
 					MYSQL *con = sql_connect();
 					sprintf(buffer, "question:%s\0", sql_get_result(con, value));
 					mysql_close(con);
-					web_push(buffer);
+					printf("BUFFERERERERE:%s\n", buffer);
+					send_to_port(8889, buffer);
 					break;
 			}
 			break;
