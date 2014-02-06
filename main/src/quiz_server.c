@@ -13,6 +13,9 @@
 //#include "buzzer.h"
 #include "mysocket.h"
 #include "db_connector.h"
+#include "database_dblinker.h"
+#include <mysql.h>
+#include <my_global.h>
 
 int buzzerPort = 8888;
 int webPort = 8889;
@@ -56,7 +59,7 @@ void myconn_callback(int port, char* msg)
 	printf("callback:\n");
 	printf("message: %s\n\n", msg);
 	/* Add your code here */
-	
+
 	//buffer variables
 	char recvBuff[50];	//command from gui
 	char instruction[10], option[10], value[10], data;	//for sscanf
@@ -101,7 +104,10 @@ void myconn_callback(int port, char* msg)
 					//read from db module, increase question pointer
 					//write to gui and web server
 					printf("reading question %d\n", atoi(value));
-					sprintf(buffer, "question:%s\0", fetch_question(value));
+					//sprintf(buffer, "question:%s\0", fetch_question(value));
+					MYSQL *con = sql_connect();
+					sprintf(buffer, "question:%s\0", sql_get_result(con, value));
+					mysql_close(con);
 					web_push(buffer);
 					break;
 			}
