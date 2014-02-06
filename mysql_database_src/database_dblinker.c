@@ -209,7 +209,6 @@ char* sql_get_result(MYSQL* con, char* cid)
 	return pushstring;
 }
 
-/*
 int main()
 {
     MYSQL *con = sql_connect();
@@ -219,4 +218,3 @@ int main()
     mysql_close(con);
     return 0;
 }
-*/
