@@ -10,7 +10,7 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include "score.h"
-//#include "buzzer.h"
+#include "buzzer.h"
 #include "database_dblinker.h"
 #include <mysql.h>
 #include <my_global.h>
@@ -156,6 +156,7 @@ void read_instruction(struct bufferevent *bev, void *ctx)
 			break;
 		case 3:
 			//buzzer
+			printf("The first to press the button is %c\n", buzzer(buzzerServer, atoi(buzzerPort), webServer, atoi(webPort)));
 			break;
 	}
 	
@@ -208,6 +209,7 @@ int parse_option(int instruction, char *option)
 			}
 			break;
 		case 3:
+			return 0;
 			break;
 		case 0:
 			return 0;
