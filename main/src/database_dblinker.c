@@ -8,7 +8,8 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include "json_string.h"
+#include <wchar.h>
+#include <locale.h>
 
 #include <sys/socket.h>
 #include <arpa/inet.h>
@@ -17,22 +18,22 @@
 #include <sys/types.h>
 
 const int socket_port = 8889;
-char socket_addr[] = "192.168.0.102";
+char socket_addr[] = "127.0.0.1";
 
 const char machine_name[] = "localhost";
 const char sql_user[] = "test";
 const char sql_pwd[] = "testing";
-const char sql_database_name[] = "test";
+const char sql_table_name[] = "test";
 
 
 char* string_create(char *id, char *question, char* A, char* B, char *C, char *D, char *correct, char *path)
 {	
          //create a string with memory allocation
          char* myStr;
-         myStr = (char*) malloc (6000);
+         myStr = (char*) malloc (sizeof(char)*6000);
  
          //concatenate all objects required
-         sprintf(myStr, "{'%s','%s','%s','%s','%s','%s','%s','%s'}", id, question, A, B, C, D, correct, path);
+         sprintf(myStr, "{\"ID\":\"%s\",\"Question\":\"%s\",\"Options\":[\"%s\",\"%s\",\"%s\",\"%s\"],\"Answer\":\"%s\",\"Path\":\"%s\"}",id, question, A, B, C, D, correct, path);
 	 printf("STRING_CREATE: %s\n", myStr);
          return myStr; 
 }
@@ -125,7 +126,7 @@ MYSQL* sql_connect()
     }
 
     //(localhost, name of user, password, database)
-    if (mysql_real_connect(con, machine_name, sql_user, sql_pwd, sql_database_name, 0, NULL, 0) == NULL) {
+    if (mysql_real_connect(con, machine_name, sql_user, sql_pwd, sql_table_name, 0, NULL, 0) == NULL) {
         printf("%s", "The connection failed, Please enter the correct password again\n");
         mysql_close(con);
         exit(-1);
@@ -189,7 +190,7 @@ char* sql_get_result(MYSQL* con, char* cid)
 	
         while((row = mysql_fetch_row(result))) {
 
-	pushstring = json_create(atoi(cid), row[2], row[5], row[6], row[7], row[8], row[3], row[10]);
+	pushstring = string_create(cid, row[1], row[4], row[5], row[6], row[7], row[3], row[9]);
 
         }
         //initialization above
@@ -198,12 +199,24 @@ char* sql_get_result(MYSQL* con, char* cid)
         //testing and printing in sending function
 	
 	//asking the result from the child and copy to the pullstring
-	char sql_fetched []="Question:";
-	sprintf(sql_fetched, pushstring);
+	//char sql_fetched []="Question:";
+	//sprintf(sql_fetched, pushstring);
 	
-	printf("Parent: %s\n", sql_fetched);
-        pushresult(socket_addr, sql_fetched);
+	//printf("Parent: %s\n", sql_fetched);
+        //pushresult(socket_addr, sql_fetched);
     
 	mysql_free_result(result);
-	return sql_fetched;
+	return pushstring;
 }
+
+/*
+int main()
+{
+    MYSQL *con = sql_connect();
+    char* result;
+    result = sql_get_result(con, "2");
+    printf("Main: %s\n", result);
+    mysql_close(con);
+    return 0;
+}
+*/
