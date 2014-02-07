@@ -8,7 +8,13 @@ all:
 	gcc -c src/mysocket.c -o obj/mysocket.o -std=c99 -g $(INC) -Wall
 	gcc -c src/json_string.c -o obj/json_string.o -g $(INC)
 	gcc -c src/quiz_server.c -o obj/quiz_server.o -g $(INC) `mysql_config --cflags`
-	gcc -o quiz_server obj/*.o -std=c99 `mysql_config --libs --cflags` -ljson-c -levent
+<<<<<<< HEAD
+	gcc -o quiz_server obj/*.o -std=c99 `mysql_config --libs --cflags` -ljson-c
+||||||| merged common ancestors
+	gcc -o quiz_server -ljson-c obj/*.o -std=c99 `mysql_config --libs --cflags`
+=======
+	gcc -o quiz_server -ljson-c obj/*.o -std=c99 `mysql_config --libs --cflags` -levent
+>>>>>>> 5b682e467c1435964e25a08612148c87dfab1a6b
 
 clean:
 	rm *.o quiz_server
