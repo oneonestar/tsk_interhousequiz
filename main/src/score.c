@@ -97,81 +97,34 @@ void update(int house, int newscore)
 	score.score_table[house]=newscore;
 	printf("%d updated to %d, score_table[%d] = %d\n", newscore, house, house, score.score_table[house]);
 }
-	
-int getscore(int house)
-{
-	printf("requested score for %d, return %d\n", house, score.score_table[house]);
-        return score.score_table[house];
-}
 
 //daemon of the scoring module process
-int scoring(char *signal)
+void change_score(char action, char house, int value)
 {
-	char house;
-	char action;
-	int value;
 	int score_result = 0;
-
-	if(strcmp(signal, "ex")==0) {
-		save(score.address);
-		//exit
-		exit(0);
-	}
-
-	//decompose signal
-	sscanf(signal, "%c:%c:%d", &action, &house, &value);
 
 	//act according to instruction
 	switch(action) {
 		case 'U':
 			update(house_to_index(house), value);
-			return 0;
+			break;
 		case 'A':
 			add(house_to_index(house), value);
-			return 0;
-		case 'M':
-			minus(house_to_index(house), value);		
-			return 0;
-		case 'G':
-			score_result = getscore(house_to_index(house));
-			return score_result;
 			break;
+		case 'M':
+			minus(house_to_index(house), value);
+			break;	
 	}
 
 	//save score to file
 	save(score.address);
 }
 
-//request by main server
-void change_score(char action, char house, int value)
-{
-	//command string to send over
-	char *cmd = (char *)malloc(10);
-
-	//setup the string
-	sprintf(cmd, "%c:%c:%d", action, house, value);
-
-	//send data over
-	scoring(cmd);
-}
-
-//kill score server
-void kill_score()
-{
-	scoring("ex");
-}
 //communicate with score server to get score
 int get_score(char house)
 {
 	//setup instruction to get score
-	char *cmd = (char *)malloc(5);
-	sprintf(cmd, "%c:%c:%d\n", 'G', house, 0);
-
-	//setup variable to receive score
-	int result_score = 0;
-
-	//return requested score
-	return scoring(cmd);
+	return(score.score_table[house_to_index(house)]);
 }
 
 void dumpLine(FILE *stream)
@@ -181,7 +134,7 @@ void dumpLine(FILE *stream)
 }
 
 //push score to web server for updating
-void pushScore(char address[])
+void pushScore(char address[], char port[])
 {
 	//setup variables
 	int sock;			//socket
@@ -198,14 +151,17 @@ void pushScore(char address[])
 	sock = socket(AF_INET, SOCK_STREAM, 0);					//new socket stream
 	memset(&serv_addr, '0', sizeof(serv_addr));				//clean address structure
 	serv_addr.sin_family = AF_INET;						//internet
-	serv_addr.sin_port = htons(PORT);					//port = N ie 8888
+	serv_addr.sin_port = htons(atoi(port));					//port = N ie 8888
 	inet_pton(AF_INET, address, &serv_addr.sin_addr);			//combine
-	connect(sock, (struct sockaddr*)&serv_addr, sizeof(serv_addr));		//connect
+	if(connect(sock, (struct sockaddr*)&serv_addr, sizeof(serv_addr))<0) {
+		printf("connection to web server failed\n");
+	}		//connect
 
 	if((n=write(sock, recvBuff, sizeof(recvBuff)))<0) {			//write score to socket to python web server
 		printf("socket write error\n");
 	}
 	printf("%d!!!!]n", n);
+	close(sock);
 }
 /*
 //dummy main
