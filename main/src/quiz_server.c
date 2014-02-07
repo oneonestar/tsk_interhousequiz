@@ -57,7 +57,6 @@ void read_instruction(struct bufferevent *bev, void *ctx)
 	size_t len = evbuffer_get_length(input);
 	if(len) {
 		evbuffer_copyout(input, recvBuff, len);
-		printf("Received: %s\n", recvBuff);
 	}
 
 	//buffer variables
@@ -70,6 +69,7 @@ void read_instruction(struct bufferevent *bev, void *ctx)
 	char buffer[500];
 	
 	recvBuff[strlen(recvBuff)] = 0;
+	printf("received command: %s\n", recvBuff);
 
 	//process instruction
 	sscanf(recvBuff, "%s %s %c %s", instruction, option, &data, value);
