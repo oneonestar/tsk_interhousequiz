@@ -12,7 +12,6 @@
 #include "score.h"
 //#include "buzzer.h"
 #include "mysocket.h"
-#include "db_connector.h"
 #include "database_dblinker.h"
 #include <mysql.h>
 #include <my_global.h>
@@ -32,6 +31,8 @@ void mytimeout_callback()
 
 void myconn_callback(int port, char* msg)
 {
+	/*create_connection("127.0.0.1", 8889);*/
+	/*send_to_port(8889, "HELLOWORLD");*/
 	printf("callback:\n");
 	printf("message: %s\n\n", msg);
 	/* Add your code here */
@@ -82,7 +83,7 @@ void myconn_callback(int port, char* msg)
 					printf("reading question %d\n", atoi(value));
 					//sprintf(buffer, "question:%s\0", fetch_question(value));
 					MYSQL *con = sql_connect();
-					sprintf(buffer, "question:%s\0", sql_get_result(con, value));
+					sprintf(buffer, "question:%s", sql_get_result(con, value));
 					mysql_close(con);
 					printf("BUFFERERERERE:%s\n", buffer);
 					send_to_port(8889, buffer);

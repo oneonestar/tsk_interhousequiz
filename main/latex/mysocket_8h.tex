@@ -1,0 +1,150 @@
+\hypertarget{mysocket_8h}{\section{src/mysocket.h File Reference}
+\label{mysocket_8h}\index{src/mysocket.\-h@{src/mysocket.\-h}}
+}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{mysocket_8h_aa8cecfc5c5c054d2875c03e77b7be15d}{T\-R\-U\-E}~1
+\item 
+\#define \hyperlink{mysocket_8h_aa93f0eb578d23995850d61f7d61c55c1}{F\-A\-L\-S\-E}~0
+\end{DoxyCompactItemize}
+\subsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef void($\ast$ \hyperlink{mysocket_8h_ab12da4d3e165d48976cfae67b6b79edf}{conn\-\_\-callback} )(int port, char $\ast$msg)
+\item 
+typedef void($\ast$ \hyperlink{mysocket_8h_a3c1703ca99d5de589e556abf082516f4}{timeout\-\_\-callback} )()
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{mysocket_8h_aa33188a983588ce527b8c21f4db600a6}{poll\-\_\-loop} (int port, \hyperlink{mysocket_8h_ab12da4d3e165d48976cfae67b6b79edf}{conn\-\_\-callback} conn\-\_\-cb, \hyperlink{mysocket_8h_a3c1703ca99d5de589e556abf082516f4}{timeout\-\_\-callback} timeout\-\_\-cb, int timeout)
+\begin{DoxyCompactList}\small\item\em Loop waiting any connection, msg or timeout then callback. \end{DoxyCompactList}\item 
+int \hyperlink{mysocket_8h_afdd8e636037a419157873214ac8de1bf}{send\-\_\-to\-\_\-port} (int port, char $\ast$msg)
+\begin{DoxyCompactList}\small\item\em Send message to connecting sockets according to the distination port. \end{DoxyCompactList}\item 
+int \hyperlink{mysocket_8h_ab2056969d2ac9b09afc4f5f62a9cb468}{create\-\_\-connection} (char $\ast$ip, int port)
+\begin{DoxyCompactList}\small\item\em Start a socket to target I\-P\-:Port. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\hypertarget{mysocket_8h_aa93f0eb578d23995850d61f7d61c55c1}{\index{mysocket.\-h@{mysocket.\-h}!F\-A\-L\-S\-E@{F\-A\-L\-S\-E}}
+\index{F\-A\-L\-S\-E@{F\-A\-L\-S\-E}!mysocket.h@{mysocket.\-h}}
+\subsubsection[{F\-A\-L\-S\-E}]{\setlength{\rightskip}{0pt plus 5cm}\#define F\-A\-L\-S\-E~0}}\label{mysocket_8h_aa93f0eb578d23995850d61f7d61c55c1}
+
+
+Definition at line 5 of file mysocket.\-h.
+
+\hypertarget{mysocket_8h_aa8cecfc5c5c054d2875c03e77b7be15d}{\index{mysocket.\-h@{mysocket.\-h}!T\-R\-U\-E@{T\-R\-U\-E}}
+\index{T\-R\-U\-E@{T\-R\-U\-E}!mysocket.h@{mysocket.\-h}}
+\subsubsection[{T\-R\-U\-E}]{\setlength{\rightskip}{0pt plus 5cm}\#define T\-R\-U\-E~1}}\label{mysocket_8h_aa8cecfc5c5c054d2875c03e77b7be15d}
+
+
+Definition at line 4 of file mysocket.\-h.
+
+
+
+\subsection{Typedef Documentation}
+\hypertarget{mysocket_8h_ab12da4d3e165d48976cfae67b6b79edf}{\index{mysocket.\-h@{mysocket.\-h}!conn\-\_\-callback@{conn\-\_\-callback}}
+\index{conn\-\_\-callback@{conn\-\_\-callback}!mysocket.h@{mysocket.\-h}}
+\subsubsection[{conn\-\_\-callback}]{\setlength{\rightskip}{0pt plus 5cm}typedef void( $\ast$ conn\-\_\-callback)(int port, char $\ast$msg)}}\label{mysocket_8h_ab12da4d3e165d48976cfae67b6b79edf}
+Callback function prototype for receiving msg. 
+
+Definition at line 8 of file mysocket.\-h.
+
+\hypertarget{mysocket_8h_a3c1703ca99d5de589e556abf082516f4}{\index{mysocket.\-h@{mysocket.\-h}!timeout\-\_\-callback@{timeout\-\_\-callback}}
+\index{timeout\-\_\-callback@{timeout\-\_\-callback}!mysocket.h@{mysocket.\-h}}
+\subsubsection[{timeout\-\_\-callback}]{\setlength{\rightskip}{0pt plus 5cm}typedef void( $\ast$ timeout\-\_\-callback)()}}\label{mysocket_8h_a3c1703ca99d5de589e556abf082516f4}
+Callback function prototype for poll() timeout. 
+
+Definition at line 11 of file mysocket.\-h.
+
+
+
+\subsection{Function Documentation}
+\hypertarget{mysocket_8h_ab2056969d2ac9b09afc4f5f62a9cb468}{\index{mysocket.\-h@{mysocket.\-h}!create\-\_\-connection@{create\-\_\-connection}}
+\index{create\-\_\-connection@{create\-\_\-connection}!mysocket.h@{mysocket.\-h}}
+\subsubsection[{create\-\_\-connection}]{\setlength{\rightskip}{0pt plus 5cm}int create\-\_\-connection (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{ip, }
+\item[{int}]{port}
+\end{DoxyParamCaption}
+)}}\label{mysocket_8h_ab2056969d2ac9b09afc4f5f62a9cb468}
+
+
+Start a socket to target I\-P\-:Port. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em ip} & target ip address (eg.\char`\"{}127.\-0.\-0.\-1\char`\"{}) \\
+\hline
+{\em port} & target port address \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em 0} & success \\
+\hline
+{\em $<$0} & connection fail \\
+\hline
+\end{DoxyRetVals}
+
+
+Definition at line 320 of file mysocket.\-c.
+
+\hypertarget{mysocket_8h_aa33188a983588ce527b8c21f4db600a6}{\index{mysocket.\-h@{mysocket.\-h}!poll\-\_\-loop@{poll\-\_\-loop}}
+\index{poll\-\_\-loop@{poll\-\_\-loop}!mysocket.h@{mysocket.\-h}}
+\subsubsection[{poll\-\_\-loop}]{\setlength{\rightskip}{0pt plus 5cm}void poll\-\_\-loop (
+\begin{DoxyParamCaption}
+\item[{int}]{port, }
+\item[{{\bf conn\-\_\-callback}}]{conn\-\_\-cb, }
+\item[{{\bf timeout\-\_\-callback}}]{timeout\-\_\-cb, }
+\item[{int}]{timeout}
+\end{DoxyParamCaption}
+)}}\label{mysocket_8h_aa33188a983588ce527b8c21f4db600a6}
+
+
+Loop waiting any connection, msg or timeout then callback. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em port} & listening to which port \\
+\hline
+{\em conn\-\_\-cb} & callback after receiving a msg \\
+\hline
+{\em timeout\-\_\-cb} & callback after timeout \\
+\hline
+{\em timeout} & timeout the listen in millisecond \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 108 of file mysocket.\-c.
+
+\hypertarget{mysocket_8h_afdd8e636037a419157873214ac8de1bf}{\index{mysocket.\-h@{mysocket.\-h}!send\-\_\-to\-\_\-port@{send\-\_\-to\-\_\-port}}
+\index{send\-\_\-to\-\_\-port@{send\-\_\-to\-\_\-port}!mysocket.h@{mysocket.\-h}}
+\subsubsection[{send\-\_\-to\-\_\-port}]{\setlength{\rightskip}{0pt plus 5cm}int send\-\_\-to\-\_\-port (
+\begin{DoxyParamCaption}
+\item[{int}]{port, }
+\item[{char $\ast$}]{msg}
+\end{DoxyParamCaption}
+)}}\label{mysocket_8h_afdd8e636037a419157873214ac8de1bf}
+
+
+Send message to connecting sockets according to the distination port. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em port} & the destination port \\
+\hline
+{\em msg} & msg needed to send out \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em number} & of connections sended by this function \\
+\hline
+\end{DoxyRetVals}
+
+
+Definition at line 87 of file mysocket.\-c.
+
