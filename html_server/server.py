@@ -107,7 +107,7 @@ class FileNoDir(static.File):
 #stdin
 stdio.StandardIO(StdinInputHandler())
 #server root directory 
-root = FileNoDir(".")
+root = FileNoDir("./www")
 root.childNotFound = NoResource()
 root.indexName=["index.html"]
 #server send events
