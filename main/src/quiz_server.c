@@ -35,7 +35,7 @@ void send_message(char *address, int port, char *msg)
 	//setup socket to the web server
 	int sock = socket(AF_INET, SOCK_STREAM, 0);
 	struct sockaddr_in server_addr;
-	memset(&sin, '0', sizeof(server_addr));
+	memset(&server_addr, '0', sizeof(server_addr));
 	server_addr.sin_family = AF_INET;
 	server_addr.sin_port = htons(port);
 	inet_pton(AF_INET, address, &server_addr.sin_addr);
@@ -220,8 +220,8 @@ int main(int argc, char *argv[])
 	score_init(0, "back.dat");
 
 	//store addresses
-	strcpy(webServer, argv[0]);
-	strcpy(buzzerServer, argv[1]);
+	strcpy(webServer, argv[1]);
+	strcpy(buzzerServer, argv[2]);
 
 	printf("parent starting\n");
 	server();
