@@ -1,0 +1,256 @@
+\hypertarget{database__dblinker_8c}{\section{src/database\-\_\-dblinker.c File Reference}
+\label{database__dblinker_8c}\index{src/database\-\_\-dblinker.\-c@{src/database\-\_\-dblinker.\-c}}
+}
+{\ttfamily \#include $<$stdio.\-h$>$}\\*
+{\ttfamily \#include $<$stdlib.\-h$>$}\\*
+{\ttfamily \#include $<$my\-\_\-global.\-h$>$}\\*
+{\ttfamily \#include $<$mysql.\-h$>$}\\*
+{\ttfamily \#include $<$string.\-h$>$}\\*
+{\ttfamily \#include $<$stdbool.\-h$>$}\\*
+{\ttfamily \#include $<$fcntl.\-h$>$}\\*
+{\ttfamily \#include $<$sys/stat.\-h$>$}\\*
+{\ttfamily \#include $<$sys/types.\-h$>$}\\*
+{\ttfamily \#include $<$unistd.\-h$>$}\\*
+{\ttfamily \#include $<$wchar.\-h$>$}\\*
+{\ttfamily \#include $<$locale.\-h$>$}\\*
+{\ttfamily \#include $<$sys/socket.\-h$>$}\\*
+{\ttfamily \#include $<$arpa/inet.\-h$>$}\\*
+{\ttfamily \#include $<$netdb.\-h$>$}\\*
+{\ttfamily \#include $<$netinet/in.\-h$>$}\\*
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+char $\ast$ \hyperlink{database__dblinker_8c_a4ec013ede61590517736f7bbe4a9ef24}{string\-\_\-create} (char $\ast$id, char $\ast$question, char $\ast$A, char $\ast$B, char $\ast$C, char $\ast$D, char $\ast$correct, char $\ast$path)
+\item 
+void \hyperlink{database__dblinker_8c_a9b8260a8af03e3998ad46489c0098a6f}{init\-\_\-track} (int track\mbox{[}40\mbox{]})
+\item 
+bool \hyperlink{database__dblinker_8c_a2cae8fd846926060374b62c7c91c1df7}{is\-\_\-track} (int track\mbox{[}40\mbox{]}, int item)
+\item 
+void \hyperlink{database__dblinker_8c_adc3396cf0a1eb5ddc138d30091bacf02}{update\-\_\-track} (int track\mbox{[}40\mbox{]}, int item)
+\item 
+void \hyperlink{database__dblinker_8c_ab34bb67965c458b121bef51a80b089f8}{get\-\_\-id} (char id\mbox{[}3\mbox{]}, int fd\mbox{[}2\mbox{]})
+\item 
+void \hyperlink{database__dblinker_8c_a54682654f4949d65918b1e698b747c2a}{send\-\_\-id} (int fd\mbox{[}2\mbox{]}, char $\ast$cid)
+\item 
+char $\ast$ \hyperlink{database__dblinker_8c_ab68cd180338002fd48dbf0a71622afd8}{get\-\_\-string} (int fd\mbox{[}2\mbox{]})
+\item 
+void \hyperlink{database__dblinker_8c_abb412fdb51cb3ad34130dd8eb3ee06d0}{send\-\_\-string} (char $\ast$json\-\_\-string, int fd\mbox{[}2\mbox{]})
+\item 
+M\-Y\-S\-Q\-L $\ast$ \hyperlink{database__dblinker_8c_a305145dcc5438f26a66d2f3e2498c8b8}{sql\-\_\-connect} ()
+\item 
+M\-Y\-S\-Q\-L\-\_\-\-R\-E\-S $\ast$ \hyperlink{database__dblinker_8c_ade2d790089f6065ac276af612079dd60}{get\-\_\-result} (M\-Y\-S\-Q\-L $\ast$con, char $\ast$query)
+\item 
+void \hyperlink{database__dblinker_8c_a9a92078827d8f60908c36190d0280214}{pushresult} (char address\mbox{[}$\,$\mbox{]}, char send\-Buff\mbox{[}$\,$\mbox{]})
+\item 
+char $\ast$ \hyperlink{database__dblinker_8c_a9a52f5ff9149b48873623f668e8123b4}{sql\-\_\-get\-\_\-result} (M\-Y\-S\-Q\-L $\ast$con, char $\ast$cid)
+\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+const int \hyperlink{database__dblinker_8c_acd1624008315860acd7eacebaabc0547}{socket\-\_\-port} = 8889
+\item 
+char \hyperlink{database__dblinker_8c_a3a8cff207673364e50f4d29cf8e35eb3}{socket\-\_\-addr} \mbox{[}$\,$\mbox{]} = \char`\"{}127.\-0.\-0.\-1\char`\"{}
+\item 
+const char \hyperlink{database__dblinker_8c_a6beec5753c13dd290445dc3c66d34994}{machine\-\_\-name} \mbox{[}$\,$\mbox{]} = \char`\"{}localhost\char`\"{}
+\item 
+const char \hyperlink{database__dblinker_8c_ad6b71a15991be1d14d49da3325bab1d2}{sql\-\_\-user} \mbox{[}$\,$\mbox{]} = \char`\"{}test\char`\"{}
+\item 
+const char \hyperlink{database__dblinker_8c_a4c6dd36407e9b579ad75de10c7ea96b1}{sql\-\_\-pwd} \mbox{[}$\,$\mbox{]} = \char`\"{}testing\char`\"{}
+\item 
+const char \hyperlink{database__dblinker_8c_afc6de2cb0584ecfe1f6c5351c5bd4988}{sql\-\_\-table\-\_\-name} \mbox{[}$\,$\mbox{]} = \char`\"{}test\char`\"{}
+\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\hypertarget{database__dblinker_8c_ab34bb67965c458b121bef51a80b089f8}{\index{database\-\_\-dblinker.\-c@{database\-\_\-dblinker.\-c}!get\-\_\-id@{get\-\_\-id}}
+\index{get\-\_\-id@{get\-\_\-id}!database_dblinker.c@{database\-\_\-dblinker.\-c}}
+\subsubsection[{get\-\_\-id}]{\setlength{\rightskip}{0pt plus 5cm}void get\-\_\-id (
+\begin{DoxyParamCaption}
+\item[{char}]{id\mbox{[}3\mbox{]}, }
+\item[{int}]{fd\mbox{[}2\mbox{]}}
+\end{DoxyParamCaption}
+)}}\label{database__dblinker_8c_ab34bb67965c458b121bef51a80b089f8}
+
+
+Definition at line 79 of file database\-\_\-dblinker.\-c.
+
+\hypertarget{database__dblinker_8c_ade2d790089f6065ac276af612079dd60}{\index{database\-\_\-dblinker.\-c@{database\-\_\-dblinker.\-c}!get\-\_\-result@{get\-\_\-result}}
+\index{get\-\_\-result@{get\-\_\-result}!database_dblinker.c@{database\-\_\-dblinker.\-c}}
+\subsubsection[{get\-\_\-result}]{\setlength{\rightskip}{0pt plus 5cm}M\-Y\-S\-Q\-L\-\_\-\-R\-E\-S$\ast$ get\-\_\-result (
+\begin{DoxyParamCaption}
+\item[{M\-Y\-S\-Q\-L $\ast$}]{con, }
+\item[{char $\ast$}]{query}
+\end{DoxyParamCaption}
+)}}\label{database__dblinker_8c_ade2d790089f6065ac276af612079dd60}
+
+
+Definition at line 137 of file database\-\_\-dblinker.\-c.
+
+\hypertarget{database__dblinker_8c_ab68cd180338002fd48dbf0a71622afd8}{\index{database\-\_\-dblinker.\-c@{database\-\_\-dblinker.\-c}!get\-\_\-string@{get\-\_\-string}}
+\index{get\-\_\-string@{get\-\_\-string}!database_dblinker.c@{database\-\_\-dblinker.\-c}}
+\subsubsection[{get\-\_\-string}]{\setlength{\rightskip}{0pt plus 5cm}char$\ast$ get\-\_\-string (
+\begin{DoxyParamCaption}
+\item[{int}]{fd\mbox{[}2\mbox{]}}
+\end{DoxyParamCaption}
+)}}\label{database__dblinker_8c_ab68cd180338002fd48dbf0a71622afd8}
+
+
+Definition at line 96 of file database\-\_\-dblinker.\-c.
+
+\hypertarget{database__dblinker_8c_a9b8260a8af03e3998ad46489c0098a6f}{\index{database\-\_\-dblinker.\-c@{database\-\_\-dblinker.\-c}!init\-\_\-track@{init\-\_\-track}}
+\index{init\-\_\-track@{init\-\_\-track}!database_dblinker.c@{database\-\_\-dblinker.\-c}}
+\subsubsection[{init\-\_\-track}]{\setlength{\rightskip}{0pt plus 5cm}void init\-\_\-track (
+\begin{DoxyParamCaption}
+\item[{int}]{track\mbox{[}40\mbox{]}}
+\end{DoxyParamCaption}
+)}}\label{database__dblinker_8c_a9b8260a8af03e3998ad46489c0098a6f}
+
+
+Definition at line 41 of file database\-\_\-dblinker.\-c.
+
+\hypertarget{database__dblinker_8c_a2cae8fd846926060374b62c7c91c1df7}{\index{database\-\_\-dblinker.\-c@{database\-\_\-dblinker.\-c}!is\-\_\-track@{is\-\_\-track}}
+\index{is\-\_\-track@{is\-\_\-track}!database_dblinker.c@{database\-\_\-dblinker.\-c}}
+\subsubsection[{is\-\_\-track}]{\setlength{\rightskip}{0pt plus 5cm}bool is\-\_\-track (
+\begin{DoxyParamCaption}
+\item[{int}]{track\mbox{[}40\mbox{]}, }
+\item[{int}]{item}
+\end{DoxyParamCaption}
+)}}\label{database__dblinker_8c_a2cae8fd846926060374b62c7c91c1df7}
+
+
+Definition at line 50 of file database\-\_\-dblinker.\-c.
+
+\hypertarget{database__dblinker_8c_a9a92078827d8f60908c36190d0280214}{\index{database\-\_\-dblinker.\-c@{database\-\_\-dblinker.\-c}!pushresult@{pushresult}}
+\index{pushresult@{pushresult}!database_dblinker.c@{database\-\_\-dblinker.\-c}}
+\subsubsection[{pushresult}]{\setlength{\rightskip}{0pt plus 5cm}void pushresult (
+\begin{DoxyParamCaption}
+\item[{char}]{address\mbox{[}$\,$\mbox{]}, }
+\item[{char}]{send\-Buff\mbox{[}$\,$\mbox{]}}
+\end{DoxyParamCaption}
+)}}\label{database__dblinker_8c_a9a92078827d8f60908c36190d0280214}
+
+
+Definition at line 150 of file database\-\_\-dblinker.\-c.
+
+\hypertarget{database__dblinker_8c_a54682654f4949d65918b1e698b747c2a}{\index{database\-\_\-dblinker.\-c@{database\-\_\-dblinker.\-c}!send\-\_\-id@{send\-\_\-id}}
+\index{send\-\_\-id@{send\-\_\-id}!database_dblinker.c@{database\-\_\-dblinker.\-c}}
+\subsubsection[{send\-\_\-id}]{\setlength{\rightskip}{0pt plus 5cm}void send\-\_\-id (
+\begin{DoxyParamCaption}
+\item[{int}]{fd\mbox{[}2\mbox{]}, }
+\item[{char $\ast$}]{cid}
+\end{DoxyParamCaption}
+)}}\label{database__dblinker_8c_a54682654f4949d65918b1e698b747c2a}
+
+
+Definition at line 87 of file database\-\_\-dblinker.\-c.
+
+\hypertarget{database__dblinker_8c_abb412fdb51cb3ad34130dd8eb3ee06d0}{\index{database\-\_\-dblinker.\-c@{database\-\_\-dblinker.\-c}!send\-\_\-string@{send\-\_\-string}}
+\index{send\-\_\-string@{send\-\_\-string}!database_dblinker.c@{database\-\_\-dblinker.\-c}}
+\subsubsection[{send\-\_\-string}]{\setlength{\rightskip}{0pt plus 5cm}void send\-\_\-string (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{json\-\_\-string, }
+\item[{int}]{fd\mbox{[}2\mbox{]}}
+\end{DoxyParamCaption}
+)}}\label{database__dblinker_8c_abb412fdb51cb3ad34130dd8eb3ee06d0}
+
+
+Definition at line 109 of file database\-\_\-dblinker.\-c.
+
+\hypertarget{database__dblinker_8c_a305145dcc5438f26a66d2f3e2498c8b8}{\index{database\-\_\-dblinker.\-c@{database\-\_\-dblinker.\-c}!sql\-\_\-connect@{sql\-\_\-connect}}
+\index{sql\-\_\-connect@{sql\-\_\-connect}!database_dblinker.c@{database\-\_\-dblinker.\-c}}
+\subsubsection[{sql\-\_\-connect}]{\setlength{\rightskip}{0pt plus 5cm}M\-Y\-S\-Q\-L$\ast$ sql\-\_\-connect (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{database__dblinker_8c_a305145dcc5438f26a66d2f3e2498c8b8}
+
+
+Definition at line 119 of file database\-\_\-dblinker.\-c.
+
+\hypertarget{database__dblinker_8c_a9a52f5ff9149b48873623f668e8123b4}{\index{database\-\_\-dblinker.\-c@{database\-\_\-dblinker.\-c}!sql\-\_\-get\-\_\-result@{sql\-\_\-get\-\_\-result}}
+\index{sql\-\_\-get\-\_\-result@{sql\-\_\-get\-\_\-result}!database_dblinker.c@{database\-\_\-dblinker.\-c}}
+\subsubsection[{sql\-\_\-get\-\_\-result}]{\setlength{\rightskip}{0pt plus 5cm}char$\ast$ sql\-\_\-get\-\_\-result (
+\begin{DoxyParamCaption}
+\item[{M\-Y\-S\-Q\-L $\ast$}]{con, }
+\item[{char $\ast$}]{cid}
+\end{DoxyParamCaption}
+)}}\label{database__dblinker_8c_a9a52f5ff9149b48873623f668e8123b4}
+
+
+Definition at line 173 of file database\-\_\-dblinker.\-c.
+
+\hypertarget{database__dblinker_8c_a4ec013ede61590517736f7bbe4a9ef24}{\index{database\-\_\-dblinker.\-c@{database\-\_\-dblinker.\-c}!string\-\_\-create@{string\-\_\-create}}
+\index{string\-\_\-create@{string\-\_\-create}!database_dblinker.c@{database\-\_\-dblinker.\-c}}
+\subsubsection[{string\-\_\-create}]{\setlength{\rightskip}{0pt plus 5cm}char$\ast$ string\-\_\-create (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{id, }
+\item[{char $\ast$}]{question, }
+\item[{char $\ast$}]{A, }
+\item[{char $\ast$}]{B, }
+\item[{char $\ast$}]{C, }
+\item[{char $\ast$}]{D, }
+\item[{char $\ast$}]{correct, }
+\item[{char $\ast$}]{path}
+\end{DoxyParamCaption}
+)}}\label{database__dblinker_8c_a4ec013ede61590517736f7bbe4a9ef24}
+
+
+Definition at line 29 of file database\-\_\-dblinker.\-c.
+
+\hypertarget{database__dblinker_8c_adc3396cf0a1eb5ddc138d30091bacf02}{\index{database\-\_\-dblinker.\-c@{database\-\_\-dblinker.\-c}!update\-\_\-track@{update\-\_\-track}}
+\index{update\-\_\-track@{update\-\_\-track}!database_dblinker.c@{database\-\_\-dblinker.\-c}}
+\subsubsection[{update\-\_\-track}]{\setlength{\rightskip}{0pt plus 5cm}void update\-\_\-track (
+\begin{DoxyParamCaption}
+\item[{int}]{track\mbox{[}40\mbox{]}, }
+\item[{int}]{item}
+\end{DoxyParamCaption}
+)}}\label{database__dblinker_8c_adc3396cf0a1eb5ddc138d30091bacf02}
+
+
+Definition at line 61 of file database\-\_\-dblinker.\-c.
+
+
+
+\subsection{Variable Documentation}
+\hypertarget{database__dblinker_8c_a6beec5753c13dd290445dc3c66d34994}{\index{database\-\_\-dblinker.\-c@{database\-\_\-dblinker.\-c}!machine\-\_\-name@{machine\-\_\-name}}
+\index{machine\-\_\-name@{machine\-\_\-name}!database_dblinker.c@{database\-\_\-dblinker.\-c}}
+\subsubsection[{machine\-\_\-name}]{\setlength{\rightskip}{0pt plus 5cm}const char machine\-\_\-name\mbox{[}$\,$\mbox{]} = \char`\"{}localhost\char`\"{}}}\label{database__dblinker_8c_a6beec5753c13dd290445dc3c66d34994}
+
+
+Definition at line 23 of file database\-\_\-dblinker.\-c.
+
+\hypertarget{database__dblinker_8c_a3a8cff207673364e50f4d29cf8e35eb3}{\index{database\-\_\-dblinker.\-c@{database\-\_\-dblinker.\-c}!socket\-\_\-addr@{socket\-\_\-addr}}
+\index{socket\-\_\-addr@{socket\-\_\-addr}!database_dblinker.c@{database\-\_\-dblinker.\-c}}
+\subsubsection[{socket\-\_\-addr}]{\setlength{\rightskip}{0pt plus 5cm}char socket\-\_\-addr\mbox{[}$\,$\mbox{]} = \char`\"{}127.\-0.\-0.\-1\char`\"{}}}\label{database__dblinker_8c_a3a8cff207673364e50f4d29cf8e35eb3}
+
+
+Definition at line 21 of file database\-\_\-dblinker.\-c.
+
+\hypertarget{database__dblinker_8c_acd1624008315860acd7eacebaabc0547}{\index{database\-\_\-dblinker.\-c@{database\-\_\-dblinker.\-c}!socket\-\_\-port@{socket\-\_\-port}}
+\index{socket\-\_\-port@{socket\-\_\-port}!database_dblinker.c@{database\-\_\-dblinker.\-c}}
+\subsubsection[{socket\-\_\-port}]{\setlength{\rightskip}{0pt plus 5cm}const int socket\-\_\-port = 8889}}\label{database__dblinker_8c_acd1624008315860acd7eacebaabc0547}
+
+
+Definition at line 20 of file database\-\_\-dblinker.\-c.
+
+\hypertarget{database__dblinker_8c_a4c6dd36407e9b579ad75de10c7ea96b1}{\index{database\-\_\-dblinker.\-c@{database\-\_\-dblinker.\-c}!sql\-\_\-pwd@{sql\-\_\-pwd}}
+\index{sql\-\_\-pwd@{sql\-\_\-pwd}!database_dblinker.c@{database\-\_\-dblinker.\-c}}
+\subsubsection[{sql\-\_\-pwd}]{\setlength{\rightskip}{0pt plus 5cm}const char sql\-\_\-pwd\mbox{[}$\,$\mbox{]} = \char`\"{}testing\char`\"{}}}\label{database__dblinker_8c_a4c6dd36407e9b579ad75de10c7ea96b1}
+
+
+Definition at line 25 of file database\-\_\-dblinker.\-c.
+
+\hypertarget{database__dblinker_8c_afc6de2cb0584ecfe1f6c5351c5bd4988}{\index{database\-\_\-dblinker.\-c@{database\-\_\-dblinker.\-c}!sql\-\_\-table\-\_\-name@{sql\-\_\-table\-\_\-name}}
+\index{sql\-\_\-table\-\_\-name@{sql\-\_\-table\-\_\-name}!database_dblinker.c@{database\-\_\-dblinker.\-c}}
+\subsubsection[{sql\-\_\-table\-\_\-name}]{\setlength{\rightskip}{0pt plus 5cm}const char sql\-\_\-table\-\_\-name\mbox{[}$\,$\mbox{]} = \char`\"{}test\char`\"{}}}\label{database__dblinker_8c_afc6de2cb0584ecfe1f6c5351c5bd4988}
+
+
+Definition at line 26 of file database\-\_\-dblinker.\-c.
+
+\hypertarget{database__dblinker_8c_ad6b71a15991be1d14d49da3325bab1d2}{\index{database\-\_\-dblinker.\-c@{database\-\_\-dblinker.\-c}!sql\-\_\-user@{sql\-\_\-user}}
+\index{sql\-\_\-user@{sql\-\_\-user}!database_dblinker.c@{database\-\_\-dblinker.\-c}}
+\subsubsection[{sql\-\_\-user}]{\setlength{\rightskip}{0pt plus 5cm}const char sql\-\_\-user\mbox{[}$\,$\mbox{]} = \char`\"{}test\char`\"{}}}\label{database__dblinker_8c_ad6b71a15991be1d14d49da3325bab1d2}
+
+
+Definition at line 24 of file database\-\_\-dblinker.\-c.
+

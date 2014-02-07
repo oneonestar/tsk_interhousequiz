@@ -1,5 +1,4 @@
 from twisted.internet import protocol, reactor, stdio
-from twisted.internet.protocol import ReconnectingClientFactory, Protocol
 from twisted.protocols import basic
 from twisted.web import server, resource, static, script
 from twisted.web.resource import Resource, NoResource
@@ -39,11 +38,14 @@ class CtrlConnection(protocol.Protocol):
 		ctrlstr+=data
 		for i in connections:
 			pushToClient(i.write)
-		trlstr = ""
+		#if ctrlstr[-1] == '\n':
+			#for i in connections:
+				#pushToClient(i.write)
+		ctrlstr = ""
 	def connectionLost(self, reason):
 		print "Ctrl close:"+ reason.getErrorMessage()
 
-class CtrlConnectionFactory(ReconnectingClientFactory):
+class CtrlConnectionFactory(protocol.Factory):
 	def buildProtocol(self, addr):
 		return CtrlConnection()
 
@@ -101,38 +103,11 @@ class FileNoDir(static.File):
 	def directoryListing(self):
 		return self.childNotFound
 
-################################
-#start connection to main server
-################################
-class Echo(Protocol):
-    def dataReceived(self, data):
-        print(data)
-
-class EchoClientFactory(ReconnectingClientFactory):
-    def startedConnecting(self, connector):
-        print 'Started to connect.'
-
-    def buildProtocol(self, addr):
-        print 'Connected.'
-        print 'Resetting reconnection delay'
-        self.resetDelay()
-        return Echo()
-
-    def clientConnectionLost(self, connector, reason):
-        print 'Lost connection.  Reason:', reason
-        ReconnectingClientFactory.clientConnectionLost(self, connector, reason)
-
-    def clientConnectionFailed(self, connector, reason):
-        print 'Connection failed. Reason:', reason
-        ReconnectingClientFactory.clientConnectionFailed(self, connector,
-                                                         reason)
-def connection_to_main(host, port):
-	reactor.connectTCP(host, port, CtrlConnectionFactory(), bindAddress=("127.0.0.1", 8889))
 		
 #stdin
 stdio.StandardIO(StdinInputHandler())
 #server root directory 
-root = FileNoDir("./www")
+root = FileNoDir(".")
 root.childNotFound = NoResource()
 root.indexName=["index.html"]
 #server send events
@@ -143,16 +118,14 @@ site = server.Site(root)
 #command line change port support
 import argparse
 parser = argparse.ArgumentParser(description='Twisted web server.')
-parser.add_argument('--ctrlport', nargs='?',default='8891', const='8891', type=int, help='Port to control server')
-parser.add_argument('--mainip', nargs='?',default='127.0.0.1', const='127.0.0.1', type=str, help='IP to main server')
-parser.add_argument('--mainport', nargs='?',default='9000', const='9000', type=int, help='Port to main server')
+parser.add_argument('--ctrlport', nargs='?',default='8889', const='8889', type=int, help='Port to control server')
 parser.add_argument('--webport', nargs='?',default='80', const='80', type=int, help='Port to control server')
 args = parser.parse_args()
 
-#ctrl connection (8891)
+#ctrl connection (8889)
 reactor.listenTCP(args.ctrlport,CtrlConnectionFactory())
 #web connection (80)
 reactor.listenTCP(args.webport,site)
-connection_to_main("127.0.0.1", args.mainport)
+
 
 reactor.run()
