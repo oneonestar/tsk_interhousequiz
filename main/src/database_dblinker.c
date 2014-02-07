@@ -20,7 +20,7 @@ const int socket_port = 8889;
 char socket_addr[] = "192.168.0.102";
 
 const char machine_name[] = "localhost";
-const char sql_user[] = "testing";
+const char sql_user[] = "test";
 const char sql_pwd[] = "testing";
 const char sql_database_name[] = "test";
 

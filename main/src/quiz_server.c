@@ -11,34 +11,56 @@
 #include <arpa/inet.h>
 #include "score.h"
 //#include "buzzer.h"
-#include "mysocket.h"
 #include "database_dblinker.h"
 #include <mysql.h>
 #include <my_global.h>
+#include "non_blocking_socket.h"
+#include <event2/listener.h>
+#include <event2/bufferevent.h>
+#include <event2/buffer.h>
 
+char webServer[50];
+char buzzerServer[50];
 int buzzerPort = 8888;
 int webPort = 8889;
 
 int parse_instruction(char *instruction);
 int parse_option(int instruction, char *option);
 
-void mytimeout_callback()
+void send_message(char *address, int port, char *msg)
 {
-	printf("timeout\n");
-	send_to_port(8887, "star");
-	/* Add your code here */
+	//temp variable
+	int n;
+
+	//setup socket to the web server
+	int sock = socket(AF_INET, SOCK_STREAM, 0);
+	struct sockaddr_in server_addr;
+	memset(&sin, '0', sizeof(server_addr));
+	server_addr.sin_family = AF_INET;
+	server_addr.sin_port = htons(port);
+	inet_pton(AF_INET, address, &server_addr.sin_addr);
+	if(connect(sock, (struct sockaddr*)&server_addr, sizeof(server_addr))) {
+		printf("fail to connect to web server\n");
+	}
+
+	if((n=send(sock, msg, strlen(msg), 0))<=0) {
+		printf("cannot send to web server\n");
+	}
 }
 
-void myconn_callback(int port, char* msg)
+//server main loop
+void read_instruction(struct bufferevent *bev, void *ctx)
 {
-	/*create_connection("127.0.0.1", 8889);*/
-	/*send_to_port(8889, "HELLOWORLD");*/
-	printf("callback:\n");
-	printf("message: %s\n\n", msg);
-	/* Add your code here */
+	//read from socket buffer
+	char recvBuff[50];	//command from gui
+	struct evbuffer *input = bufferevent_get_input(bev);
+	size_t len = evbuffer_get_length(input);
+	if(len) {
+		evbuffer_copyout(input, recvBuff, len);
+		printf("Received: %s\n", recvBuff);
+	}
 
 	//buffer variables
-	char recvBuff[50];	//command from gui
 	char instruction[10], option[10], value[10], data;	//for sscanf
 	int intInstruction, intOption, intValue, intData;	//for parsing
 
@@ -46,8 +68,6 @@ void myconn_callback(int port, char* msg)
 	int question_pointer[6] = {0};
 
 	char buffer[500];
-
-	strcpy(recvBuff, msg);
 	
 	recvBuff[strlen(recvBuff)] = 0;
 
@@ -86,7 +106,7 @@ void myconn_callback(int port, char* msg)
 					sprintf(buffer, "question:%s", sql_get_result(con, value));
 					mysql_close(con);
 					printf("BUFFERERERERE:%s\n", buffer);
-					send_to_port(8889, buffer);
+					send_message(webServer, webPort, buffer);
 					break;
 			}
 			break;
@@ -165,50 +185,31 @@ int parse_option(int instruction, char *option)
 	return -1;
 }
 
-void server_module(char *webServer, char *buzzingServer)
+void server()
 {
-	struct sockaddr_in web_serv_addr;	//addr data structure for buzzer
-	struct sockaddr_in buzzer_serv_addr;	//addr data structure for web server
+	//setup UI listener
+	struct event_base *base;
+	struct evconnlistener *listener;
+	struct sockaddr_in serv_addr;
 
-	//setup socket to the web server
-	int webSock = socket(AF_INET, SOCK_STREAM, 0);
-	memset(&web_serv_addr, '0', sizeof(web_serv_addr));
-	web_serv_addr.sin_family = AF_INET;
-	web_serv_addr.sin_port = htons(webPort);
-	inet_pton(AF_INET, webServer, &web_serv_addr.sin_addr);
-	connect(webSock, (struct sockaddr*)&web_serv_addr, sizeof(web_serv_addr));
-
-	//setup socket to the buzzer
-	int buzzerSock = socket(AF_INET, SOCK_STREAM, 0);
-	memset(&buzzer_serv_addr, '0', sizeof(buzzer_serv_addr));
-	buzzer_serv_addr.sin_family = AF_INET;
-	buzzer_serv_addr.sin_port = htons(buzzerPort);
-	inet_pton(AF_INET, webServer, &buzzer_serv_addr.sin_addr);
-	connect(buzzerSock, (struct sockaddr*)&buzzer_serv_addr, sizeof(buzzer_serv_addr));
-
-	//buffer variables
-	char recvBuff[50];	//command from gui
-	char instruction[10], option[10], value[10], data;	//for sscanf
-
-	int current_question_set[6] = {0};
-	int question_pointer[6] = {0};
-
-	//start server main loop
-	while(1) {
-		//clean all variables before listening
-		memset(&recvBuff, 0, sizeof(recvBuff));
-		memset(&instruction, 0, sizeof(instruction));
-		memset(&option, 0, sizeof(option));
-		memset(&value, 0, sizeof(value));
-
-		//receive instruction from GUI
-		//dummy, receive from stdin
-		printf("->");
-		int port = 9000;
-		poll_loop( port, myconn_callback, mytimeout_callback , 3*1000); //3 sec timeout 
-// 		fgets(recvBuff, 49, stdin);
-		
+	base = event_base_new();
+	if(!base) {
+		printf("cannot open even base\n");
 	}
+
+	memset(&serv_addr, '0', sizeof(serv_addr));
+	serv_addr.sin_family = AF_INET;
+	serv_addr.sin_addr.s_addr = INADDR_ANY;
+	serv_addr.sin_port = htons(9000);
+
+	listener = evconnlistener_new_bind(base, accept_connection, NULL, LEV_OPT_CLOSE_ON_FREE | LEV_OPT_REUSEABLE, -1, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
+
+	if(!listener) {
+		printf("cannot create listneer\n");
+	}
+
+	event_base_dispatch(base);
+
 }
 
 
@@ -217,10 +218,13 @@ int main(int argc, char *argv[])
 	//start score module
 	printf("printing score\n");
 	score_init(0, "back.dat");
-//		scoring();
+
+	//store addresses
+	strcpy(webServer, argv[0]);
+	strcpy(buzzerServer, argv[1]);
 
 	printf("parent starting\n");
-	server_module(argv[1], argv[2]);
+	server();
 	
 	
 
