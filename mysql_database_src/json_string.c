@@ -2,10 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <json/json.h>
-#include <wchar.h>
-#include <locale.h>
 
-wchar_t *json_create(int id, wchar_t *question, wchar_t *A, wchar_t *B, wchar_t *C, wchar_t *D, wchar_t *correct, wchar_t *path)
+char *json_create(int id, char *question, char *A, char *B, char *C, char *D, char *correct, char *path)
 {
 	//new json structures
 	struct json_object *root;
@@ -33,15 +31,16 @@ wchar_t *json_create(int id, wchar_t *question, wchar_t *A, wchar_t *B, wchar_t 
 	json_object_object_add(root, "Path", json_object_new_string(path));
 
 	//new string to store the json string
-	wchar_t *json_string = (wchar_t*)malloc(sizeof(wchar_t)*wcslen((wchar_t*)json_object_get_string(root)));
-	wcscpy(json_string, (wchar_t*)json_object_get_string(root));
+	char *json_string = (char*)malloc(sizeof(char)*strlen((char*)json_object_get_string(root)));
+	strcpy(json_string, (char*)json_object_get_string(root));
 
 	//return string pointer
 	return json_string;
 }
 
 //array parser
-wchar_t **json_parse_array( json_object *jobj, wchar_t *key) {
+
+char **json_parse_array( json_object *jobj, char *key) {
 	void json_parse(json_object * jobj); /*Forward Declaration*/
 	enum json_type type;
 
@@ -58,41 +57,41 @@ wchar_t **json_parse_array( json_object *jobj, wchar_t *key) {
 	json_object * jvalue;
 
 	//to hold the return
-	wchar_t **options = (wchar_t**)malloc(sizeof(wchar_t*)*4);
+	char **options = (char**)malloc(sizeof(char*)*4);
 
 	//iterate through the array and read value
 	for (i=0; i< arraylen; i++) {
 		jvalue = json_object_array_get_idx(jarray, i); /*Getting the array element at position i*/
-		options[i] = (wchar_t*)malloc(sizeof(wchar_t)*wcslen(json_object_get_string(jvalue)));
-		wcscpy(options[i], json_object_get_string(jvalue));
+		options[i] = (char*)malloc(sizeof(char)*strlen(json_object_get_string(jvalue)));
+		strcpy(options[i], json_object_get_string(jvalue));
 	}
 
 	return options;
 }
 
 //parse answers
-wchar_t **answer_parser(wchar_t *json_string)
+char **answer_parser(char *json_string)
 {
 	//new tokener
 	json_object *jobj = json_tokener_parse(json_string);
 	enum json_type type;
 	int i = 0;
-	wchar_t **answer;
+	char **answer;
 
 	json_object_object_foreach(jobj, key, val) {
 		//only get the option part
-		if(wcscmp(key, L"Options")==0) {
+		if(strcmp(key, "Options")==0) {
 			answer = json_parse_array(jobj, key);
 		}
 	}
 	return answer;
 }
 
-wchar_t **question_parser(wchar_t *json_string)
+char **question_parser(char *json_string)
 {
 	json_object *jobj = json_tokener_parse(json_string);
 	enum json_type type;
-	wchar_t **question = (wchar_t**)malloc(sizeof(wchar_t*)*4);
+	char **question = (char**)malloc(sizeof(char*)*4);
 	int i = 0;
 
 	json_object_object_foreach(jobj, key, val) {
@@ -101,8 +100,8 @@ wchar_t **question_parser(wchar_t *json_string)
 			case json_type_array:
 				break;
 			case json_type_string:
-				question[i] = (wchar_t*)malloc(sizeof(wchar_t)*strlen(json_object_get_string(val)));
-				wcscpy(question[i], json_object_get_string(val));
+				question[i] = (char*)malloc(sizeof(char)*strlen(json_object_get_string(val)));
+				strcpy(question[i], json_object_get_string(val));
 				i++;
 				break;
 		}
@@ -110,12 +109,11 @@ wchar_t **question_parser(wchar_t *json_string)
 
 	return question;
 }
-
+/*
 int main(void)
 {
-	wchar_t *question = json_create(1, "question", "A", "B", "C", "D", "correct", "path");
-	setlocale(LC_ALL, "");
-	wprintf(L"%ls\n", question);
+	char *question = json_create(1, "question", "A", "B", "C", "D", "correct", "path");
+	printf("%s\n", question);
 	return 0;
 }
-
+*/
