@@ -19,15 +19,19 @@
 #include <event2/bufferevent.h>
 #include <event2/buffer.h>
 
+//global variables to store address of buzzer and web server
 char webServer[50];
 char buzzerServer[50];
-int buzzerPort = 8888;
-int webPort = 8889;
+char buzzerPort[] = "8888";
+char webPort[] = "8889";
+char uiPort[] = "9000";
 
+//declaration
 int parse_instruction(char *instruction);
 int parse_option(int instruction, char *option);
 
-void send_message(char *address, int port, char *msg)
+//a function to send a message to whatever destination
+int send_message(char *address, char *port, char *msg)
 {
 	//temp variable
 	int n;
@@ -37,7 +41,7 @@ void send_message(char *address, int port, char *msg)
 	struct sockaddr_in server_addr;
 	memset(&server_addr, '0', sizeof(server_addr));
 	server_addr.sin_family = AF_INET;
-	server_addr.sin_port = htons(port);
+	server_addr.sin_port = htons(atoi(port));
 	inet_pton(AF_INET, address, &server_addr.sin_addr);
 	if(connect(sock, (struct sockaddr*)&server_addr, sizeof(server_addr))) {
 		printf("fail to connect to web server\n");
@@ -45,30 +49,47 @@ void send_message(char *address, int port, char *msg)
 
 	if((n=send(sock, msg, strlen(msg), 0))<=0) {
 		printf("cannot send to web server\n");
+		return -1;
 	}
+	else
+		return n;
 }
 
-//server main loop
+//server main loop and call back function to parse instruction from telnet
 void read_instruction(struct bufferevent *bev, void *ctx)
 {
 	//read from socket buffer
-	char recvBuff[50];	//command from gui
-	struct evbuffer *input = bufferevent_get_input(bev);
-	size_t len = evbuffer_get_length(input);
+	//evbuffer created to get input from buffer, obtain lenth of data in buffer with evbuffer_get_length()
+	//allot memory and call evbuffer_remove() to copy data into recvBuffer and drain data inside buffer
+	char *recvBuff;
+	struct evbuffer *input = bufferevent_get_input(bev);	//read the buffer
+	struct info *inf = ctx;									//get information about the connection
+	size_t len = evbuffer_get_length(input);				//get length
 	if(len) {
-		evbuffer_copyout(input, recvBuff, len);
+		printf("Data of length %zu received from %s:%s\n", len, inf->address, inf->port);
+		recvBuff = (char*)malloc(sizeof(char)*(len+1));
+		if(evbuffer_remove(input, recvBuff, len)<0) {
+			printf("copy form evbuffer failed!\n");
+		}
+		else {
+			recvBuff[len] = 0;
+		}
+		
 	}
 
-	//buffer variables
+	//parsing variables
+	//instruction=command catag, option=action to be taken; value=a char value; data=an int value
 	char instruction[10], option[10], value[10], data;	//for sscanf
 	int intInstruction, intOption, intValue, intData;	//for parsing
 
+	//store pointer to current question
 	int current_question_set[6] = {0};
 	int question_pointer[6] = {0};
 
+	//a buffer for storing returned string from functions
 	char buffer[500];
 	
-	recvBuff[strlen(recvBuff)] = 0;
+	//DEBUG
 	printf("received command: %s\n", recvBuff);
 
 	//process instruction
@@ -76,6 +97,9 @@ void read_instruction(struct bufferevent *bev, void *ctx)
 	intInstruction = parse_instruction(instruction);			//read instructions
 	intOption = parse_option(intInstruction, option);			//read options
 
+	//free recvBuff after use
+	free(recvBuff);
+	
 	//error check
 	if(intInstruction==-1||intOption==-1) {
 		printf("invalid instruction\n");
@@ -86,9 +110,8 @@ void read_instruction(struct bufferevent *bev, void *ctx)
 		case 0:
 			//end
 			printf("Exiting...\n");
-			kill_score();
 			exit(0);
-			return;
+			break;
 		case 1:
 			//database process
 			switch(intOption) {
@@ -98,14 +121,16 @@ void read_instruction(struct bufferevent *bev, void *ctx)
 					//update current question pointer for respective house
 					break;
 				case 2:
-					//read from db module, increase question pointer
-					//write to gui and web server
+					//to read a question from database
 					printf("reading question %d\n", atoi(value));
-					//sprintf(buffer, "question:%s\0", fetch_question(value));
-					MYSQL *con = sql_connect();
-					sprintf(buffer, "question:%s", sql_get_result(con, value));
-					mysql_close(con);
-					printf("BUFFERERERERE:%s\n", buffer);
+					
+					//procedure to get json string from database module
+					MYSQL *con = sql_connect();									//initiate mysql connection
+					sprintf(buffer, "question:%s", sql_get_result(con, value));	//get question with question ID and store in buffer
+					mysql_close(con);											//close the connection
+					
+					//send message to webserver to show question
+					printf("Buffer:%s\n", buffer);
 					send_message(webServer, webPort, buffer);
 					break;
 			}
@@ -127,12 +152,18 @@ void read_instruction(struct bufferevent *bev, void *ctx)
 					break;
 			}
 			//push score to webserver
-			pushScore("127.0.0.1");
+			pushScore(webServer, webPort);
 			break;
 		case 3:
 			//buzzer
 			break;
 	}
+	
+	//clear information
+	memset(&recvBuff, 0, sizeof(recvBuff));
+	memset(&buffer, 0, sizeof(buffer));
+	intInstruction = 0;
+	intOption = 0;
 }
 
 
@@ -187,43 +218,49 @@ int parse_option(int instruction, char *option)
 
 void server()
 {
+	//start score module
+	printf("printing score\n");
+	score_init(0, "back.dat");
+	//push score to webserver
+	pushScore(webServer, webPort);
+	
 	//setup UI listener
 	struct event_base *base;
 	struct evconnlistener *listener;
 	struct sockaddr_in serv_addr;
 
+	//setup libevent event base
 	base = event_base_new();
 	if(!base) {
 		printf("cannot open even base\n");
 	}
 
+	//setup struction of the address
 	memset(&serv_addr, '0', sizeof(serv_addr));
 	serv_addr.sin_family = AF_INET;
 	serv_addr.sin_addr.s_addr = INADDR_ANY;
-	serv_addr.sin_port = htons(9000);
+	serv_addr.sin_port = htons(atoi(uiPort));
 
-	listener = evconnlistener_new_bind(base, accept_connection, NULL, LEV_OPT_CLOSE_ON_FREE | LEV_OPT_REUSEABLE, -1, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
+	//bind event to call bcak "accept_connection", which will then call read_instruction()
+	listener = evconnlistener_new_bind(base, accept_connection, NULL, LEV_OPT_CLOSE_ON_FREE | LEV_OPT_REUSEABLE, -1, (struct sockaddr*)&serv_addr, sizeof(serv_addr));
 
 	if(!listener) {
 		printf("cannot create listneer\n");
 	}
 
+	//start event loop
 	event_base_dispatch(base);
-
 }
 
 
 int main(int argc, char *argv[])
 {
-	//start score module
-	printf("printing score\n");
-	score_init(0, "back.dat");
 
 	//store addresses
 	strcpy(webServer, argv[1]);
 	strcpy(buzzerServer, argv[2]);
 
-	printf("parent starting\n");
+	printf("Server starting\n");
 	server();
 	
 	

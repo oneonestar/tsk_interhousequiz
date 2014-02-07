@@ -104,6 +104,16 @@ char **question_parser(char *json_string)
 				strcpy(question[i], json_object_get_string(val));
 				i++;
 				break;
+			case json_type_double:
+				break;
+			case json_type_boolean:
+				break;
+			case json_type_int:
+				break;
+			case json_type_null:
+				break;
+			case json_type_object:
+				break;
 		}
 	}
 
