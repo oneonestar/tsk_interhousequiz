@@ -189,7 +189,6 @@ void server_module(char *webServer, char *buzzingServer)
 	//buffer variables
 	char recvBuff[50];	//command from gui
 	char instruction[10], option[10], value[10], data;	//for sscanf
-	int intInstruction, intOption, intValue, intData;	//for parsing
 
 	int current_question_set[6] = {0};
 	int question_pointer[6] = {0};
@@ -201,8 +200,6 @@ void server_module(char *webServer, char *buzzingServer)
 		memset(&instruction, 0, sizeof(instruction));
 		memset(&option, 0, sizeof(option));
 		memset(&value, 0, sizeof(value));
-		intInstruction = 0;
-		intOption = 0;
 
 		//receive instruction from GUI
 		//dummy, receive from stdin
