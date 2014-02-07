@@ -7,6 +7,7 @@ all:
 	gcc -c src/database_dblinker.c -o obj/db_connector.o -I./src -I../mysql_database_src `mysql_config --cflags` -std=c11
 	gcc -c src/json_string.c -o obj/json_string.o -g $(INC)
 	gcc -c src/quiz_server.c -std=c11 -o obj/quiz_server.o -g $(INC) `mysql_config --cflags`
+	gcc -c src/buzzer.c -o obj/buzzer.o -g $(INC)
 	gcc -o quiz_server obj/*.o -std=c99 `mysql_config --libs --cflags` -ljson-c -levent
 
 clean:
