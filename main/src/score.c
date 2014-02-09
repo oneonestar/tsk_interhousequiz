@@ -160,7 +160,6 @@ void pushScore(char address[], char port[])
 	if((n=write(sock, recvBuff, sizeof(recvBuff)))<0) {			//write score to socket to python web server
 		printf("socket write error\n");
 	}
-	printf("%d!!!!]n", n);
 	close(sock);
 }
 /*

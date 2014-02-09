@@ -65,11 +65,11 @@ void accept_connection(struct evconnlistener *listener, evutil_socket_t fd, stru
 	
 	struct sockaddr_in *sin = (struct sockaddr_in *) address;
 	char *myaddr = inet_ntoa(sin->sin_addr);
-	printf("%s!!!!\n", myaddr);
+	printf("Accepted connection %s\n", myaddr);
 
 	//create connection information
 	struct info *info1 = malloc(sizeof(struct info));
-	info1->address = host;
+	info1->address = myaddr;
 	info1->port = port;
 	info1->total_drained = 0;
 
