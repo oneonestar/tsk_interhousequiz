@@ -13,8 +13,8 @@ public class Communicator extends Thread{
        Socket s;
        FileInputStream fin;
        InputStreamReader is;
-       static int PORT=8887;
-       static String ADDR="localhost";
+       static int PORT=9000;
+       static String ADDR="192.168.0.101";
        PrintWriter pw;
        int port;
        String addr;
@@ -43,6 +43,7 @@ public class Communicator extends Thread{
        }
        public void write(String instruction){
     	   pw.println(instruction);
+    	   pw.flush();
        }
        
        class InReader extends Thread{
