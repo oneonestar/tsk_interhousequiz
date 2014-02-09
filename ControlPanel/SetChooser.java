@@ -12,7 +12,9 @@ public class SetChooser extends JPanel implements ActionListener{
     JButton set6;
     JButton back;
     JLabel currenthouse;
+    JLabel currentSet;
     String currenthouseName;
+    String currentSetNo;
     JLabel empty;
     boolean set1used=false;
     boolean set2used=false;
@@ -42,6 +44,7 @@ public class SetChooser extends JPanel implements ActionListener{
     	back=new JButton("back");
     	currenthouse=new JLabel();
     	currenthouse.setHorizontalAlignment(SwingConstants.CENTER);
+    	currentSet=new JLabel();
     	//this.add(empty);
     	set1.setFont(f);
     	set2.setFont(f);
@@ -78,26 +81,38 @@ public class SetChooser extends JPanel implements ActionListener{
 		if(e.getSource()==set1){
 			cl.show(window.cardstack, "QL");
 			set1.setEnabled(false);
+			currentSetNo="Set 1";
+			currentSet.setText(currentSetNo);
 		}
 		if(e.getSource()==set2){
 			cl.show(window.cardstack, "QL");
 			set2.setEnabled(false);
+			currentSetNo="Set 2";
+			currentSet.setText(currentSetNo);
 		}
 		if(e.getSource()==set3){
 			cl.show(window.cardstack, "QL");
 			set3.setEnabled(false);
+			currentSetNo="Set 3";
+			currentSet.setText(currentSetNo);
 		}
 		if(e.getSource()==set4){
 			cl.show(window.cardstack, "QL");
 			set4.setEnabled(false);
+			currentSetNo="Set 4";
+			currentSet.setText(currentSetNo);
 		}
 		if(e.getSource()==set5){
 			cl.show(window.cardstack, "QL");
 			set5.setEnabled(false);
+			currentSetNo="Set 5";
+			currentSet.setText(currentSetNo);
 		}
 		if(e.getSource()==set6){
 			cl.show(window.cardstack, "QL");
 			set6.setEnabled(false);
+			currentSetNo="Set 6";
+			currentSet.setText(currentSetNo);
 		}
 		
 		
