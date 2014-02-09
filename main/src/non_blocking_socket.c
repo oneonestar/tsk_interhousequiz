@@ -58,6 +58,7 @@ void accept_connection(struct evconnlistener *listener, evutil_socket_t fd, stru
 	int infd;
 	in_len = sizeof(address);
 	int s = getnameinfo(address, sizeof(address), host, 1024, port, 20, 0);
+	host[strlen(host)] = 0;
 	if(s==0)
 		printf("connection from %s:%s\n", host, port);
 	
@@ -66,7 +67,7 @@ void accept_connection(struct evconnlistener *listener, evutil_socket_t fd, stru
 	info1->address = host;
 	info1->port = port;
 	info1->total_drained = 0;
-	
+
 	//create start reading the connection
 	struct event_base *base = evconnlistener_get_base(listener);
 	struct bufferevent *bev = bufferevent_socket_new(base, fd, BEV_OPT_CLOSE_ON_FREE);
