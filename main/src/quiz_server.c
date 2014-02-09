@@ -69,6 +69,7 @@ void read_instruction(struct bufferevent *bev, void *ctx)
 		printf("Data of length %zu received from %s:%s\n", len, inf->address, inf->port);
 		recvBuff = (char*)malloc(sizeof(char)*(len+1));
 		if(evbuffer_remove(input, recvBuff, len)<0) {
+			recvBuff[len] = 0;
 			printf("copy form evbuffer failed!\n");
 		}
 		else {
