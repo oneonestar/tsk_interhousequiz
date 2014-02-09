@@ -7,6 +7,7 @@
 #include <sys/un.h>
 #include <string.h>
 #include <stdlib.h>
+#include <arpa/inet.h>
 #include <stdio.h>
 #include <errno.h>
 #include "non_blocking_socket.h"
@@ -62,6 +63,10 @@ void accept_connection(struct evconnlistener *listener, evutil_socket_t fd, stru
 	if(s==0)
 		printf("connection from %s:%s\n", host, port);
 	
+	struct sockaddr_in *sin = (struct sockaddr_in *) address;
+	char *myaddr = inet_ntoa(sin->sin_addr);
+	printf("%s!!!!\n", myaddr);
+
 	//create connection information
 	struct info *info1 = malloc(sizeof(struct info));
 	info1->address = host;
