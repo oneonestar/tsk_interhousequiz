@@ -79,37 +79,37 @@ public class SetChooser extends JPanel implements ActionListener{
 			cl.show(window.cardstack, "HOUSE");
 		}
 		if(e.getSource()==set1){
-			cl.show(window.cardstack, "QL");
+			cl.show(window.cardstack, "qSet0");
 			set1.setEnabled(false);
 			currentSetNo="Set 1";
 			currentSet.setText(currentSetNo);
 		}
 		if(e.getSource()==set2){
-			cl.show(window.cardstack, "QL");
+			cl.show(window.cardstack, "qSet1");
 			set2.setEnabled(false);
 			currentSetNo="Set 2";
 			currentSet.setText(currentSetNo);
 		}
 		if(e.getSource()==set3){
-			cl.show(window.cardstack, "QL");
+			cl.show(window.cardstack, "qSet2");
 			set3.setEnabled(false);
 			currentSetNo="Set 3";
 			currentSet.setText(currentSetNo);
 		}
 		if(e.getSource()==set4){
-			cl.show(window.cardstack, "QL");
+			cl.show(window.cardstack, "qSet3");
 			set4.setEnabled(false);
 			currentSetNo="Set 4";
 			currentSet.setText(currentSetNo);
 		}
 		if(e.getSource()==set5){
-			cl.show(window.cardstack, "QL");
+			cl.show(window.cardstack, "qSet4");
 			set5.setEnabled(false);
 			currentSetNo="Set 5";
 			currentSet.setText(currentSetNo);
 		}
 		if(e.getSource()==set6){
-			cl.show(window.cardstack, "QL");
+			cl.show(window.cardstack, "qSet5");
 			set6.setEnabled(false);
 			currentSetNo="Set 6";
 			currentSet.setText(currentSetNo);
