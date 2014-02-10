@@ -20,12 +20,12 @@ import java.awt.Insets;
 
 public class MarksPanel extends JPanel implements ActionListener{
 	   
-	   static String MARKSA="1200";
-	   static String MARKSD="300";
-	   static String MARKSH="6000";
-	   static String MARKSJ="1800";
-	   static String MARKSL="10000";
-	   static String MARKSM="6000";
+	   static String MARKSA="100";
+	   static String MARKSD="100";
+	   static String MARKSH="100";
+	   static String MARKSJ="100";
+	   static String MARKSL="100";
+	   static String MARKSM="100";
 		
 	   
 	   JTextField changeMarksA;

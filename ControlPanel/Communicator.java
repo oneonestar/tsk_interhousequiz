@@ -19,8 +19,16 @@ public class Communicator extends Thread{
        int port;
        String addr;
        MainWindow window;
-       public Communicator(MainWindow window){
+       ArrayList<ArrayList<Question>> qSet;
+       ArrayList<QuestionPages> qPages;
+	   WelcomePanel wp;
+	   SetChooser chooser;
+       public Communicator(MainWindow window, WelcomePanel wp, SetChooser sc){
+    	   this.wp=wp;
+    	   this.chooser=sc;
     	   this.window=window;
+    	   qSet=new ArrayList<ArrayList<Question>>();
+    	   qPages=new ArrayList<QuestionPages>();
        }
        public void setUpNetworking(){
     	   try {
@@ -84,7 +92,7 @@ public class Communicator extends Thread{
 			jsonReader.close();
 	        JsonArray questionSetArray = jsonObject.getJsonArray("QuestionSets");
 	        
-	        ArrayList<ArrayList<Question>> qSet=new  ArrayList<ArrayList<Question>>();
+	        //ArrayList<ArrayList<Question>> qSet=new  ArrayList<ArrayList<Question>>();
 	        for(int i=0;i<6;i++){
 	        	qSet.add(new ArrayList<Question>());
 	        }
@@ -118,6 +126,15 @@ public class Communicator extends Thread{
 	  		        
 	  		         System.out.println(qSet.get(i).get(j));
 	  	        }
+	        	
+	        }
+	        int index=0;
+	        String sindex="qSet0";
+	        for(int l=0;l<6;l++){
+	        	qPages.add(new QuestionPages(window, wp, qSet.get(l), chooser , window.c));
+	        	window.cardstack.add(qPages.get(l),sindex);
+	        	index++;
+	        	sindex="qSet"+index;
 	        }
 	        
    		}
