@@ -31,7 +31,7 @@ public class MainWindow {
 	Communicator c;
 	MarksPanel mp;
     public MainWindow(){
-    	c=new Communicator(this);
+    	
     	mainframe=new JFrame("TSK Interhouse Quiz - Admin Control Panel");
     	cardstack=new JPanel(new RXCardLayout());
     	ArrayList<Question> qArray=new ArrayList<Question>();
@@ -40,7 +40,7 @@ public class MainWindow {
     	setChooser=new SetChooser(this);
     	houseList=new HouseChooser(this,setChooser);
     	mp=new MarksPanel(c);
-    	
+    	c=new Communicator(this, welcome, setChooser);
     }
     public void go(){
     	mainframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
