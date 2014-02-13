@@ -1,13 +1,13 @@
 # Readme
 
 ##Folder Structure##
-    - buzzer_src/ .............. buzzer for arduino and pi
-    - html_server/ ............. web server for display question
-    - json_checker/ ............ verify json string
-    - main/ .................... main server
-    - mysql_database_src/ ...... mysql database
-    - mongodb_database_src/ .... mongodb database (backup)
-    - redis_database_src/ ...... redis database (backup)
+    - buzzer_src/ .............. Buzzer for arduino and pi
+    - html_server/ ............. Web server for display question
+    - json_checker/ ............ Verify json string
+    - main/ .................... Main server
+    - mysql_database_src/ ...... Mysql database
+    - mongodb_database_src/ .... Mongodb database (backup)
+    - redis_database_src/ ...... Redis database (backup)
     - ControlPanel/ ............ Java main UI
     - QuizSystemControlPanel/ .. Java main UI
     - quizcontrol/ ............. QT main UI (backup)
