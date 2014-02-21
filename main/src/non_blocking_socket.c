@@ -50,26 +50,18 @@ void read_instruction(struct bufferevent *bev, void *ctx)
 */
 void accept_connection(struct evconnlistener *listener, evutil_socket_t fd, struct sockaddr *address, int socklen, void *cts)
 {
-	//char *str = (char*)malloc(sizeof(char)*INET_ADDRSTRLEN);
-	//inet_ntop(address->sa_family, &(address->sa_data), str, INET_ADDRSTRLEN);
-	
 	char *host = (char*)malloc(sizeof(char)*1024);
 	char *port = (char*)malloc(sizeof(char)*20);
-	socklen_t in_len;
-	int infd;
-	in_len = sizeof(address);
-	int s = getnameinfo(address, sizeof(address), host, 1024, port, 20, 0);
-	host[strlen(host)] = 0;
-	if(s==0)
-		printf("connection from %s:%s\n", host, port);
 	
+	//only works for IPv4
 	struct sockaddr_in *sin = (struct sockaddr_in *) address;
-	char *myaddr = inet_ntoa(sin->sin_addr);
-	printf("Accepted connection %s\n", myaddr);
+	strcpy(host, inet_ntoa(sin->sin_addr));
+	sprintf(port, "%d", sin->sin_port);
+	printf("Accepted connection %s:%s\n", host, port);
 
 	//create connection information
 	struct info *info1 = malloc(sizeof(struct info));
-	info1->address = myaddr;
+	info1->address = host;
 	info1->port = port;
 	info1->total_drained = 0;
 

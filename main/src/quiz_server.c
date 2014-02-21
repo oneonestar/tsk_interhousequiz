@@ -9,15 +9,26 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
-#include "score.h"
-#include "buzzer.h"
-#include "database_dblinker.h"
-#include <mysql.h>
-#include <my_global.h>
-#include "non_blocking_socket.h"
 #include <event2/listener.h>
 #include <event2/bufferevent.h>
 #include <event2/buffer.h>
+#include "score.h"
+#include "buzzer.h"
+#include "non_blocking_socket.h"
+
+#ifndef USE_REDIS
+#ifndef USE_MONGODB
+#define USE_MYSQL
+#endif
+#endif
+
+#ifdef USE_MYSQL
+#include "db_mysql.h"
+#endif
+
+#ifdef USE_REDIS
+#include "db_redis.h"
+#endif
 
 //global variables to store address of buzzer and web server
 char webServer[50];
@@ -126,9 +137,9 @@ void read_instruction(struct bufferevent *bev, void *ctx)
 					printf("reading question %d\n", atoi(value));
 					
 					//procedure to get json string from database module
-					MYSQL *con = sql_connect();									//initiate mysql connection
-					sprintf(buffer, "question:%s", sql_get_result(con, value));	//get question with question ID and store in buffer
-					mysql_close(con);											//close the connection
+					db_con *con = db_connect();									//initiate mysql connection
+					sprintf(buffer, "question:%s", db_get_result(con, value));	//get question with question ID and store in buffer
+					db_close(con);											//close the connection
 					
 					//send message to webserver to show question
 					printf("Buffer:%s\n", buffer);
