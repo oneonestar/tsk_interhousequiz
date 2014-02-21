@@ -3,7 +3,6 @@
 ##Folder Structure##
     - buzzer_src/ .............. Buzzer for arduino and pi
     - html_server/ ............. Web server for display question
-    - json_checker/ ............ Verify json string
     - main/ .................... Main server
     - mysql_database_src/ ...... Mysql database
     - mongodb_database_src/ .... Mongodb database (backup)
