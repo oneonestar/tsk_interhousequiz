@@ -33,6 +33,8 @@ elseif (${DB} STREQUAL "Redis")
 	SET_SOURCE_FILES_PROPERTIES( quiz_server.c PROPERTIES COMPILE_FLAGS -DUSE_REDIS )
 	SET(MyLinkedLib ${MyLinkedLib} lib_redis)
 
+	#dependency
+	SET( CPACK_DEBIAN_PACKAGE_DEPENDS "redis-server, libhiredis0.10" )
 #if using Mongodb
 elseif (${DB} STREQUAL "Mongodb")
   message("Mongodb")
@@ -45,3 +47,22 @@ SET(CMAKE_C_FLAGS_DEBUG "-Wall")
 
 SET_SOURCE_FILES_PROPERTIES( score.c PROPERTIES COMPILE_FLAGS -std=c99 )
 target_link_libraries(quiz ${MyLinkedLib})
+
+INSTALL(TARGETS quiz DESTINATION /tmp/tsk )
+
+#debian binary pack using cpack
+SET( CPACK_GENERATOR "DEB" )
+SET( CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_LIST_DIR}/../../README.md" )
+SET( CPACK_PACKAGE_DESCRIPTION_SUMMARY "TSK Inter-House Quiz Competition Main Control" )
+SET( CPACK_PACKAGE_INSTALL_DIRECTORY "/tmp/starstar/" )
+SET( CPACK_PACKAGE_NAME "quiz_server" )
+SET( CPACK_PACKAGE_VENDOR "TSK alumni" )
+SET( CPACK_PACKAGE_VERSION_MAJOR "0" )
+SET( CPACK_PACKAGE_VERSION_MINOR "1" )
+SET( CPACK_PACKAGE_VERSION_PATCH "0" )
+SET( CPACK_SOURCE_PACKAGE_FILE_NAME "quiz_server" )
+SET( CPACK_DEBIAN_PACKAGE_DEPENDS "${CPACK_DEBIAN_PACKAGE_DEPENDS}, libevent-core-2.0-5, mysql-server, libmysqlclient-dev, libc6-bin" )
+SET( CPACK_DEBIAN_PACKAGE_MAINTAINER "oneonestar oneonestar@gmail.com" )
+SET( CPACK_DEBIAN_PACKAGE_SECTION "devel" )
+SET( CPACK_DEBIAN_PACKAGE_PRIORITY "optional" )
+include(CPack)
