@@ -109,21 +109,20 @@ button[disabled] {
   color: #ccc;
 }
 .house_container p {
-	width:250px;
+	width:25%;
 	height:50px;
 	padding:10px;
-	border:5px solid;
+	border:10px solid;
 	display:inline-block;
 	vertical-align: top;
 	margin:5px; 
+  text-align: center;
 }
 .house_container span {
 	font-size:50px;
 	color:black;
 	font-weight:bold;
 	vertical-align: top;
-	margin-left:50px;
-	margin-top:-2px;
 	display:inline-block;
 }
 .house_container #A_score_box {
@@ -143,4 +142,58 @@ button[disabled] {
 }
 .house_container #M_score_box {
 	border-color: blue;
+}
+
+/* Question */
+#QuestionContainer {
+  color: #000000;
+}
+
+#Question_Catalog, #Question_Set, #Question_ID {
+  color: #000000;
+  font-size: 25px;
+}
+
+/*.question_content {
+  background-color: #300000;
+}
+*/
+#Box_Catalog, #Box_Set, #Box_ID {
+  height: 50px;
+}
+
+#Box_Catalog {
+  float: left;
+  width: 35%;
+}
+
+#Box_Set {
+  float: left;
+  width: 35%;
+}
+
+#Box_ID {
+  float: left;
+  width: 30%;
+}
+
+#Box_Question {
+  float:left;
+  min-width: 100%;
+  width:100%;
+  font-size: 30px;
+  height: 200px;
+}
+
+.question_option {
+  width:50%;
+  float: left;
+  font-size: 30px;
+  min-height: 50px;
+}
+
+#Question_Answer {
+  display:none;
+  color:red;
+  font-size:36px;
 }

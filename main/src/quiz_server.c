@@ -91,7 +91,7 @@ void read_instruction(struct bufferevent *bev, void *ctx)
 
 	//parsing variables
 	//instruction=command catag, option=action to be taken; value=a char value; data=an int value
-	char instruction[10], option[10], value[10], data;	//for sscanf
+	char instruction[10], option[10], value[100], data;	//for sscanf
 	int intInstruction, intOption, intValue, intData;	//for parsing
 
 	//store pointer to current question
@@ -134,7 +134,7 @@ void read_instruction(struct bufferevent *bev, void *ctx)
 					break;
 				case 2:
 					//to read a question from database
-					printf("reading question %d\n", atoi(value));
+					printf("reading question %s\n", value);
 					
 					//procedure to get json string from database module
 					db_con *con = db_connect();									//initiate mysql connection
@@ -170,6 +170,10 @@ void read_instruction(struct bufferevent *bev, void *ctx)
 			//buzzer
 			printf("The first to press the button is %c\n", buzzer(buzzerServer, atoi(buzzerPort), webServer, atoi(webPort)));
 			break;
+		case 4:
+			//answer
+			send_message(webServer, webPort, "answer:{}");
+			break;
 	}
 	
 	//clear information
@@ -191,6 +195,9 @@ int parse_instruction(char *instruction)
 	}
 	else if(strcmp(instruction, "Buzzer")==0) {
 		return 3;
+	}
+	else if(strcmp(instruction, "Answer")==0) {
+		return 4;
 	}
 	else if(strcmp(instruction, "Quit")==0) {
 		return 0;
@@ -221,6 +228,9 @@ int parse_option(int instruction, char *option)
 			}
 			break;
 		case 3:
+			return 0;
+			break;
+		case 4:
 			return 0;
 			break;
 		case 0:

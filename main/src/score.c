@@ -144,7 +144,7 @@ void pushScore(char address[], char port[])
 
 	//get score and convert to character from integer
 	memset(recvBuff, 0, sizeof(recvBuff));					//clean buffer
-	sprintf(recvBuff, "score:A:%d\nscore:D:%d\nscore:H:%d\nscore:J:%d\nscore:L:%d\nscore:M:%d\n", get_score('A'), get_score('D'), get_score('H'), get_score('J'), get_score('L'), get_score('M'));
+	sprintf(recvBuff, "score:{\"A\":\"%d\", \"D\":\"%d\", \"H\":\"%d\", \"J\":\"%d\", \"L\":\"%d\", \"M\":\"%d\"}\n", get_score('A'), get_score('D'), get_score('H'), get_score('J'), get_score('L'), get_score('M'));
 	printf("DEBUG: pushScore(): recvBuff = %s\n", recvBuff);
 
 	//setup socket

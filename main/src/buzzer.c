@@ -79,7 +79,7 @@ char buzzer(char *buzzerAddress, int buzzerPort, char *webServer, int webServerP
 		//when multiple houses press the button in short interval and two characters are received
 		for(i=0; i<strlen(recvBuff); i++) {
 			recvBuff[strlen(recvBuff)] = 0;
-			sprintf(sendBuff, "buzzer:%c:%ld\n", houseToChar(recvBuff[i]-48), time(NULL));	//instruction for web server
+			sprintf(sendBuff, "buzzer:{\"%c\":\"%ld\"}\n", houseToChar(recvBuff[i]-48), time(NULL));	//instruction for web server
 			printf("sending: %s\n", sendBuff);
 			if((n=write(sock1, sendBuff, sizeof(sendBuff)-1))<0) {	//write to web server
 				printf("error\n");

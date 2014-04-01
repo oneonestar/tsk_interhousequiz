@@ -59,18 +59,8 @@ def pushToClient(echo):
 			continue	#empty command
 		print(repr(i))
 		arr = i.split(':')
-		if arr[0] == "score" or arr[0] == "buzzer" or arr[0]=="img":
-			#form json string and send
-			echo("event: %s\n" % arr[0])
-			print(arr)
-			echo('data: {"%s":"%s"}'% (arr[1], arr[2]))
-			echo("\n\n")
-		if arr[0] == "question":
-			#already a json string
-			print("QUESTION:"+i[i.find(':')+1:])
-			echo("event: question\n")
-			echo('data:' + i[i.find(':')+1:].replace('\n','<br>'))
-			echo("\n\n")
+		echo("event: %s\n" % arr[0])
+		echo("data: %s\n\n" % i[i.find(':')+1:])
 
 def myConnectionLost(reason, request): 
 	print("Close HTTP connection:\n"+reason.getErrorMessage())
