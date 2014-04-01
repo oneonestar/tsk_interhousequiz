@@ -1,0 +1,121 @@
+Database:
+[JSON:Info]
+  {
+    "Name":""
+  }
+
+
+Redis:
+Info:A			[JSON:Info] (catalog)
+Info:B			[JSON:Info]
+Info:A:1		[JSON:Info] (set)
+Info:A:2		[JSON:Info]
+Info:B:1		[JSON:Info]
+Info:B:2		[JSON:Info]
+Question:A:1:1		[JSON:Question]
+Question:A:1:2		[JSON:Question]
+
+
+i.e.
+Info:A      齊答題
+Info:B      必答題
+Info:C      附加題
+Info:D      搶答題
+
+Info:A:1    題目集
+Info:B:1    題目集1
+Info:B:2    題目集2
+Info:B:3    題目集3
+Info:B:4    題目集4
+Info:B:5    題目集5
+Info:B:6    題目集6
+Info:B:7    題目集7
+Info:C:1    科學1
+Info:C:2    科學2
+Info:C:3    綜合人文1
+Info:C:4    綜合人文2
+Info:C:5    時事1
+Info:C:6    時事2
+Info:C:7    唔識抵死題（常識）
+
+
+
+
+
+{ "Catalog":"附加題", "Set":"科學1", "ID":"1", "Question": "「初生之犢」的「犢」是指什麼?", "Answer": "小牛", "Path": "abc" }
+
+
+[JSON:Question]
+  {
+    "Question":"",
+    "Options":[ "A", "B", "C", "D" ],
+    "Answer":"",
+    "Path":""
+  }
+
+
+i.e.
+Question:A:1:1    [JSON:Question]
+Question:A:1:2    [JSON:Question]
+...x8 齊答題
+
+Question:B:1:1    [JSON:Question] 題目集1:題目1
+...x4
+Question:B:2:1    [JSON:Question] 題目集2:題目1
+...x4
+
+Question:C:1:1    [JSON:Question] 科學1:題目1
+...x2
+...
+
+===================================
+C structure:
+Question:
+
+[Struct:Question]
+  catalogID:char
+  set:int
+  id:int
+  question:[JSON:Question]
+  ------------------------
+  answer_by:[HouseID]
+  answer_by_alt:[HouseID]
+  card:[CardID]
+  status:[Status]
+
+  
+[HouseID]: char
+[CardID]: flag (32-bit int)
+[Status]: flag (32-bit int)
+
+
+API:
+char* getinfo_catalog(catalogID);
+char* getinfo_set(setID);
+
+
+
+
+[Struct:House]
+  houseID:char
+
+[Struct:CardID]
+
+
+
+
+
+======================
+Command:
+
+
+Question Next x Question:A:1:1
+
+Score Add A 10
+Add
+Update
+Minus 
+
+Buzzer 
+
+Quit

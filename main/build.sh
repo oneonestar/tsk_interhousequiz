@@ -13,3 +13,4 @@ then
 	cmake ../src -DDB:STRING=Mongodb
 fi
 make
+cpack

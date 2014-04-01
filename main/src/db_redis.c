@@ -48,9 +48,16 @@ char* db_get_result(db_con *con, char* cid)
 {	
 	int set = 1;
 	redisReply *reply;
-	reply = redisCommand(con, "GET %d:%s", set, cid);
+	reply = redisCommand(con, "GET %s", cid);
 	char *str = (char*)malloc(reply->len+1);
-	strcpy(str, reply->str);
+	if(reply->len >0)
+	{
+		strcpy(str, reply->str);
+	}
+	else
+	{
+		strcpy(str, "");
+	}
 	freeReplyObject(reply);
 	return str;
 }
