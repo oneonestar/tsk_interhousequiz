@@ -99,7 +99,7 @@
 				$("#Question_Answer span").text(data.Answer);
 
 				if(data.Path.length > 0){
-					$("#myImage").attr("src", data.Path).fadeIn(500);
+					$("#myImage").attr("src", data.Path);
 				}
 
 				if (data.Options != null) {
