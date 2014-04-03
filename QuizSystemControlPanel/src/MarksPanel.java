@@ -45,6 +45,9 @@ public class MarksPanel extends JPanel implements ActionListener{
 	   JLabel Mellitus=new JLabel("Mellitus"); 
 	   
 	   JButton update;
+	   JButton startB;
+	   JButton stopB;
+	   JButton back;
 	   Font f;
 	   Font f2;
 	   
@@ -53,9 +56,9 @@ public class MarksPanel extends JPanel implements ActionListener{
 		   this.c=c;
 		   GridBagLayout gridBagLayout = new GridBagLayout();
 		   gridBagLayout.columnWidths = new int[]{150, 150, 150, 0};
-		   gridBagLayout.rowHeights = new int[]{50, 50, 50, 50, 50, 43, 0, 33, 0};
+		   gridBagLayout.rowHeights = new int[]{50, 50, 50, 50, 50, 43, 0, 33, 0, 0};
 		   gridBagLayout.columnWeights = new double[]{0.0, 0.0, 0.0, Double.MIN_VALUE};
-		   gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		   gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		   setLayout(gridBagLayout);
 		   GridBagConstraints gbc_Augustin = new GridBagConstraints();
 		   gbc_Augustin.fill = GridBagConstraints.VERTICAL;
@@ -70,6 +73,8 @@ public class MarksPanel extends JPanel implements ActionListener{
 		   gbc_changeMarksA.gridx = 1;
 		   gbc_changeMarksA.gridy = 0;
 		   this.add(changeMarksA, gbc_changeMarksA);
+		   changeMarksA.setBackground(Color.red);
+		   changeMarksA.setFont(f);
 		   GridBagConstraints gbc_Deusdedit = new GridBagConstraints();
 		   gbc_Deusdedit.fill = GridBagConstraints.VERTICAL;
 		   gbc_Deusdedit.insets = new Insets(0, 0, 5, 5);
@@ -83,6 +88,8 @@ public class MarksPanel extends JPanel implements ActionListener{
 		   gbc_changeMarksD.gridx = 1;
 		   gbc_changeMarksD.gridy = 1;
 		   this.add(changeMarksD, gbc_changeMarksD);
+		   changeMarksD.setBackground(Color.yellow);
+		   changeMarksD.setFont(f);
 		   GridBagConstraints gbc_Justus = new GridBagConstraints();
 		   gbc_Justus.fill = GridBagConstraints.VERTICAL;
 		   gbc_Justus.insets = new Insets(0, 0, 5, 5);
@@ -140,20 +147,16 @@ public class MarksPanel extends JPanel implements ActionListener{
 		   
 		   update=new JButton("Update");
 		   GridBagConstraints gbc_update = new GridBagConstraints();
-		   gbc_update.insets = new Insets(0, 0, 0, 5);
+		   gbc_update.insets = new Insets(0, 0, 5, 5);
 		   gbc_update.fill = GridBagConstraints.BOTH;
 		   gbc_update.gridx = 1;
 		   gbc_update.gridy = 7;
 		   this.add(update, gbc_update);
 		   update.addActionListener(this);
-		   changeMarksA.setBackground(Color.red);
-		   changeMarksD.setBackground(Color.yellow);
 		   changeMarksJ.setBackground(Color.green);
 		   changeMarksH.setBackground(new Color(238,173,14));
 		   changeMarksL.setBackground(new Color(153,50,204));
 		   changeMarksM.setBackground(Color.blue);
-		   changeMarksA.setFont(f);
-		   changeMarksD.setFont(f);
 		   changeMarksJ.setFont(f);
 		   changeMarksH.setFont(f);
 		   changeMarksL.setFont(f);
@@ -166,8 +169,19 @@ public class MarksPanel extends JPanel implements ActionListener{
 		   Honorius.setFont(f2); 
 		   Laurentius.setFont(f2); 
 		   Mellitus.setFont(f2);
-
-		   
+		   startB=new JButton("Start Buzzer");
+		   GridBagConstraints gbc_startB = new GridBagConstraints();
+		   gbc_startB.insets = new Insets(0, 0, 0, 5);
+		   gbc_startB.gridx = 0;
+		   gbc_startB.gridy = 8;
+		   this.add(startB, gbc_startB);
+		   stopB=new JButton("Stop Buzzer");
+		   GridBagConstraints gbc_stopB = new GridBagConstraints();
+		   gbc_stopB.insets = new Insets(0, 0, 0, 5);
+		   gbc_stopB.gridx = 1;
+		   gbc_stopB.gridy = 8;
+		   this.add(stopB, gbc_stopB);
+		   back=new JButton("back");
 	   }
 	@Override
 	public void actionPerformed(ActionEvent e) {
