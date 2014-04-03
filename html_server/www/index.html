@@ -9,80 +9,14 @@
 		<script src="js/jquery-1.10.2.js"></script>
 		<script src="js/jquery-ui-1.10.4.custom.js"></script>
 		<script type="text/javascript">
-		if (!window.DOMTokenList) {
-			Element.prototype.containsClass = function (name) {
-				return new RegExp("(?:^|\\s+)" + name + "(?:\\s+|$)").test(this.className);
-			};
-
-			Element.prototype.addClass = function (name) {
-				if (!this.containsClass(name)) {
-					var c = this.className;
-					this.className = c ? [c, name].join(' ') : name;
-				}
-			};
-
-			Element.prototype.removeClass = function (name) {
-				if (this.containsClass(name)) {
-					var c = this.className;
-					this.className = c.replace(
-						new RegExp("(?:^|\\s+)" + name + "(?:\\s+|$)", "g"), "");
-				}
-			};
-		}
-
-		 // /events sends messages with text/event-stream mimetype.
 		var source = new EventSource('/events');
 
-		function Logger(id) {
-			this.el = document.getElementById(id);
-		}
-
-		Logger.prototype.log = function (msg, opt_class) {
-			var fragment = document.createDocumentFragment();
-			var p = document.createElement('p');
-			p.className = opt_class || 'info';
-			p.textContent = msg;
-			fragment.appendChild(p);
-			this.el.appendChild(fragment);
-		};
-
-		Logger.prototype.clear = function () {
-			this.el.textContent = '';
-			var house = ["A", "D", "H", "J", "L", "M", "Question", "Answer", "Path"];
-			house.forEach(function (house) {
-				document.getElementById(house).style.backgroundColor = "#FFFFFF";
-				document.getElementById(house).value = 0;
-			});
-		};
-
-		var logger = new Logger('log');
-
-		function closeConnection() {
-			source.close();
-			logger.log('> Connection was closed');
-			updateConnectionStatus('Disconnected', false);
-		}
-
-		function updateConnectionStatus(msg, connected) {
-			var el = document.querySelector('#connection');
-			if (connected) {
-				if (el.classList) {
-					el.classList.add('connected');
-					el.classList.remove('disconnected');
-				} else {
-					el.addClass('connected');
-					el.removeClass('disconnected');
-				}
-			} else {
-				if (el.classList) {
-					el.classList.remove('connected');
-					el.classList.add('disconnected');
-				} else {
-					el.removeClass('connected');
-					el.addClass('disconnected');
-				}
-			}
-			el.innerHTML = msg + '\n';
+		function updateConnectionStatus(text, status){
+			if(status) $('#connection').removeClass('disconnected').addClass('connected');
+			else $('#connection').removeClass('disconnected').addClass('connected');
+			
+			$('#connection span').text(text);
+			$('#connection').delay(500).fadeOut(500);
 		}
 
 		$(function(){
@@ -91,18 +25,14 @@
 					alert('Origin was not http://localhost:8000');
 					// return;
 				}
-
-				logger.log('lastEventID: ' + (e.lastEventId || '--') + ', server time: ' + e.data, 'msg');
 			}, false);
 
 			source.addEventListener('open', function (e) {
-				logger.log('> Connection was opened');
 				updateConnectionStatus('Connected', true);
 			}, false);
 
 			source.addEventListener('error', function (e) {
 				if (e.eventPhase == 2) { //EventSource.CLOSED
-					logger.log('> Connection was closed');
 					updateConnectionStatus('Disconnected', false);
 				}
 			}, false);
@@ -121,7 +51,6 @@
 			});
 
 			source.addEventListener('answer', function (e) {
-				logger.log('>Answer:');
 				$('#Question_Answer')
 					.show();
 				$('#Box_Option')
@@ -131,7 +60,6 @@
 			source.addEventListener('score', function (e) {
 				var data = JSON.parse(e.data);
 				for (var k in data) {
-					logger.log('>Score:' + k + data[k]);
 					$("#" + k + '_score_box')
 						.html(data[k]); //change score according to house ID
 				}
@@ -141,14 +69,12 @@
 				var data = JSON.parse(e.data);
 				$("#myImage")
 					.attr("src", data.path);
-				logger.log('>imgs:' + data.path);
 			});
 
 			/* UI */
 			source.addEventListener('ui', function (e) {
 				var data = JSON.parse(e.data);
 				for (var k in data) {
-					logger.log('>ui:' + k + data[k]);
 					if (k == "score") {
 						if (data[k] == "show")
 							$(".house_container")
@@ -159,22 +85,22 @@
 			});
 
 			source.addEventListener('question', function (e) {
-				logger.log('>>Question:' + e.data);
 				$(".question_content").text("");
 				$("#Box_Option div").text("");
 				$('#Question_Answer').hide();
-				$('#Box_Option').show();
+				$('.box_option').show();
 
 				var data = JSON.parse(e.data);
-				for (var k in data) {
-					logger.log('>Question:' + k + " value:" + data[k]);
-				}
 
 				$("#Question_Catalog").text(data.Catalog);
 				$("#Question_Set").text(data.Set);
 				$("#Question_ID").text(data.ID);
 				$("#Question_Question").text(data.Question);
-				$("#Question_Answer").text(data.Answer);
+				$("#Question_Answer span").text(data.Answer);
+
+				if(data.Path.length > 0){
+					$("#myImage").attr("src", data.Path);
+				}
 
 				if (data.Options != null) {
 					$("#Option_A").text(data.Options[0]);
@@ -214,49 +140,27 @@
 		</div>
 		<!--Questions-->
 		<div id="QuestionContainer">
-			<div id="Box_Catalog" class="Box">
-				<div id="Question_Catalog" class="question_content"></div>
-			</div>
-			<div id="Box_Set" class="Box">
-				<div id="Question_Set" class="question_content"></div>
-			</div>
-			<div id="Box_ID" class="Box">
-				<div id="Question_ID" class="question_content"></div>
+			<div class="row">
+				<div id="Question_Catalog" class="col-md-4 question_content"></div>
+				<div id="Question_ID" class="col-md-4 question_content"></div>
+				<div id="Question_Set" class="col-md-4 question_content"></div>
 			</div>
 			<div id="Box_Question" class="Box">
+				<img id="myImage" src="" alt="image_loc" />
 				<div id="Question_Question" class="question_content"></div>
 			</div>
-			<div id="Box_Option">
-				<div id="Option_A" class="question_option"></div>
-				<div id="Option_B" class="question_option"></div>
-				<div id="Option_C" class="question_option"></div>
-				<div id="Option_D" class="question_option"></div>
+			<div class="box-option row">
+				<div id="Option_A" class="col-md-6 question_option"></div>
+				<div id="Option_B" class="col-md-6 question_option"></div>
 			</div>
-			<div id="Question_Answer">Answer: <input type="text" id="Answer" /></div>
-			<p>Path: <input type="text" id="Path" /></p>
-			<p>Image: <img id="myImage" src="" alt="image_loc" /></p>
+			<div class="box-option row">
+				<div id="Option_C" class="col-md-6 question_option"></div>
+				<div id="Option_D" class="col-md-6 question_option"></div>
+			</div>
+			<div id="Question_Answer">Answer: <span></span></div>
 		</div>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-		<p>
-			<button onclick="logger.clear()">Clear log</button>
-			<button onclick="closeConnection()">Stop reconnections</button>
-			<span id="connection">Connecting...</span>
-		</p>
-		<div class="border" id="log"></div>
+		<div id="connection">
+			<span>Connecting...</span>
+		</div>
 	</body>
 </html>

@@ -35,9 +35,9 @@ if args.score1:
 if args.score2:
 	s.sendall("""score:{"A":"100", "D":"200", "H":"300", "J":"700", "L":"350", "M":"1200"}\n""")
 if args.question:
-	s.sendall("""question:{ "Catalog":"必答題", "Set":"題目集1", "ID":"1", "Question": "Which of the following industries belongs to tertiary production?", "Options": [ "A. Agriculture", "B. Construction", "C. Insurance", "D. Energy Supply" ], "Answer": "correct", "Path": "abc" }\n""")
+	s.sendall("""question:{ "Catalog":"必答題", "Set":"題目集1", "ID":"1", "Question": "Which of the following industries belongs to tertiary production?", "Options": [ "A. Agriculture", "B. Construction", "C. Insurance", "D. Energy Supply" ], "Answer": "correct", "Path": "" }\n""")
 if args.question2:
-	s.sendall("""question:{ "Catalog":"附加題", "Set":"科學1", "ID":"1", "Question": "「初生之犢」的「犢」是指什麼?", "Answer": "小牛", "Path": "abc" }\n""")
+	s.sendall("""question:{ "Catalog":"附加題", "Set":"科學1", "ID":"1", "Question": "「初生之犢」的「犢」是指什麼?", "Answer": "小牛", "Path": "" }\n""")
 if args.img:
 	s.sendall("""img:{"path":"imgs/test.jpg"}\n""")
 if args.img2:
