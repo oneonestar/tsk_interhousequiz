@@ -14,6 +14,7 @@ public class WelcomePanel extends JPanel implements ActionListener{
        Communicator c;
        private JSeparator separator;
        boolean received;
+       
        public WelcomePanel(MainWindow window, Communicator c){
     	   this.c=c;
     	   f=new Font("Big",1,36);
@@ -30,24 +31,24 @@ public class WelcomePanel extends JPanel implements ActionListener{
     	   GridBagConstraints gbc_welcome = new GridBagConstraints();
     	   gbc_welcome.anchor = GridBagConstraints.NORTH;
     	   gbc_welcome.insets = new Insets(0, 0, 5, 5);
-    	   gbc_welcome.gridx = 5;
+    	   gbc_welcome.gridx = 6;
     	   gbc_welcome.gridy = 0;
     	   this.add(welcome, gbc_welcome);
-    	   comp=new JButton("Compulsory");
-    	   comp.setEnabled(false);
-    	   comp.addActionListener(this);
     	   receive=new JButton("Receive Questions");
     	   receive.addActionListener(this);
     	   GridBagConstraints gbc_receive = new GridBagConstraints();
     	   gbc_receive.insets = new Insets(0, 0, 5, 5);
-    	   gbc_receive.gridx = 5;
+    	   gbc_receive.gridx = 6;
     	   gbc_receive.gridy = 1;
     	   this.add(receive, gbc_receive);
+    	   comp=new JButton("Compulsory");
+    	   //comp.setEnabled(false);
+    	   comp.addActionListener(this);
     	   comp.setFont(f);
     	   GridBagConstraints gbc_comp = new GridBagConstraints();
     	   gbc_comp.anchor = GridBagConstraints.NORTH;
     	   gbc_comp.insets = new Insets(0, 0, 5, 5);
-    	   gbc_comp.gridx = 5;
+    	   gbc_comp.gridx = 6;
     	   gbc_comp.gridy = 2;
     	   this.add(comp, gbc_comp);
     	   chal=new JButton("Challenge");
@@ -56,7 +57,7 @@ public class WelcomePanel extends JPanel implements ActionListener{
     	   GridBagConstraints gbc_chal = new GridBagConstraints();
     	   gbc_chal.anchor = GridBagConstraints.NORTH;
     	   gbc_chal.insets = new Insets(0, 0, 5, 5);
-    	   gbc_chal.gridx = 5;
+    	   gbc_chal.gridx = 6;
     	   gbc_chal.gridy = 4;
     	   this.add(chal, gbc_chal);
     	   
@@ -79,7 +80,7 @@ public class WelcomePanel extends JPanel implements ActionListener{
 		}
 		RXCardLayout cl=(RXCardLayout)(window.cardstack.getLayout());
 		if(e.getSource()==comp){
-			cl.show(window.cardstack, "HOUSE" );
+			cl.show(window.cardstack, "qlp" );
 			isChallenge=false;
 		}
 		if(e.getSource()==chal){
