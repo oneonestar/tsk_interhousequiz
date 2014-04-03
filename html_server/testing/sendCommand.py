@@ -18,6 +18,7 @@ parser.add_argument("-b",'--buzzer', help='Push buzzer', action="store_true")
 parser.add_argument("-b2",'--buzzer2', help='Push buzzer2', action="store_true")
 parser.add_argument("-u",'--ui', help='UI', action="store_true")
 parser.add_argument("-u2",'--ui2', help='UI2', action="store_true")
+parser.add_argument("-a",'--answer', help='answer', action="store_true")
 args = parser.parse_args()
 
 
@@ -50,7 +51,8 @@ if args.ui:
 	s.sendall("""ui:{"score":"hide"}\n""")
 if args.ui2:
 	s.sendall("""ui:{"score":"show"}\n""")
-
+if args.a:
+	s.sendall("""answer:{}\n""")
 
 #time.sleep(3)
 s.close()
