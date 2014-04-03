@@ -109,6 +109,10 @@
 					$("#Option_D").text(data.Options[3]);
 				}
 			});
+
+			source.addEventListener('answer', function(){
+				$('#Question_Answer').fadeIn(500);
+			}, false);
 		});
 		</script>
 	</head>
