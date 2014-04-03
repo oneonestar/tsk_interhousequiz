@@ -2,10 +2,11 @@ need python-twisted
 (apt-get install python-twisted)
 
 commands:
-score:[House]:[Score int]
-buzzer:[House]:[Time]
-question:[json string of question]
-img:path:[path of the image]
+score:{[House]:[Score int]}
+buzzer:{[House]:[Time]}
+question:{[json string of question]}
+img:{path:[path of the image]}
+answer:{}
 
 
 Known issue:
