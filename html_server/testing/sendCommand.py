@@ -51,7 +51,7 @@ if args.ui:
 	s.sendall("""ui:{"score":"hide"}\n""")
 if args.ui2:
 	s.sendall("""ui:{"score":"show"}\n""")
-if args.a:
+if args.answer:
 	s.sendall("""answer:{}\n""")
 
 #time.sleep(3)

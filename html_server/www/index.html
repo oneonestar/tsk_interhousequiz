@@ -87,7 +87,7 @@
 			source.addEventListener('question', function (e) {
 				$(".question_content").text("");
 				$("#Box_Option div").text("");
-				$('#Question_Answer').hide();
+				$('#Question_Answer').fadeOut(500);
 				$('.box_option').show();
 
 				var data = JSON.parse(e.data);
