@@ -4,9 +4,12 @@ import java.awt.event.ActionListener;
 import java.awt.event.TextEvent;
 import java.awt.event.TextListener;
 
+import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -16,194 +19,119 @@ import java.awt.Font;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
+import java.util.ArrayList;
 
 
 public class MarksPanel extends JPanel implements ActionListener{
 	   
-	   static String MARKSA="100";
-	   static String MARKSD="100";
-	   static String MARKSH="100";
-	   static String MARKSJ="100";
-	   static String MARKSL="100";
-	   static String MARKSM="100";
-		
+	   private static ArrayList<String> MARKS;
+	  
+	   private static ArrayList<Color> colors;
 	   
-	   JTextField changeMarksA;
-	   JTextField changeMarksD;
-	   JTextField changeMarksJ;
-	   JTextField changeMarksH;
-	   JTextField changeMarksL;
-	   JTextField changeMarksM;
+	   private ArrayList<JTextField> changeMarks;
 	   
-	   Communicator c;
+	   private Communicator c;
 	   
-	   JLabel Augustin=new JLabel("Augustin");
-	   JLabel Deusdedit=new JLabel("Deusdedit"); 
-	   JLabel Justus=new JLabel("Justus"); 
-	   JLabel Honorius=new JLabel("Honorius"); 
-	   JLabel Laurentius=new JLabel("Laurentius"); 
-	   JLabel Mellitus=new JLabel("Mellitus"); 
+	   private ArrayList<JLabel> houseName; 
 	   
-	   JButton update;
-	   JButton startB;
-	   JButton stopB;
-	   JButton back;
-	   Font f;
-	   Font f2;
+	   private JButton update;
+	   private JButton startB;
+	   private JButton stopB;
+	   private JButton back;
+	   private Font f;
+	   private Font f2;
+	   private ButtonGroup group;
+	   private ArrayList<JPanel> panels;
+	   
+	   private ArrayList<JRadioButton> current;
 	   
 	   public MarksPanel(Communicator c){
+		   group=new ButtonGroup();
+		   current=new ArrayList<JRadioButton>();
+		   
 		   f=new Font("Big",1,36);
 		   this.c=c;
-		   GridBagLayout gridBagLayout = new GridBagLayout();
-		   gridBagLayout.columnWidths = new int[]{150, 150, 150, 0};
-		   gridBagLayout.rowHeights = new int[]{50, 50, 50, 50, 50, 43, 0, 33, 0, 0};
-		   gridBagLayout.columnWeights = new double[]{0.0, 0.0, 0.0, Double.MIN_VALUE};
-		   gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-		   setLayout(gridBagLayout);
-		   GridBagConstraints gbc_Augustin = new GridBagConstraints();
-		   gbc_Augustin.fill = GridBagConstraints.VERTICAL;
-		   gbc_Augustin.insets = new Insets(0, 0, 5, 5);
-		   gbc_Augustin.gridx = 0;
-		   gbc_Augustin.gridy = 0;
-		   this.add(Augustin, gbc_Augustin);
-		   changeMarksA=new JTextField(MARKSA);
-		   GridBagConstraints gbc_changeMarksA = new GridBagConstraints();
-		   gbc_changeMarksA.fill = GridBagConstraints.BOTH;
-		   gbc_changeMarksA.insets = new Insets(0, 0, 5, 5);
-		   gbc_changeMarksA.gridx = 1;
-		   gbc_changeMarksA.gridy = 0;
-		   this.add(changeMarksA, gbc_changeMarksA);
-		   changeMarksA.setBackground(Color.red);
-		   changeMarksA.setFont(f);
-		   GridBagConstraints gbc_Deusdedit = new GridBagConstraints();
-		   gbc_Deusdedit.fill = GridBagConstraints.VERTICAL;
-		   gbc_Deusdedit.insets = new Insets(0, 0, 5, 5);
-		   gbc_Deusdedit.gridx = 0;
-		   gbc_Deusdedit.gridy = 1;
-		   this.add(Deusdedit, gbc_Deusdedit);
-		   changeMarksD=new JTextField(MARKSD);
-		   GridBagConstraints gbc_changeMarksD = new GridBagConstraints();
-		   gbc_changeMarksD.fill = GridBagConstraints.BOTH;
-		   gbc_changeMarksD.insets = new Insets(0, 0, 5, 5);
-		   gbc_changeMarksD.gridx = 1;
-		   gbc_changeMarksD.gridy = 1;
-		   this.add(changeMarksD, gbc_changeMarksD);
-		   changeMarksD.setBackground(Color.yellow);
-		   changeMarksD.setFont(f);
-		   GridBagConstraints gbc_Justus = new GridBagConstraints();
-		   gbc_Justus.fill = GridBagConstraints.VERTICAL;
-		   gbc_Justus.insets = new Insets(0, 0, 5, 5);
-		   gbc_Justus.gridx = 0;
-		   gbc_Justus.gridy = 2;
-		   this.add(Justus, gbc_Justus);
-		   changeMarksJ=new JTextField(MARKSJ);
-		   GridBagConstraints gbc_changeMarksJ = new GridBagConstraints();
-		   gbc_changeMarksJ.fill = GridBagConstraints.BOTH;
-		   gbc_changeMarksJ.insets = new Insets(0, 0, 5, 5);
-		   gbc_changeMarksJ.gridx = 1;
-		   gbc_changeMarksJ.gridy = 2;
-		   this.add(changeMarksJ, gbc_changeMarksJ);
-		   GridBagConstraints gbc_Honorius = new GridBagConstraints();
-		   gbc_Honorius.fill = GridBagConstraints.VERTICAL;
-		   gbc_Honorius.insets = new Insets(0, 0, 5, 5);
-		   gbc_Honorius.gridx = 0;
-		   gbc_Honorius.gridy = 3;
-		   this.add(Honorius, gbc_Honorius);
-		   changeMarksH=new JTextField(MARKSH);
-		   GridBagConstraints gbc_changeMarksH = new GridBagConstraints();
-		   gbc_changeMarksH.fill = GridBagConstraints.BOTH;
-		   gbc_changeMarksH.insets = new Insets(0, 0, 5, 5);
-		   gbc_changeMarksH.gridx = 1;
-		   gbc_changeMarksH.gridy = 3;
-		   this.add(changeMarksH, gbc_changeMarksH);
-		   GridBagConstraints gbc_Laurentius = new GridBagConstraints();
-		   gbc_Laurentius.fill = GridBagConstraints.VERTICAL;
-		   gbc_Laurentius.insets = new Insets(0, 0, 5, 5);
-		   gbc_Laurentius.gridx = 0;
-		   gbc_Laurentius.gridy = 4;
-		   this.add(Laurentius, gbc_Laurentius);
-		   changeMarksL=new JTextField(MARKSL);
-		   GridBagConstraints gbc_changeMarksL = new GridBagConstraints();
-		   gbc_changeMarksL.fill = GridBagConstraints.BOTH;
-		   gbc_changeMarksL.insets = new Insets(0, 0, 5, 5);
-		   gbc_changeMarksL.gridx = 1;
-		   gbc_changeMarksL.gridy = 4;
-		   this.add(changeMarksL, gbc_changeMarksL);
-		   GridBagConstraints gbc_Mellitus = new GridBagConstraints();
-		   gbc_Mellitus.fill = GridBagConstraints.VERTICAL;
-		   gbc_Mellitus.insets = new Insets(0, 0, 5, 5);
-		   gbc_Mellitus.gridx = 0;
-		   gbc_Mellitus.gridy = 5;
-		   this.add(Mellitus, gbc_Mellitus);
-		   changeMarksM=new JTextField(MARKSM);
-		   GridBagConstraints gbc_changeMarksM = new GridBagConstraints();
-		   gbc_changeMarksM.fill = GridBagConstraints.BOTH;
-		   gbc_changeMarksM.insets = new Insets(0, 0, 5, 5);
-		   gbc_changeMarksM.gridx = 1;
-		   gbc_changeMarksM.gridy = 5;
-		   this.add(changeMarksM, gbc_changeMarksM);
 		   
+		   panels=new ArrayList<JPanel>();
+		   for(int i=0;i<7;i++){
+			   panels.add(new JPanel());
+		   }
+		   MARKS=new ArrayList<String>();
+		   changeMarks=new ArrayList<JTextField>();
+		   for(int i=0;i<6;i++){
+			   current.add(new JRadioButton());
+			   group.add(current.get(i));
+			   MARKS.add("500");
+			   changeMarks.add(new JTextField(MARKS.get(i)));
+		   }
+		   
+		   houseName=new ArrayList<JLabel>();
+		   houseName.add(new JLabel("Augustin"));
+		   houseName.add(new JLabel("Deusdedit"));
+		   houseName.add(new JLabel("Justus"));
+		   houseName.add(new JLabel("Honorius"));
+		   houseName.add(new JLabel("Laurentius"));
+		   houseName.add(new JLabel("Mellitus"));
+		   
+		   colors=new ArrayList<Color>();
+		   colors.add(Color.red);
+		   colors.add(Color.yellow);
+		   colors.add(Color.green);
+		   colors.add(new Color(238,173,14));
+		   colors.add(new Color(153,50,204));
+		   colors.add(Color.blue);
+		   
+		   f2=new Font("Medium",1,24);
+		   
+		   for(int i=0;i<6;i++){
+			   panels.get(i).add(current.get(i));
+			   panels.get(i).add(houseName.get(i));
+			   panels.get(i).add(changeMarks.get(i));
+			   changeMarks.get(i).setBackground(colors.get(i));
+			   changeMarks.get(i).setFont(f);
+			   houseName.get(i).setFont(f2);
+		   }
+		  
+		
 		  
 		   
 		   update=new JButton("Update");
-		   GridBagConstraints gbc_update = new GridBagConstraints();
-		   gbc_update.insets = new Insets(0, 0, 5, 5);
-		   gbc_update.fill = GridBagConstraints.BOTH;
-		   gbc_update.gridx = 1;
-		   gbc_update.gridy = 7;
-		   this.add(update, gbc_update);
-		   update.addActionListener(this);
-		   changeMarksJ.setBackground(Color.green);
-		   changeMarksH.setBackground(new Color(238,173,14));
-		   changeMarksL.setBackground(new Color(153,50,204));
-		   changeMarksM.setBackground(Color.blue);
-		   changeMarksJ.setFont(f);
-		   changeMarksH.setFont(f);
-		   changeMarksL.setFont(f);
-		   changeMarksM.setFont(f);
-		   
-		   f2=new Font("Medium",1,24);
-		   Augustin.setFont(f2);
-		   Deusdedit.setFont(f2); 
-		   Justus.setFont(f2); 
-		   Honorius.setFont(f2); 
-		   Laurentius.setFont(f2); 
-		   Mellitus.setFont(f2);
 		   startB=new JButton("Start Buzzer");
-		   GridBagConstraints gbc_startB = new GridBagConstraints();
-		   gbc_startB.insets = new Insets(0, 0, 0, 5);
-		   gbc_startB.gridx = 0;
-		   gbc_startB.gridy = 8;
-		   this.add(startB, gbc_startB);
 		   stopB=new JButton("Stop Buzzer");
-		   GridBagConstraints gbc_stopB = new GridBagConstraints();
-		   gbc_stopB.insets = new Insets(0, 0, 0, 5);
-		   gbc_stopB.gridx = 1;
-		   gbc_stopB.gridy = 8;
-		   this.add(stopB, gbc_stopB);
-		   back=new JButton("back");
+		   panels.get(6).add(update);
+		   panels.get(6).add(startB);
+		   panels.get(6).add(stopB);
+		   
+		   
+		   update.addActionListener(this);
+		   
+		   
+		  
+		   this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+		   for(int i=0;i<7;i++){
+			   this.add(panels.get(i));
+		   }
+
+		   
 	   }
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
-		MARKSA=changeMarksA.getText();
-		MARKSD=changeMarksD.getText();
-		MARKSJ=changeMarksJ.getText();
-		MARKSH=changeMarksH.getText();
-		MARKSL=changeMarksL.getText();
-		MARKSM=changeMarksM.getText();
+		for(int i=0;i<6;i++){
+		MARKS.set(i,changeMarks.get(i).getText());
+		}
 		try {
-		c.write("Score Update A "+MARKSA);
+		c.write("Score Update A "+MARKS.get(0));
 			Thread.sleep(5);
-		c.write("Score Update D "+MARKSD);
+		c.write("Score Update D "+MARKS.get(1));
 			Thread.sleep(5);
-		c.write("Score Update J "+MARKSJ);
+		c.write("Score Update J "+MARKS.get(2));
 			Thread.sleep(5);
-		c.write("Score Update H "+MARKSH);
+		c.write("Score Update H "+MARKS.get(3));
 			Thread.sleep(5);
-		c.write("Score Update L "+MARKSL);
+		c.write("Score Update L "+MARKS.get(4));
 			Thread.sleep(5);
-		c.write("Score Update M "+MARKSM);
+		c.write("Score Update M "+MARKS.get(5));
 			Thread.sleep(5);
 		} catch (InterruptedException e1) {
 			// TODO Auto-generated catch block

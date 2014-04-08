@@ -11,46 +11,46 @@ import java.awt.FlowLayout;
 import java.awt.BorderLayout;
 
 public class QuestionListPage extends JPanel{
-    final static JLabel together=new JLabel("齊答題");
-    final static JLabel complusory=new JLabel("必答題");
-    static ArrayList<JLabel> Sets;
-    final static JLabel basicComp=new JLabel("基本部分");
-    final static JLabel AddComp=new JLabel("附加部分");
-    final static JLabel Sci1=new JLabel("科學1");
-    final static JLabel Sci2=new JLabel("科學2");
-    final static JLabel IH1=new JLabel("綜合人文1");
-    final static JLabel IH2=new JLabel("綜合人文2");
-    final static JLabel News1=new JLabel("時事1");
-    final static JLabel News2=new JLabel("時事2");
-    final static JLabel commonsense=new JLabel("唔識抵死題(常識)");
-    ArrayList<JButton> togetherB; 
-    ArrayList<JButton> complusoryB;
-    ArrayList<JButton> basicCompB;
-    ArrayList<JButton> AddCompB; 
-	ArrayList<JPanel> panels;
-	JPanel mainPanel;
-	Communicator c;
-	MarksPanel mp;
-	JScrollPane scrollPane;
-	ButtonListener BL;
-	JButton Answer;
+    private final static JLabel together=new JLabel("齊答題");
+    private final static JLabel complusory=new JLabel("必答題");
+    private static ArrayList<JLabel> Sets;
+    private final static JLabel basicComp=new JLabel("基本部分");
+    private final static JLabel AddComp=new JLabel("附加部分");
+    private final static JLabel Sci1=new JLabel("科學1");
+    private final static JLabel Sci2=new JLabel("科學2");
+    private final static JLabel IH1=new JLabel("綜合人文1");
+    private final static JLabel IH2=new JLabel("綜合人文2");
+    private final static JLabel News1=new JLabel("時事1");
+    private final static JLabel News2=new JLabel("時事2");
+    private final static JLabel commonsense=new JLabel("唔識抵死題(常識)");
+    private ArrayList<JButton> togetherB; 
+    private ArrayList<JButton> complusoryB;
+    private ArrayList<JButton> basicCompB;
+    private ArrayList<JButton> AddCompB; 
+    private ArrayList<JPanel> panels;
+    private JPanel mainPanel;
+    private Communicator c;
+    private MarksPanel mp;
+    private JScrollPane scrollPane;
+    private ButtonListener BL;
+    private JButton Answer;
 	
 	public QuestionListPage(Communicator c, MarksPanel mp){
-		BL=new ButtonListener();
-		this.c=c;
-		this.mp=mp;
+		BL=new ButtonListener();//create button listener
+		this.c=c;//get instance of communicator
+		this.mp=mp;//get instance of marks panel
 		mainPanel=new JPanel();
 		mainPanel.setLayout(new BoxLayout(mainPanel,BoxLayout.PAGE_AXIS));
 		scrollPane=new JScrollPane(mainPanel);
 		Answer=new JButton("Check Answer");
 		Answer.addActionListener(BL);
 		Answer.setEnabled(false);
-		
+		//new JPanel as containers for buttons
 		panels=new ArrayList<JPanel>();
 		for(int a=0;a<20;a++){
 			panels.add(new JPanel());
 		}
-	
+	    //ArrayList to store buttons
 		togetherB=new ArrayList<JButton>();
 		complusoryB=new ArrayList<JButton>();
 		basicCompB=new ArrayList<JButton>();
@@ -165,150 +165,72 @@ public class QuestionListPage extends JPanel{
 		
 	}
 	
+	
 	class ButtonListener implements ActionListener{
-
+		
+		private void togetherCommand(int index){
+			c.write("TOG "+(index+1));
+		}
+		private void complusoryCommand(int index){
+			index=index+1;
+			if(index/4<=1){
+				c.write("SET1"+(index));
+			}else
+			if(index/4<=2){
+				c.write("SET2"+(index-4));
+			}else
+			if(index/4<=3){
+				c.write("SET3"+(index-8));
+			}else
+			if(index/4<=4){
+				c.write("SET4"+(index-12));
+			}else
+			if(index/4<=5){
+				c.write("SET5"+(index-16));
+			}else
+			if(index/4<=6){
+				c.write("SET6"+(index-20));
+			}else
+			if(index/4<=7){
+				c.write("SET7"+(index-24));
+			}
+		}
+		private void AddCompCommand(int index){
+			//set number=index of question in the set of topic/2+1
+			//e.g 0,1,2,3(index of question) correspond to Science1 q1, Science1 q2, 
+			//Science2 q1, Science1 q2
+			//when index>=4, minus 4 or 8 to get back 0,1,2,3
+			//Question index in a set = index mod 2 +1
+			if(index/4<1){
+				c.write("SCI"+((index)/2+1)+" "+(((index)%2)+1));
+			}else if(index/4<2){
+				c.write("IH"+((index-4)/2+1)+" "+(((index)%2)+1));
+			}else if(index/4<3){
+				c.write("News"+((index-8)/2+1)+" "+(((index)%2)+1));
+			}else{
+				c.write("CS "+(index-11));
+			}
+			
+			
+		}
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			// TODO Auto-generated method stub
-			if(e.getSource()==togetherB.get(0)){
-				c.write("TOG 1");
+			JButton b=(JButton)e.getSource();
+			if(togetherB.contains(b)){
+				togetherCommand(togetherB.indexOf(b));
 				Answer.setEnabled(true);
-			}if(e.getSource()==togetherB.get(1)){
-				c.write("TOG 2");
+			}
+			if(complusoryB.contains(b)){
+				complusoryCommand(complusoryB.indexOf(b));
 				Answer.setEnabled(true);
-			}if(e.getSource()==togetherB.get(2)){
-				c.write("TOG 3");
+			}
+			if(AddCompB.contains(b)){
+				AddCompCommand(AddCompB.indexOf(b));
 				Answer.setEnabled(true);
-			}if(e.getSource()==togetherB.get(3)){
-				c.write("TOG 4");
-				Answer.setEnabled(true);
-			}if(e.getSource()==complusoryB.get(0)){
-				c.write("SET1 1");
-				Answer.setEnabled(true);
-			}if(e.getSource()==complusoryB.get(1)){
-				c.write("SET1 2");
-				Answer.setEnabled(true);
-			}if(e.getSource()==complusoryB.get(2)){
-				c.write("SET1 3");
-				Answer.setEnabled(true);
-			}if(e.getSource()==complusoryB.get(3)){
-				c.write("SET1 4");
-				Answer.setEnabled(true);
-			}if(e.getSource()==complusoryB.get(4)){
-				c.write("SET2 1");
-				Answer.setEnabled(true);
-			}if(e.getSource()==complusoryB.get(5)){
-				c.write("SET2 2");
-				Answer.setEnabled(true);
-			}if(e.getSource()==complusoryB.get(6)){
-				c.write("SET2 3");
-				Answer.setEnabled(true);
-			}if(e.getSource()==complusoryB.get(7)){
-				c.write("SET2 4");
-				Answer.setEnabled(true);
-			}if(e.getSource()==complusoryB.get(8)){
-				c.write("SET3 1");
-				Answer.setEnabled(true);
-			}if(e.getSource()==complusoryB.get(9)){
-				c.write("SET3 2");
-				Answer.setEnabled(true);
-			}if(e.getSource()==complusoryB.get(10)){
-				c.write("SET3 3");
-				Answer.setEnabled(true);
-			}if(e.getSource()==complusoryB.get(11)){
-				c.write("SET3 4");
-				Answer.setEnabled(true);
-			}if(e.getSource()==complusoryB.get(12)){
-				c.write("SET4 1");
-				Answer.setEnabled(true);
-			}if(e.getSource()==complusoryB.get(13)){
-				c.write("SET4 2");
-				Answer.setEnabled(true);
-			}if(e.getSource()==complusoryB.get(14)){
-				c.write("SET4 3");
-				Answer.setEnabled(true);
-			}if(e.getSource()==complusoryB.get(15)){
-				c.write("SET4 4");
-				Answer.setEnabled(true);
-			}if(e.getSource()==complusoryB.get(16)){
-				c.write("SET5 1");
-				Answer.setEnabled(true);
-			}if(e.getSource()==complusoryB.get(17)){
-				c.write("SET5 2");
-				Answer.setEnabled(true);
-			}if(e.getSource()==complusoryB.get(18)){
-				c.write("SET5 3");
-				Answer.setEnabled(true);
-			}if(e.getSource()==complusoryB.get(19)){
-				c.write("SET5 4");
-				Answer.setEnabled(true);
-			}if(e.getSource()==complusoryB.get(20)){
-				c.write("SET6 1");
-				Answer.setEnabled(true);
-			}if(e.getSource()==complusoryB.get(21)){
-				c.write("SET6 2");
-				Answer.setEnabled(true);
-			}if(e.getSource()==complusoryB.get(22)){
-				c.write("SET6 3");
-				Answer.setEnabled(true);
-			}if(e.getSource()==complusoryB.get(23)){
-				c.write("SET6 4");
-				Answer.setEnabled(true);
-			}if(e.getSource()==complusoryB.get(24)){
-				c.write("SET7 1");
-				Answer.setEnabled(true);
-			}if(e.getSource()==complusoryB.get(25)){
-				c.write("SET7 2");
-				Answer.setEnabled(true);
-			}if(e.getSource()==complusoryB.get(26)){
-				c.write("SET7 3");
-				Answer.setEnabled(true);
-			}if(e.getSource()==complusoryB.get(27)){
-				c.write("SET7 4");
-				Answer.setEnabled(true);
-			}if(e.getSource()==AddCompB.get(0)){
-				c.write("SCI1 1");
-				Answer.setEnabled(true);
-			}if(e.getSource()==AddCompB.get(1)){
-				c.write("SCI1 2");
-				Answer.setEnabled(true);
-			}if(e.getSource()==AddCompB.get(2)){
-				c.write("SCI2 1");
-				Answer.setEnabled(true);
-			}if(e.getSource()==AddCompB.get(3)){
-				c.write("SCI2 2");
-				Answer.setEnabled(true);
-			}if(e.getSource()==AddCompB.get(4)){
-				c.write("IH1 1");
-				Answer.setEnabled(true);
-			}if(e.getSource()==AddCompB.get(5)){
-				c.write("IH1 2");
-				Answer.setEnabled(true);
-			}if(e.getSource()==AddCompB.get(6)){
-				c.write("IH2 1");
-				Answer.setEnabled(true);
-			}if(e.getSource()==AddCompB.get(7)){
-				c.write("IH2 2");
-				Answer.setEnabled(true);
-			}if(e.getSource()==AddCompB.get(8)){
-				c.write("News1 1");
-				Answer.setEnabled(true);
-			}if(e.getSource()==AddCompB.get(9)){
-				c.write("News1 2");
-				Answer.setEnabled(true);
-			}if(e.getSource()==AddCompB.get(10)){
-				c.write("News2 1");
-				Answer.setEnabled(true);
-			}if(e.getSource()==AddCompB.get(11)){
-				c.write("News2 2");
-				Answer.setEnabled(true);
-			}if(e.getSource()==AddCompB.get(12)){
-				c.write("CS 1");
-				Answer.setEnabled(true);
-			}if(e.getSource()==AddCompB.get(13)){
-				c.write("CS 2");
-				Answer.setEnabled(true);
-			}if(e.getSource()==Answer){
+			}
+			
+			if(e.getSource()==Answer){
 				c.write("CHKANS");
 				Answer.setEnabled(false);
 			}
