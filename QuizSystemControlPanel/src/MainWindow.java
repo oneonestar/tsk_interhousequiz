@@ -1,11 +1,7 @@
-import javax.json.Json;
-import javax.json.JsonArray;
-import javax.json.JsonObject;
-import javax.json.JsonReader;
 import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
+
+import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.net.*;
 import java.util.ArrayList;
 
@@ -17,12 +13,7 @@ public class MainWindow {
 	HouseChooser houseList;
 	SetChooser setChooser;
 	JPanel QuestionList2;
-	QuestionPages qp1;
-	QuestionPages qp2;
-	QuestionPages qp3;
-	QuestionPages qp4;
-	QuestionPages qp5;
-	QuestionPages qp6;
+	QuestionListPage qlp;
 	ArrayList<QuestionPage> QuestionSets;
 	ArrayList<Question> qArray;
 	Socket socket;
@@ -30,6 +21,7 @@ public class MainWindow {
 	Question q;
 	Communicator c;
 	MarksPanel mp;
+	MarksPanel mpa;
     public MainWindow(){
     	
     	mainframe=new JFrame("TSK Interhouse Quiz - Admin Control Panel");
@@ -39,19 +31,24 @@ public class MainWindow {
     	welcome=new WelcomePanel(this,c);
     	setChooser=new SetChooser(this);
     	houseList=new HouseChooser(this,setChooser);
-    	mp=new MarksPanel(c);
+    	
     	c=new Communicator(this, welcome, setChooser);
+    	mp=new MarksPanel(c);
+    	mpa=new MarksPanel(c);
+    	qlp=new QuestionListPage(c,mpa);
     }
     public void go(){
+    	//Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
     	mainframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     	
     	cardstack.add(welcome,"WELCOME");
     	cardstack.add(houseList,"HOUSE");
     	cardstack.add(setChooser,"SET");
+    	cardstack.add(qlp,"qlp");
     	cardstack.add(mp,"CHALLENGE");
     	
     	mainframe.getContentPane().add(cardstack);
-    	mainframe.setSize(1024,600);
+    	mainframe.pack();
     	mainframe.setVisible(true);
     	c.start();
     }
