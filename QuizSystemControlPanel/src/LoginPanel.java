@@ -1,4 +1,6 @@
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -11,7 +13,7 @@ import javax.json.JsonReader;
 import javax.swing.*;
 
 
-public class LoginPanel extends JPanel {
+public class LoginPanel extends JPanel implements ActionListener {
 	JButton login;
 	JTextField hostname;
 	JTextField port;
@@ -19,8 +21,15 @@ public class LoginPanel extends JPanel {
 	JLabel portl;
 	int portn;
 	String addr;
-	ArrayList<Question> qArray;
-	public LoginPanel(ArrayList<Question> qArray){
+	Communicator c;
+	MainWindow window;
+	private QuestionListPage qlp;
+	private MarksPanel mp;
+	private JPanel paneladdr;
+	private JPanel panelport;
+	
+	public LoginPanel(MainWindow mw){
+		window=mw;
 		hostname=new JTextField(20);
 		hostname.setText("localhost");
 		hostname.setSize(20, 5);
@@ -30,15 +39,35 @@ public class LoginPanel extends JPanel {
 		login=new JButton("Login");
 		portl=new JLabel("Port: ");
 		hostl=new JLabel("Host: ");
-		this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
-		this.add(hostl);
-		this.add(hostname);
-		this.add(portl);
-		this.add(port);
+		
+		
+		login.addActionListener(this);
+		
+		paneladdr=new JPanel();
+		panelport=new JPanel();
+		paneladdr.add(hostl);
+		paneladdr.add(hostname);
+		panelport.add(portl);
+		panelport.add(port);
+		this.add(paneladdr);
+		this.add(panelport);
 		this.add(login);
-		this.setPreferredSize(new Dimension(100,100));
-		qArray=new ArrayList<Question>();
+		
+		//qArray=new ArrayList<Question>();
 	}
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		// TODO Auto-generated method stub
+		c=new Communicator(window, hostname.getText(), Integer.parseInt(port.getText()));
+		c.start();
+		mp=new MarksPanel(c);
+		qlp=new QuestionListPage(c,mp);
+		window.cardstack.add(qlp,"qlp");
+		CardLayout cl=(CardLayout) window.cardstack.getLayout();
+		cl.show(window.cardstack, "qlp");
+		
+	}
+	/*
 	public void parseQuestions(File f){
 		try {
 			FileInputStream in=new FileInputStream(f);
@@ -78,6 +107,8 @@ public class LoginPanel extends JPanel {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
+	}*/
+
+	
 	
 }

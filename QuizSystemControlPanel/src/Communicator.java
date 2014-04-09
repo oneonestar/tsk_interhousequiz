@@ -10,25 +10,25 @@ import javax.swing.*;
 
 
 public class Communicator extends Thread{
-       Socket s;
-       FileInputStream fin;
-       InputStreamReader is;
-       static int PORT=9000;
-       static String ADDR="192.168.0.101";
-       PrintWriter pw;
-       int port;
-       String addr;
-       MainWindow window;
-       ArrayList<ArrayList<Question>> qSet;
-       ArrayList<QuestionPages> qPages;
-	   WelcomePanel wp;
-	   SetChooser chooser;
-       public Communicator(MainWindow window, WelcomePanel wp, SetChooser sc){
-    	   this.wp=wp;
-    	   this.chooser=sc;
+       private Socket s;
+       private FileInputStream fin;
+       private InputStreamReader is;
+       private static int PORT=9000;
+       private static String ADDR="192.168.0.101";
+       private PrintWriter pw;
+       private int port;
+       private String addr;
+       private MainWindow window;
+       private ArrayList<ArrayList<Question>> qSet;
+       private ArrayList<QuestionPages> qPages;
+       private WelcomePanel wp;
+       private SetChooser chooser;
+       public Communicator(MainWindow window, String ip, int port){
+    	   addr=ip;
+    	   this.port=port;
+    	  
     	   this.window=window;
-    	   qSet=new ArrayList<ArrayList<Question>>();
-    	   qPages=new ArrayList<QuestionPages>();
+    	   
        }
        public void setUpNetworking(){
     	   try {
@@ -67,7 +67,7 @@ public class Communicator extends Thread{
    					String message=br.readLine();
    					if(message=="questions"){
    						message=br.readLine();
-   						this.QuestionParser(message);
+   						///this.QuestionParser(message);
    					}
    					if(message==""){}
    					if(message==""){}
@@ -86,6 +86,7 @@ public class Communicator extends Thread{
    		public void run(){
    			read();
    		}
+   		/*
    		public void QuestionParser(String JsonString){
    			JsonReader jsonReader = Json.createReader(new StringReader(JsonString));
 			JsonObject jsonObject = jsonReader.readObject();
@@ -138,6 +139,7 @@ public class Communicator extends Thread{
 	        }
 	        
    		}
+   		*/
    	}
    	
 }
