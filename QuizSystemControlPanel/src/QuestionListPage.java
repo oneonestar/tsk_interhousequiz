@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import javax.swing.*;
 
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
@@ -34,6 +35,9 @@ public class QuestionListPage extends JPanel{
     private JScrollPane scrollPane;
     private ButtonListener BL;
     private JButton Answer;
+    private JTabbedPane tabbedPane;
+	private JPanel addPanel;
+	private Font f2;
 	
 	public QuestionListPage(Communicator c, MarksPanel mp){
 		BL=new ButtonListener();//create button listener
@@ -41,10 +45,12 @@ public class QuestionListPage extends JPanel{
 		this.mp=mp;//get instance of marks panel
 		mainPanel=new JPanel();
 		mainPanel.setLayout(new BoxLayout(mainPanel,BoxLayout.PAGE_AXIS));
-		scrollPane=new JScrollPane(mainPanel);
+		//scrollPane=new JScrollPane(mainPanel);
 		Answer=new JButton("Check Answer");
 		Answer.addActionListener(BL);
 		Answer.setEnabled(false);
+		tabbedPane=new JTabbedPane();
+		this.add(tabbedPane);
 		//new JPanel as containers for buttons
 		panels=new ArrayList<JPanel>();
 		for(int a=0;a<20;a++){
@@ -56,7 +62,7 @@ public class QuestionListPage extends JPanel{
 		basicCompB=new ArrayList<JButton>();
 		AddCompB=new ArrayList<JButton>();
 		Sets=new ArrayList<JLabel>();
-		mainPanel.add(together);
+		
 		for(int i=0;i<4;i++){
 			togetherB.add(new JButton("Question "+(i+1)));
 			
@@ -66,9 +72,9 @@ public class QuestionListPage extends JPanel{
 			panels.get(0).add(b);
 			//b.addActionListener(this);
 		}
-		mainPanel.add(panels.get(0));
-		mainPanel.add(complusory);
-		mainPanel.add(basicComp);
+		tabbedPane.add("齊答題",panels.get(0));
+		
+		
 		for(int i=0;i<7;i++){
 			Sets.add(new JLabel("題目集"+(i+1)));
 			
@@ -88,6 +94,7 @@ public class QuestionListPage extends JPanel{
 			panels.get(i+1).add(Sets.get(i));
 			j+=4;
 		}
+		tabbedPane.add("基本部分",mainPanel);
 		
 		
 		AddCompB.add(new JButton("科學1 1"));
@@ -141,15 +148,25 @@ public class QuestionListPage extends JPanel{
 		panels.get(15).add(commonsense);
 		panels.get(15).add(AddCompB.get(12));
 		panels.get(15).add(AddCompB.get(13));
+		
+		addPanel=new JPanel();
         for(int i=9;i<16;i++){
-        	mainPanel.add(panels.get(i));
+        	addPanel.add(panels.get(i));
         }
+        addPanel.setLayout(new BoxLayout(addPanel, BoxLayout.Y_AXIS));
+        tabbedPane.add("附加部分", addPanel);
 		setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
-		this.add(scrollPane,BorderLayout.LINE_START);
-		scrollPane.setPreferredSize(new Dimension(600,600));
+		this.add(tabbedPane,BorderLayout.LINE_START);
+		//scrollPane.setPreferredSize(new Dimension(600,600));
 		this.add(Answer,BorderLayout.PAGE_END);
 		this.add(mp,BorderLayout.EAST);
+		tabbedPane.setTabPlacement(SwingConstants.LEFT);
 		//this.add(new MarksPanel());
+		f2=new Font("Medium",1,24);
+		tabbedPane.setFont(f2);
+		for(JPanel p : panels){
+			p.setAlignmentY(LEFT_ALIGNMENT);
+		}
 		for(JButton b : togetherB){
 			b.addActionListener(BL);
 		}

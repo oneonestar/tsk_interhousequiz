@@ -62,7 +62,7 @@ public class MarksPanel extends JPanel implements ActionListener{
 			   current.add(new JRadioButton());
 			   group.add(current.get(i));
 			   MARKS.add("500");
-			   changeMarks.add(new JTextField(MARKS.get(i)));
+			   changeMarks.add(new JTextField(MARKS.get(i),3));
 		   }
 		   
 		   houseName=new ArrayList<JLabel>();
@@ -102,12 +102,14 @@ public class MarksPanel extends JPanel implements ActionListener{
 		   panels.get(6).add(startB);
 		   panels.get(6).add(stopB);
 		   
-		   
+		   for(JPanel p:panels){
+			   p.setAlignmentX(LEFT_ALIGNMENT);
+		   }
 		   update.addActionListener(this);
 		   
 		   
 		  
-		   this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+		   this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		   for(int i=0;i<7;i++){
 			   this.add(panels.get(i));
 		   }
