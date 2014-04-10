@@ -1,11 +1,46 @@
 #include <Wire.h>
 #define SLAVE_ADDRESS 0x04
 
-const int one =1;
+//pin 2-7: Button
+//2=A, 3=D ...
+//pin 8-13: LED
+//8=A, 9=D ...
+
+
+//time to reset after first pressed (ms)
+const int TIMEOUT = 5*1000;
+
+//record each house is pressed or not
 int counter[6]={0, 0, 0, 0, 0, 0};
-int signal = 0;//it determines which button has been pressed
-int buzzerState = 0;
-unsigned long timer[6];
+
+//digit's position:
+//signal[0] = First Pressed
+//signal[1] = Second Pressed
+//signal[2] = Second Pressed
+//...
+//signal[5] = Fifth Pressed
+//===========================
+//digit's value
+//signal[n] = [1-6]
+//1=A, 2=D, 3=H, 4=J, 5=L, 6=M
+//===========================
+//eg.
+//000001 = [A]
+//000645 = [L,J,M], L pressed first
+char signal[7];
+
+//number of house pressed
+int pressed = 0;
+
+//buzzerState = 0 => Disable
+//buzzerState = 1 => Enable
+int buzzerState = 1;
+
+//record the first pressed time
+unsigned long timer = 0;
+
+int index = 0;
+
 
 void setup()
 {
@@ -22,17 +57,21 @@ void setup()
   
   //setup the output pins
   pinMode(8, OUTPUT);
-  pinMode(8, LOW);
   pinMode(9, OUTPUT);
-  pinMode(9, LOW);
   pinMode(10, OUTPUT);
-  pinMode(10, LOW);
   pinMode(11, OUTPUT);
-  pinMode(11, LOW);
   pinMode(12, OUTPUT);
-  pinMode(12, LOW);
   pinMode(13, OUTPUT);
+  
+  pinMode(8, LOW);
+  pinMode(9, LOW);
+  pinMode(10, LOW);
+  pinMode(11, LOW);
+  pinMode(12, LOW);
   pinMode(13, LOW);
+
+  // = End
+  signal[6] = 65;
   
   //start i2c connection
   Wire.begin(SLAVE_ADDRESS);
@@ -44,10 +83,7 @@ void loop()
 {
   while(buzzerState==1)
   {
-    //int temp;//use for storing a temp integer for the other usage
-    //signal = 0;//it determines which button has been pressed
-    
-    for(int index=2; index<8; index++)
+    for(int index=2; index<8; index++)  //2-7
     {
       if(counter[index-2]==1) {
         continue;
@@ -55,50 +91,36 @@ void loop()
       else {
         //read from button
         int buttonvoltage = digitalRead(index);
-        timer[index-2] = millis();
         if (buttonvoltage == LOW)
-        {
-          //digitalWrite(13, HIGH);
-          signal += (one << (index-2));  //rotate the bits
-          //signal += temp;  //set respective bit to 1
-          
-         // if(index==2)
-          counter[index-2]=1;// counter fot that partiucular button
+        { //First pressed for this house
+          if(pressed == 0)
+          { //First pressed for all house
+            timer = millis();
+          }
+          signal[pressed] = (index-1)+48;
+          counter[index-2]=1;
           pinMode(index+6, HIGH);
-          //Serial.println(counter[index-2]);
+          pressed++;
         }
       }
     }
-    //Serial.println(signal);
-/*    
-    //try to turn on the led for few seconds after pressing the button
-    for(int index = 0; index<6; index++)
+    if(timer>0)
     {
-      if(counter[index] !=0)
+      if(millis() - timer > TIMEOUT)
       {
-        digitalWrite(index+8, LOW);
-        counter[index] --;
-      }
-      else
-      {
-        digitalWrite(index+8, HIGH);
+        reset();
       }
     }
-*/
   }
 }
 
 void reset()
 {
-  signal = 0;
-  /*
+  timer = 0;
+  pressed = 0;
   for(int i=0; i<6; i++) {
-    Serial.println(timer[i]);
-  }
-  */
-  for(int i=0; i<6; i++) {
+    signal[i] = 0;
     counter[i] = 0;
-    timer[i] = 0;
     pinMode(i+8, LOW);
   }
 }
@@ -107,15 +129,19 @@ void receiveData(int byteCount) {
   while(Wire.available()) {
     int reader = Wire.read();
     
-    if(reader==0) {
-      buzzerState = reader;
+    if(reader==0) //reset()
+    {
       reset();
     }
-    else {
-      reset();
-      buzzerState = reader;
+    if(reader==1) //enable()
+    {
+      buzzerState = 1;
     }
-  
+    if(reader==2) //disable()
+    {
+      buzzerState = 0;
+    }
+
     Serial.print("data received: ");
     Serial.println(buzzerState);
     //Serial.print("data size: ");
@@ -124,6 +150,9 @@ void receiveData(int byteCount) {
 }
 
 void sendData() {
-  
-  Wire.write(signal);
+  Wire.write(signal[index]);
+  index++;
+  if(index > 6) {
+    index = 0;
+  }
 }
