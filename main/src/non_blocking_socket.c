@@ -35,19 +35,7 @@ void echo_event_cb(struct bufferevent *bev, short events, void *ctx)
 		bufferevent_free(bev);
 	}
 }
-/*
-void read_instruction(struct bufferevent *bev, void *ctx)
-{
-	struct evbuffer *input = bufferevent_get_input(bev);
-	size_t len = evbuffer_get_length(input);
-	char *data = (char*)malloc(len*sizeof(char));
-	if(len) {
-		evbuffer_copyout(input, data, len);
-		printf("read %s\n", data);
-	}
-	free(data);
-}
-*/
+
 void accept_connection(struct evconnlistener *listener, evutil_socket_t fd, struct sockaddr *address, int socklen, void *cts)
 {
 	char *host = (char*)malloc(sizeof(char)*1024);

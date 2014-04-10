@@ -7,9 +7,40 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <time.h>
+#include <event2/event.h>
+#include <event2/util.h>
 #include "buzzer.h"
 
+
+static struct event * ev_read;
+static char *webAddress, *webPort;
 #define PORT 8888
+
+//a function to send a message to whatever destination
+int send_message(char *address, char *port, char *msg)
+{
+	//temp variable
+	int n;
+
+	//setup socket to the web server
+	int sock = socket(AF_INET, SOCK_STREAM, 0);
+	struct sockaddr_in server_addr;
+	memset(&server_addr, '0', sizeof(server_addr));
+	server_addr.sin_family = AF_INET;
+	server_addr.sin_port = htons(atoi(port));
+	inet_pton(AF_INET, address, &server_addr.sin_addr);
+	if(connect(sock, (struct sockaddr*)&server_addr, sizeof(server_addr))) {
+		printf("fail to connect to web server\n");
+	}
+
+	if((n=send(sock, msg, strlen(msg), 0))<=0) {
+		printf("cannot send to web server\n");
+		close(sock);
+		return -1;
+	}
+	close(sock);
+	return n;
+}
 
 int houseToChar(int house)
 {
@@ -36,60 +67,67 @@ int houseToChar(int house)
 	return 'z';
 }
 
-char buzzer(char *buzzerAddress, int buzzerPort, char *webServer, int webServerPort)
+void buzzerCallback(evutil_socket_t sock, short flags, void * args)
 {
-	int sock, sock1;
+	char buf[128];  
+    int ret = recv(sock, buf, 128, 0);
+    buf[ret] = 0;
+    
+    if(ret == 0)  
+    {  
+        printf("read_cb connection closed\n");  
+        event_del(ev_read);  
+        return;
+    }
+	printf("%s\n", buf);
+	char buffer[500];
+	char buffer2[500];
+	strcpy(buffer, "buzzer:{\"");
+	// for(int i = 0, i< ret, i++)
+	// 	strcat(buffer, "A\":\"123\"}\n");
+	sprintf(buffer2, "%c\":\"123\"}\n", houseToChar(buf[0]-49));
+	strcat(buffer, buffer2);
+
+	send_message(webAddress, webPort, buffer);
+}
+
+static evutil_socket_t make_tcp_socket()  
+{  
+    int on = 1;  
+    evutil_socket_t sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);  
+  
+    evutil_make_socket_nonblocking(sock); 
+    setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (void *)&on, sizeof(on));  
+  
+    return sock;  
+}  
+
+
+int buzzer(struct event_base *base, char *buzzerAddress, char *buzzerPort, char *l_webAddress, char *l_webPort)
+{
+	evutil_socket_t sock = make_tcp_socket();
 	int n = 0;
 	char recvBuff[5];
 	char sendBuff[50];
 	struct sockaddr_in serv_addr;	//addr data structure for buzzer
-	struct sockaddr_in serv_addr1;	//addr data structure for web server
 	int flag = 0;			//indidate if the received button is first one
 	char winner = 0;		//winning house in the buzz
-	int i;
 
 	//setup socket to the buzzer
-	sock = socket(AF_INET, SOCK_STREAM, 0);
 	memset(&serv_addr, '0', sizeof(serv_addr));
 	serv_addr.sin_family = AF_INET;
-	serv_addr.sin_port = htons(buzzerPort);
+	serv_addr.sin_port = htons(atoi(buzzerPort));
 	inet_pton(AF_INET, buzzerAddress, &serv_addr.sin_addr);
 	connect(sock, (struct sockaddr*)&serv_addr, sizeof(serv_addr));
 
-	//setup weocket to web server
-	sock1 = socket(AF_INET, SOCK_STREAM, 0);
-	memset(&serv_addr1, '0', sizeof(serv_addr1));
-	serv_addr1.sin_family = AF_INET;
-	serv_addr1.sin_port = htons(webServerPort);
-	inet_pton(AF_INET, webServer, &serv_addr1.sin_addr);
-	connect(sock1, (struct sockaddr*)&serv_addr1, sizeof(serv_addr1));
+	printf("TEST\n");
 
-	//clearn data structure to recv and send data
-	memset(&recvBuff, 0, sizeof(recvBuff));
-	memset(&sendBuff, 0, sizeof(sendBuff));
+	ev_read = malloc(sizeof(struct event*));
+	ev_read = event_new(base, sock, (short)EV_READ|EV_PERSIST, buzzerCallback, (void*)ev_read);
+	event_add(ev_read, 0);  
 
-	//start reading from buzzer
-	while((n = read(sock, recvBuff, sizeof(recvBuff)))>0) {
-		//if it is the first button being pressed, set winner
-		if(flag==0) {
-			winner = houseToChar(recvBuff[0]-48);
-			printf("winner %c\n", winner);
-			flag++;
-		}
-		//when multiple houses press the button in short interval and two characters are received
-		for(i=0; i<strlen(recvBuff); i++) {
-			recvBuff[strlen(recvBuff)] = 0;
-			sprintf(sendBuff, "buzzer:{\"%c\":\"%ld\"}\n", houseToChar(recvBuff[i]-48), time(NULL));	//instruction for web server
-			printf("sending: %s\n", sendBuff);
-			if((n=write(sock1, sendBuff, sizeof(sendBuff)-1))<0) {	//write to web server
-				printf("error\n");
-			}
-			printf("button %s pressed and printed\n", recvBuff);
-			memset(sendBuff, 0, sizeof(sendBuff));	//clear send buffer for next send
-		}
-		memset(recvBuff, 0, sizeof(recvBuff));		//clear recv buffer for next read
-	}
-	return winner;
+	webPort = l_webPort;
+	webAddress = l_webAddress;
 }
 /*
 int main(int argc, char *argv[])

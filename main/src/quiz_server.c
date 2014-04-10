@@ -41,30 +41,7 @@ char uiPort[] = "9000";
 int parse_instruction(char *instruction);
 int parse_option(int instruction, char *option);
 
-//a function to send a message to whatever destination
-int send_message(char *address, char *port, char *msg)
-{
-	//temp variable
-	int n;
 
-	//setup socket to the web server
-	int sock = socket(AF_INET, SOCK_STREAM, 0);
-	struct sockaddr_in server_addr;
-	memset(&server_addr, '0', sizeof(server_addr));
-	server_addr.sin_family = AF_INET;
-	server_addr.sin_port = htons(atoi(port));
-	inet_pton(AF_INET, address, &server_addr.sin_addr);
-	if(connect(sock, (struct sockaddr*)&server_addr, sizeof(server_addr))) {
-		printf("fail to connect to web server\n");
-	}
-
-	if((n=send(sock, msg, strlen(msg), 0))<=0) {
-		printf("cannot send to web server\n");
-		return -1;
-	}
-	else
-		return n;
-}
 
 //server main loop and call back function to parse instruction from telnet
 void read_instruction(struct bufferevent *bev, void *ctx)
@@ -167,8 +144,8 @@ void read_instruction(struct bufferevent *bev, void *ctx)
 			pushScore(webServer, webPort);
 			break;
 		case 3:
-			//buzzer
-			printf("The first to press the button is %c\n", buzzer(buzzerServer, atoi(buzzerPort), webServer, atoi(webPort)));
+			//Buzzer
+			send_message(buzzerServer, buzzerPort, option);
 			break;
 		case 4:
 			//answer
@@ -247,17 +224,17 @@ void server()
 	score_init(0, "back.dat");
 	//push score to webserver
 	pushScore(webServer, webPort);
-	
+
 	//setup UI listener
 	struct event_base *base;
 	struct evconnlistener *listener;
 	struct sockaddr_in serv_addr;
-
 	//setup libevent event base
 	base = event_base_new();
 	if(!base) {
 		printf("cannot open even base\n");
 	}
+	buzzer(base, buzzerServer, buzzerPort, webServer, webPort);
 
 	//setup struction of the address
 	memset(&serv_addr, '0', sizeof(serv_addr));
@@ -271,7 +248,6 @@ void server()
 	if(!listener) {
 		printf("cannot create listneer\n");
 	}
-
 	//start event loop
 	event_base_dispatch(base);
 }
@@ -279,7 +255,11 @@ void server()
 
 int main(int argc, char *argv[])
 {
-
+	if (argc != 3)
+	{
+		printf("quiz [WebServer] [Buzzer]\n");
+		return 1;
+	}
 	//store addresses
 	strcpy(webServer, argv[1]);
 	strcpy(buzzerServer, argv[2]);

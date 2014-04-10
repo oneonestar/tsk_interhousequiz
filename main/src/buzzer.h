@@ -2,6 +2,8 @@
 #define _BUZZER_H_
 
 int houseToChar(int);
-char buzzer(char*, int, char*, int);
+void buzzerCallback(evutil_socket_t sock, short flags, void * args);
+int buzzer(struct event_base *base, char *buzzerAddress, char *buzzerPort, char *webAddress, char *webPort);
+int send_message(char *address, char *port, char *msg);
 
 #endif
