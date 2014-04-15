@@ -214,6 +214,7 @@ button[disabled] {
 
 #myImage {
 	margin: 0 auto;
+	display: block;
 	opacity: 0;
 	transition: 0.5s all;
 	-webkit-transition: 0.5s all;
@@ -243,4 +244,5 @@ button[disabled] {
 	display: none;
 	color: red;
 	font-size: 36px;
+	text-align: center;
 }
