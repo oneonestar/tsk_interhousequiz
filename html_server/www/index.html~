@@ -51,10 +51,8 @@
 			});
 
 			source.addEventListener('answer', function (e) {
-				$('#Question_Answer')
-					.show();
-				$('#Box_Option')
-					.hide();
+				$('#Question_Answer').fadeIn(500);
+				$('.box-option').fadeOut(500);
 			});
 
 			source.addEventListener('score', function (e) {
@@ -67,8 +65,9 @@
 
 			source.addEventListener('img', function (e) {
 				var data = JSON.parse(e.data);
-				$("#myImage")
-					.attr("src", data.path);
+				$("#myImage").attr("src", data.path).fadeIn(500, function(){
+					$("#myImage").css("display", "block");
+				});
 			});
 
 			/* UI */
@@ -76,10 +75,13 @@
 				var data = JSON.parse(e.data);
 				for (var k in data) {
 					if (k == "score") {
-						if (data[k] == "show")
-							$(".house_container")
-								.show("blind", "", 1000)
-						if (data[k] == "hide") $(".house_container").hide("blind", "", 1000)
+						if (data[k] == "show") {
+							$(".house_container").slideDown(1000);
+						}
+						
+						if (data[k] == "hide") {
+							$(".house_container").hide("blind", "", 1000);
+						}
 					}
 				}
 			});
@@ -88,7 +90,8 @@
 				$(".question_content").text("");
 				$("#Box_Option div").text("");
 				$('#Question_Answer').fadeOut(500);
-				$('.box_option').show();
+				$('.box-option').fadeIn(500);
+				$("#myImage").fadeOut(500);
 
 				var data = JSON.parse(e.data);
 
@@ -109,10 +112,6 @@
 					$("#Option_D").text(data.Options[3]);
 				}
 			});
-
-			source.addEventListener('answer', function(){
-				$('#Question_Answer').fadeIn(500);
-			}, false);
 		});
 		</script>
 	</head>

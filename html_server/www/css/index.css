@@ -214,15 +214,7 @@ button[disabled] {
 
 #myImage {
 	margin: 0 auto;
-	display: block;
-	opacity: 0;
-	transition: 0.5s all;
-	-webkit-transition: 0.5s all;
-	-moz-transition: 0.5s all;
-}
-
-#myImage[src^=imgs] {
-	opacity: 1;
+	display: none;
 }
 
 .box-option {
@@ -244,4 +236,5 @@ button[disabled] {
 	display: none;
 	color: red;
 	font-size: 36px;
+	text-align: center;
 }
