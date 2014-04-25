@@ -170,7 +170,7 @@ public class QuestionListPage extends JPanel{
 		for(JButton b : togetherB){
 			b.addActionListener(BL);
 		}
-		for(JButton b : complusoryB){
+		for(JButton b : basicCompB){
 			b.addActionListener(BL);
 		}
 		for(JButton b : AddCompB){
@@ -184,32 +184,33 @@ public class QuestionListPage extends JPanel{
 	
 	
 	class ButtonListener implements ActionListener{
-		
+		String command="Question Next x Question:";
 		private void togetherCommand(int index){
-			c.write("TOG "+(index+1));
+			//c.write("TOG "+(index+1));
+			c.write("Question Next x Question:A:1:"+(index+1));
 		}
 		private void complusoryCommand(int index){
-			index=index+1;
-			if(index/4<=1){
-				c.write("SET1"+(index));
+			//index=index+1;
+			if(index/4<1){
+				c.write(command+"B:"+"1:"+(index+1));
 			}else
-			if(index/4<=2){
-				c.write("SET2"+(index-4));
+			if(index/4<2){
+				c.write(command+"B:"+"2:"+(index-3));
 			}else
-			if(index/4<=3){
-				c.write("SET3"+(index-8));
+			if(index/4<3){
+				c.write(command+"B:"+"3:"+(index-7));
 			}else
-			if(index/4<=4){
-				c.write("SET4"+(index-12));
+			if(index/4<4){
+				c.write(command+"B:"+"4:"+(index-11));
 			}else
-			if(index/4<=5){
-				c.write("SET5"+(index-16));
+			if(index/4<5){
+				c.write(command+"B:"+"5:"+(index-15));
 			}else
-			if(index/4<=6){
-				c.write("SET6"+(index-20));
+			if(index/4<6){
+				c.write(command+"B:"+"6:"+(index-19));
 			}else
-			if(index/4<=7){
-				c.write("SET7"+(index-24));
+			if(index/4<7){
+				c.write(command+"B:"+"7:"+(index-23));
 			}
 		}
 		private void AddCompCommand(int index){
@@ -219,13 +220,13 @@ public class QuestionListPage extends JPanel{
 			//when index>=4, minus 4 or 8 to get back 0,1,2,3
 			//Question index in a set = index mod 2 +1
 			if(index/4<1){
-				c.write("SCI"+((index)/2+1)+" "+(((index)%2)+1));
+				c.write(command+"C:"+((index)/2+1)+":"+(((index)%2)+1));
 			}else if(index/4<2){
-				c.write("IH"+((index-4)/2+1)+" "+(((index)%2)+1));
+				c.write(command+"C:"+((index)/2+1)+":"+(((index)%2)+1));
 			}else if(index/4<3){
-				c.write("News"+((index-8)/2+1)+" "+(((index)%2)+1));
+				c.write(command+"C:"+((index)/2+1)+":"+(((index)%2)+1));
 			}else{
-				c.write("CS "+(index-11));
+				c.write(command+"C:"+"7:"+(index-11));
 			}
 			
 			
@@ -238,8 +239,10 @@ public class QuestionListPage extends JPanel{
 				togetherCommand(togetherB.indexOf(b));
 				Answer.setEnabled(true);
 			}
-			if(complusoryB.contains(b)){
-				complusoryCommand(complusoryB.indexOf(b));
+			if(basicCompB.contains(b)){
+				System.out.println(basicCompB.indexOf(b));
+				complusoryCommand(basicCompB.indexOf(b));
+				System.out.println("comp");
 				Answer.setEnabled(true);
 			}
 			if(AddCompB.contains(b)){
@@ -248,7 +251,7 @@ public class QuestionListPage extends JPanel{
 			}
 			
 			if(e.getSource()==Answer){
-				c.write("CHKANS");
+				c.write("Answer");
 				Answer.setEnabled(false);
 			}
 			
