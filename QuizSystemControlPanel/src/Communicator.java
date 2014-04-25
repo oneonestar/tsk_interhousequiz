@@ -2,10 +2,7 @@ import java.net.*;
 import java.util.ArrayList;
 import java.io.*;
 
-import javax.json.Json;
-import javax.json.JsonArray;
-import javax.json.JsonObject;
-import javax.json.JsonReader;
+
 import javax.swing.*;
 
 
@@ -19,8 +16,8 @@ public class Communicator extends Thread{
        private int port;
        private String addr;
        private MainWindow window;
-       private ArrayList<ArrayList<Question>> qSet;
-       private ArrayList<QuestionPages> qPages;
+//       private ArrayList<ArrayList<Question>> qSet;
+  //     private ArrayList<QuestionPages> qPages;
        private WelcomePanel wp;
        private SetChooser chooser;
        public Communicator(MainWindow window, String ip, int port){
