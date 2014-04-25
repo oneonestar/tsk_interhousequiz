@@ -2,7 +2,6 @@ import java.net.*;
 import java.util.ArrayList;
 import java.io.*;
 
-
 import javax.swing.*;
 
 
@@ -16,10 +15,7 @@ public class Communicator extends Thread{
        private int port;
        private String addr;
        private MainWindow window;
-//       private ArrayList<ArrayList<Question>> qSet;
-  //     private ArrayList<QuestionPages> qPages;
-       private WelcomePanel wp;
-       private SetChooser chooser;
+      
        public Communicator(MainWindow window, String ip, int port){
     	   addr=ip;
     	   this.port=port;
@@ -29,7 +25,7 @@ public class Communicator extends Thread{
        }
        public void setUpNetworking(){
     	   try {
-   			s=new Socket(ADDR,PORT);
+   			s=new Socket(addr,port);
    			is=new InputStreamReader(s.getInputStream());
    			pw=new PrintWriter(s.getOutputStream());
    			
@@ -43,11 +39,12 @@ public class Communicator extends Thread{
        }
        public void run(){
     	   setUpNetworking();
-    	   new InReader(is).start();
+    	   //new InReader(is).start();
     	   
        }
        public void write(String instruction){
     	   pw.println(instruction);
+    	   System.out.println(instruction);
     	   pw.flush();
        }
        
@@ -140,3 +137,4 @@ public class Communicator extends Thread{
    	}
    	
 }
+
