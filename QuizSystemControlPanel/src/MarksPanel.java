@@ -45,7 +45,15 @@ public class MarksPanel extends JPanel implements ActionListener{
 	   
 	   private ArrayList<JRadioButton> current;
 	   
+	   private JButton add;
+	   private JButton minus;
+
+	private JButton resetB;
+	   
 	   public MarksPanel(Communicator c){
+		   add=new JButton("+");
+		   minus=new JButton("-");
+		   
 		   group=new ButtonGroup();
 		   current=new ArrayList<JRadioButton>();
 		   
@@ -98,6 +106,10 @@ public class MarksPanel extends JPanel implements ActionListener{
 		   update=new JButton("Update");
 		   startB=new JButton("Start Buzzer");
 		   stopB=new JButton("Stop Buzzer");
+		   add.addActionListener(this);
+		   minus.addActionListener(this);
+		   panels.get(6).add(add);
+		   panels.get(6).add(minus);
 		   panels.get(6).add(update);
 		   panels.get(6).add(startB);
 		   panels.get(6).add(stopB);
@@ -107,8 +119,11 @@ public class MarksPanel extends JPanel implements ActionListener{
 		   }
 		   update.addActionListener(this);
 		   
-		   
-		  
+		   stopB.addActionListener(this);
+		   startB.addActionListener(this);		   
+		   resetB=new JButton("Reset Buzzer");
+		   resetB.addActionListener(this);
+		   panels.get(6).add(resetB);
 		   this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		   for(int i=0;i<7;i++){
 			   this.add(panels.get(i));
@@ -119,26 +134,101 @@ public class MarksPanel extends JPanel implements ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
-		for(int i=0;i<6;i++){
-		MARKS.set(i,changeMarks.get(i).getText());
-		}
-		try {
-		c.write("Score Update A "+MARKS.get(0));
-			Thread.sleep(5);
-		c.write("Score Update D "+MARKS.get(1));
-			Thread.sleep(5);
-		c.write("Score Update J "+MARKS.get(2));
-			Thread.sleep(5);
-		c.write("Score Update H "+MARKS.get(3));
-			Thread.sleep(5);
-		c.write("Score Update L "+MARKS.get(4));
-			Thread.sleep(5);
-		c.write("Score Update M "+MARKS.get(5));
-			Thread.sleep(5);
-		} catch (InterruptedException e1) {
+		if(e.getSource()==stopB){
+			c.write("Buzzer 2");
+			return;
+		}else if(e.getSource()==startB){
+			c.write("Buzzer 1");
+			return;
+		}else if(e.getSource()==resetB){
+			c.write("Buzzer 0");
+			return;
+		}else if(e.getSource()==add){
+			System.out.println("add");
+			for(JRadioButton rb : current){
+				if(rb.isSelected()){
+					int index=current.indexOf(rb);
+					switch (index){
+						case 0:
+							c.write("Score Add A 10");
+							break;
+						case 1:
+							c.write("Score Add D 10");
+							break;
+						case 2:
+							c.write("Score Add J 10");
+							break;
+						case 3:
+							c.write("Score Add H 10");
+							break;
+						case 4:
+							c.write("Score Add L 10");
+							break;
+						case 5:
+							c.write("Score Add M 10");
+							break;
+					}
+					
+				}
+			}
+		}else if(e.getSource()==minus){
+			System.out.println("minus");
+			for(JRadioButton rb : current){
+				if(rb.isSelected()){
+					int index=current.indexOf(rb);
+					switch (index){
+					case 0:
+						c.write("Score Minus A 10");
+						break;
+					case 1:
+						c.write("Score Minus D 10");
+						break;
+					case 2:
+						c.write("Score Minus J 10");
+						break;
+					case 3:
+						c.write("Score Minus H 10");
+						break;
+					case 4:
+						c.write("Score Minus L 10");
+						break;
+					case 5:
+						c.write("Score Minus M 10");
+						break;
+					}
+					
+				}
+			}
+		}else{
+			for(int i=0;i<6;i++){
+				MARKS.set(i,changeMarks.get(i).getText());
+			}
+			try {
+				c.write("Score Update A "+MARKS.get(0));
+				Thread.sleep(5);
+				c.write("Score Update D "+MARKS.get(1));
+				Thread.sleep(5);
+				c.write("Score Update J "+MARKS.get(2));
+				Thread.sleep(5);
+				c.write("Score Update H "+MARKS.get(3));
+				Thread.sleep(5);
+				c.write("Score Update L "+MARKS.get(4));
+				Thread.sleep(5);
+				c.write("Score Update M "+MARKS.get(5));
+				Thread.sleep(5);
+			} catch (InterruptedException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
+			}
 		}
+		/*
+		System.out.println("Score Update A "+MARKS.get(0));
+		System.out.println("Score Update A "+MARKS.get(1));
+		System.out.println("Score Update A "+MARKS.get(2));
+		System.out.println("Score Update A "+MARKS.get(3));
+		System.out.println("Score Update A "+MARKS.get(4));
+		System.out.println("Score Update A "+MARKS.get(5));
+	   */
 	}
 
 	
