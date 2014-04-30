@@ -69,7 +69,7 @@ int houseToChar(int house)
 
 void buzzerCallback(evutil_socket_t sock, short flags, void * args)
 {
-	char buf[128];  
+	char buf[5000];  
     int ret = recv(sock, buf, 128, 0);
     buf[ret] = 0;
     
@@ -80,8 +80,8 @@ void buzzerCallback(evutil_socket_t sock, short flags, void * args)
         return;
     }
 	printf("%s\n", buf);
-	char buffer[500];
-	char buffer2[500];
+	char buffer[5000];
+	char buffer2[5000];
 	strcpy(buffer, "buzzer:{\"");
 	// for(int i = 0, i< ret, i++)
 	// 	strcat(buffer, "A\":\"123\"}\n");

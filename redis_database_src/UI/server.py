@@ -25,11 +25,13 @@ class MyResource(Resource):
 		data = {}
 		for item in newdata.split('&'):
 			if("Option" not in item.split('=')[0]):
-				data[item.split('=')[0]] = item.split('=')[1]
+				data[item.split('=')[0]] = "".join(item[item.find("=")+1:])
+			print item.split('=')
 		if request.args["OptionA"][0] != "":
 			arr = [request.args["OptionA"][0],request.args["OptionB"][0],request.args["OptionC"][0],request.args["OptionD"][0]]
 			data["Options"] = arr
 		print data["QuestionID"]
+		print data
 		print json.dumps(data)
 		r.set(data["QuestionID"], json.dumps(data))
 		request.redirect(".")

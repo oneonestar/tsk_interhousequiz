@@ -76,7 +76,7 @@ void read_instruction(struct bufferevent *bev, void *ctx)
 	int question_pointer[6] = {0};
 
 	//a buffer for storing returned string from functions
-	char buffer[500];
+	char buffer[5000];
 	
 	//DEBUG
 	printf("received command: %s\n", recvBuff);
