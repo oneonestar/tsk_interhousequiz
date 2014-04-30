@@ -15,11 +15,11 @@ public class MainWindow {
 	SetChooser setChooser;
 	JPanel QuestionList2;
 	QuestionListPage qlp;
-	ArrayList<QuestionPage> QuestionSets;
-	ArrayList<Question> qArray;
+//	ArrayList<QuestionPage> QuestionSets;
+//	ArrayList<Question> qArray;
 	Socket socket;
 	LoginPanel login;
-	Question q;
+//	Question q;
 	Communicator c;
 	MarksPanel mp;
 	MarksPanel mpa;
