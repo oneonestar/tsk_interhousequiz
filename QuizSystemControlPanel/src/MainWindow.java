@@ -8,18 +8,16 @@ import java.util.ArrayList;
 
 public class MainWindow {
     JFrame mainframe;
-    WelcomePanel welcome;
+    
     JPanel cardstack;
     JPanel QuestionList;
-	HouseChooser houseList;
-	SetChooser setChooser;
+	
 	JPanel QuestionList2;
 	QuestionListPage qlp;
-//	ArrayList<QuestionPage> QuestionSets;
-//	ArrayList<Question> qArray;
+	
 	Socket socket;
 	LoginPanel login;
-//	Question q;
+	
 	Communicator c;
 	MarksPanel mp;
 	MarksPanel mpa;
@@ -29,9 +27,6 @@ public class MainWindow {
     	cardstack=new JPanel(new CardLayout());
     	
     	login=new LoginPanel(this);
-    	welcome=new WelcomePanel(this,c);
-    	setChooser=new SetChooser(this);
-    	houseList=new HouseChooser(this,setChooser);
     	
     	
     	mp=new MarksPanel(c);
@@ -48,7 +43,7 @@ public class MainWindow {
     	
     	
     	mainframe.getContentPane().add(cardstack);
-    	mainframe.setSize(1024,768);
+    	mainframe.pack();
     	mainframe.setVisible(true);
     	//c.start();
     }
