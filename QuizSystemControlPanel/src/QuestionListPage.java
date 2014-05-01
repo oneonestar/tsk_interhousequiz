@@ -3,6 +3,7 @@ import java.util.ArrayList;
 
 import javax.swing.*;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagLayout;
@@ -40,6 +41,7 @@ public class QuestionListPage extends JPanel{
 	private Font f2;
 	
 	public QuestionListPage(Communicator c, MarksPanel mp){
+		this.setBackground(Color.GRAY);
 		BL=new ButtonListener();//create button listener
 		this.c=c;//get instance of communicator
 		this.mp=mp;//get instance of marks panel
@@ -50,11 +52,13 @@ public class QuestionListPage extends JPanel{
 		Answer.addActionListener(BL);
 		Answer.setEnabled(false);
 		tabbedPane=new JTabbedPane();
+		tabbedPane.setBackground(Color.gray);
 		this.add(tabbedPane);
 		//new JPanel as containers for buttons
 		panels=new ArrayList<JPanel>();
 		for(int a=0;a<20;a++){
 			panels.add(new JPanel());
+			panels.get(a).setBackground(Color.gray);
 		}
 	    //ArrayList to store buttons
 		togetherB=new ArrayList<JButton>();
@@ -95,7 +99,7 @@ public class QuestionListPage extends JPanel{
 			j+=4;
 		}
 		tabbedPane.add("基本部分",mainPanel);
-		
+		mainPanel.setBackground(Color.gray);
 		
 		AddCompB.add(new JButton("科學1 1"));
 		
@@ -150,6 +154,7 @@ public class QuestionListPage extends JPanel{
 		panels.get(15).add(AddCompB.get(13));
 		
 		addPanel=new JPanel();
+		addPanel.setBackground(Color.gray);
         for(int i=9;i<16;i++){
         	addPanel.add(panels.get(i));
         }

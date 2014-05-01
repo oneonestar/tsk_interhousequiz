@@ -1,4 +1,5 @@
-import java.awt.*;
+import java.awt.CardLayout;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -27,6 +28,7 @@ public class LoginPanel extends JPanel implements ActionListener {
 	
 	public LoginPanel(MainWindow mw){
 		window=mw;
+		this.setBackground(Color.GRAY);
 		hostname=new JTextField(20);
 		hostname.setText("localhost");
 		hostname.setSize(20, 5);
@@ -42,6 +44,8 @@ public class LoginPanel extends JPanel implements ActionListener {
 		
 		paneladdr=new JPanel();
 		panelport=new JPanel();
+		paneladdr.setBackground(Color.gray);
+		panelport.setBackground(Color.gray);
 		paneladdr.add(hostl);
 		paneladdr.add(hostname);
 		panelport.add(portl);
@@ -62,6 +66,7 @@ public class LoginPanel extends JPanel implements ActionListener {
 		window.cardstack.add(qlp,"qlp");
 		CardLayout cl=(CardLayout) window.cardstack.getLayout();
 		cl.show(window.cardstack, "qlp");
+		window.mainframe.pack();
 		
 	}
 	/*

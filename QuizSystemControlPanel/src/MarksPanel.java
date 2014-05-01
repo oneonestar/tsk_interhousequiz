@@ -53,7 +53,7 @@ public class MarksPanel extends JPanel implements ActionListener{
 	   public MarksPanel(Communicator c){
 		   add=new JButton("+");
 		   minus=new JButton("-");
-		   
+		   this.setBackground(Color.gray);
 		   group=new ButtonGroup();
 		   current=new ArrayList<JRadioButton>();
 		   
@@ -61,13 +61,15 @@ public class MarksPanel extends JPanel implements ActionListener{
 		   this.c=c;
 		   
 		   panels=new ArrayList<JPanel>();
-		   for(int i=0;i<7;i++){
+		   for(int i=0;i<8;i++){
 			   panels.add(new JPanel());
+			   panels.get(i).setBackground(Color.GRAY);
 		   }
 		   MARKS=new ArrayList<String>();
 		   changeMarks=new ArrayList<JTextField>();
 		   for(int i=0;i<6;i++){
 			   current.add(new JRadioButton());
+			   current.get(i).setBackground(Color.gray);
 			   group.add(current.get(i));
 			   MARKS.add("500");
 			   changeMarks.add(new JTextField(MARKS.get(i),3));
@@ -111,8 +113,8 @@ public class MarksPanel extends JPanel implements ActionListener{
 		   panels.get(6).add(add);
 		   panels.get(6).add(minus);
 		   panels.get(6).add(update);
-		   panels.get(6).add(startB);
-		   panels.get(6).add(stopB);
+		   panels.get(7).add(startB);
+		   panels.get(7).add(stopB);
 		   
 		   for(JPanel p:panels){
 			   p.setAlignmentX(LEFT_ALIGNMENT);
@@ -123,9 +125,9 @@ public class MarksPanel extends JPanel implements ActionListener{
 		   startB.addActionListener(this);		   
 		   resetB=new JButton("Reset Buzzer");
 		   resetB.addActionListener(this);
-		   panels.get(6).add(resetB);
+		   panels.get(7).add(resetB);
 		   this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-		   for(int i=0;i<7;i++){
+		   for(int i=0;i<8;i++){
 			   this.add(panels.get(i));
 		   }
 
@@ -148,6 +150,8 @@ public class MarksPanel extends JPanel implements ActionListener{
 			for(JRadioButton rb : current){
 				if(rb.isSelected()){
 					int index=current.indexOf(rb);
+					MARKS.set(index, ""+(Integer.parseInt(MARKS.get(index))+10));
+					changeMarks.get(index).setText(MARKS.get(index));
 					switch (index){
 						case 0:
 							c.write("Score Add A 10");
@@ -176,6 +180,8 @@ public class MarksPanel extends JPanel implements ActionListener{
 			for(JRadioButton rb : current){
 				if(rb.isSelected()){
 					int index=current.indexOf(rb);
+					MARKS.set(index, ""+(Integer.parseInt(MARKS.get(index))-10));
+					changeMarks.get(index).setText(MARKS.get(index));
 					switch (index){
 					case 0:
 						c.write("Score Minus A 10");
