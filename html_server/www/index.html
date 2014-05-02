@@ -95,7 +95,7 @@
 				$("#Option_C").text("");
 				$("#Option_D").text("");
 				$('.box-option').fadeIn(500);
-				$("#myImage").fadeOut(500);
+				$("#myImage").fadeOut(0);
 
 				var data = JSON.parse(e.data);
 
@@ -107,6 +107,7 @@
 
 				if(data.Path.length > 0){
 					$("#myImage").attr("src", data.Path);
+					$("#myImage").fadeIn(0);
 					$("#myImage").css("display", "block");
 				}
 
