@@ -11,12 +11,30 @@
 		<script type="text/javascript">
 		var source = new EventSource('/events');
 
-		function updateConnectionStatus(text, status){
-			if(status) $('#connection').removeClass('disconnected').addClass('connected');
-			else $('#connection').removeClass('disconnected').addClass('connected');
-			
+		function updateConnectionStatus(text, color){
+			$('#connection').removeClass('disconnected').addClass('connected');
+			$('#connection').css('background-color', color);
 			$('#connection span').text(text);
-			$('#connection').delay(500).fadeOut(500);
+			$('#connection').fadeIn(500).delay(500).fadeOut(500);
+		}
+		function getHouseName(char){
+			switch(char){
+				case 'A': return "Augustin"
+					break;
+				case 'D': return "Deusdedit"
+					break;
+				case 'H': return "Honorious"
+					break;
+				case 'J': return "Justus"
+					break;
+				case 'L': return "Laurentius"
+					break;
+				case 'M': return "Mellitus"
+					break;
+			}
+		}
+		function getHouseColor(char){
+			return $("#" + char + "_score_box").css('border-left-color');
 		}
 
 		$(function(){
@@ -28,19 +46,19 @@
 			}, false);
 
 			source.addEventListener('open', function (e) {
-				updateConnectionStatus('Connected', true);
+				updateConnectionStatus('Connected', 'green');
 			}, false);
 
 			source.addEventListener('error', function (e) {
 				if (e.eventPhase == 2) { //EventSource.CLOSED
-					updateConnectionStatus('Disconnected', false);
+					updateConnectionStatus('Disconnected', 'red');
 				}
 			}, false);
 
 			source.addEventListener('buzzer', function (e) {
 				var data = JSON.parse(e.data);
 				for (var k in data) {
-					logger.log('>Buzzer:' + k + data[k]);
+					updateConnectionStatus(getHouseName(k), getHouseColor(k));
 					$("#" + k + "_score_box")
 						.fadeIn(300)
 						.fadeOut(300)
