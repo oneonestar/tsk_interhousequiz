@@ -3,7 +3,7 @@
 
 struct Score{
 	int score_table[6];
-	char address[10];
+	char address[50];
 };
 
 int server2score[2];
