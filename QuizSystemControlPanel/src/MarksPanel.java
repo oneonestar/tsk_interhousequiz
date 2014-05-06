@@ -48,9 +48,11 @@ public class MarksPanel extends JPanel implements ActionListener
 
     private JButton add;
     private JButton minus;
-
     private JButton resetB;
 
+
+    private JButton ui_Hide;
+    private JButton ui_Show;
     public MarksPanel( Communicator c )
     {
         add=new JButton( "+" );
@@ -63,7 +65,7 @@ public class MarksPanel extends JPanel implements ActionListener
         this.c=c;
 
         panels=new ArrayList<JPanel>();
-        for( int i=0; i<8; i++ )
+        for( int i=0; i<9; i++ )
         {
             panels.add( new JPanel() );
             panels.get( i ).setBackground( Color.GRAY );
@@ -133,18 +135,35 @@ public class MarksPanel extends JPanel implements ActionListener
         resetB.addActionListener( this );
         panels.get( 7 ).add( resetB );
         this.setLayout( new BoxLayout( this, BoxLayout.Y_AXIS ) );
-        for( int i=0; i<8; i++ )
+
+
+        ui_Hide = new JButton("UI Hide");
+        ui_Hide.addActionListener(this);
+        ui_Show = new JButton("UI Show");
+        ui_Show.addActionListener(this);
+        panels.get( 8 ).add( ui_Hide );
+        panels.get( 8 ).add( ui_Show );
+
+        for( int i=0; i<9; i++ )
         {
             this.add( panels.get( i ) );
         }
-
-
     }
     @Override
     public void actionPerformed( ActionEvent e )
     {
         // TODO Auto-generated method stub
-        if( e.getSource()==stopB )
+        if( e.getSource()==ui_Hide )
+        {
+            c.write( "UI Hide" );
+            return;
+        }
+        else if( e.getSource()==ui_Show )
+        {
+            c.write( "UI Show" );
+            return;
+        }
+        else if( e.getSource()==stopB )
         {
             c.write( "Buzzer 2" );
             return;
