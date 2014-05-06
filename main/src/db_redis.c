@@ -5,8 +5,6 @@
 
 /*#include <hiredis.h>*/
 
-int set_question(int question, char *json_str);
-char* get_question(int set, int question);
 int init_db();
 void close_db();
 

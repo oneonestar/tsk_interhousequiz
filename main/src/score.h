@@ -17,7 +17,7 @@ void save(char*);
 void pushScore(char*, char*);
 int get_score(char);
 int house_to_index(char);
-char index_to_house(ints);
+char index_to_house(int);
 //void change_score(char, char, int);
 
 #endif
