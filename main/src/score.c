@@ -24,7 +24,6 @@ struct Score score;
 void score_init(int initscore, char address[])
 {
 	strcpy(score.address, address);
-
 	if(access(score.address, F_OK)!=-1) {
 		printf("%s found, loading data for initialization...\n", score.address);
 		char temp[50];

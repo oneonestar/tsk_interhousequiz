@@ -121,7 +121,6 @@ void buzzer_init(struct event_base *base, char *buzzerAddress, char *buzzerPort,
 	inet_pton(AF_INET, buzzerAddress, &serv_addr.sin_addr);
 	connect(sock, (struct sockaddr*)&serv_addr, sizeof(serv_addr));
 
-	printf("TEST\n");
 
 	ev_read = malloc(sizeof(struct event*));
 	ev_read = event_new(base, sock, (short)EV_READ|EV_PERSIST, buzzer_callback, (void*)ev_read);
@@ -129,4 +128,5 @@ void buzzer_init(struct event_base *base, char *buzzerAddress, char *buzzerPort,
 
 	webPort = l_webPort;
 	webAddress = l_webAddress;
+	printf("Buzzer initialized!\n");
 }
