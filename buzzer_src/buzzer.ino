@@ -83,23 +83,23 @@ void loop()
 {
   while(buzzerState==1)
   {
-    for(int index=2; index<8; index++)  //2-7
+    for(int i=2; i<8; i++)  //2-7
     {
-      if(counter[index-2]==1) {
+      if(counter[i-2]==1) {
         continue;
       }
       else {
         //read from button
-        int buttonvoltage = digitalRead(index);
+        int buttonvoltage = digitalRead(i);
         if (buttonvoltage == LOW)
         { //First pressed for this house
           if(pressed == 0)
           { //First pressed for all house
             timer = millis();
           }
-          signal[pressed] = (index-1)+48;
-          counter[index-2]=1;
-          pinMode(index+6, HIGH);
+          signal[pressed] = (i-1)+48;
+          counter[i-2]=1;
+          pinMode(i+6, HIGH);
           pressed++;
         }
       }
@@ -116,6 +116,7 @@ void loop()
 
 void reset()
 {
+  index = 0;
   timer = 0;
   pressed = 0;
   for(int i=0; i<6; i++) {
@@ -135,20 +136,21 @@ void receiveData(int byteCount) {
     }
     if(reader==1) //enable()
     {
+      reset();
       buzzerState = 1;
     }
     if(reader==2) //disable()
     {
+      reset();
       buzzerState = 0;
     }
 
-    Serial.print("data received: ");
-    Serial.println(buzzerState);
+    //Serial.print("data received: ");
+    //Serial.println(buzzerState);
     //Serial.print("data size: ");
     //Serial.println(byteCount);
   }
 }
-
 void sendData() {
   Wire.write(signal[index]);
   index++;

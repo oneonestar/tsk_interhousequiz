@@ -1,0 +1,18 @@
+<part>
+  <title>Arduino</title>
+  <preface>
+    <title>Frontispiece</title>
+    <para>Date of issue: </para>
+    <para>Status: Draft</para>
+    <para>Version : 1.0.</para>
+    <para>Authorship: Star Poon&lt; oneonestar@gmail.com&gt;</para>
+    <para>Type of Document: Design Documentation</para>
+    <para>Change history:</para>
+  </preface>
+  <chapter>
+    <title>Scope</title>
+    <para>
+        Content is required in chapters too.
+    </para>
+  </chapter>
+</part>
