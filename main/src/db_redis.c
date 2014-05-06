@@ -22,18 +22,13 @@ db_con* db_connect()
     c = redisConnectWithTimeout(hostname, port, timeout);
     if (c == NULL || c->err) {
         if (c) {
-            printf("Connection error: %s\n", c->errstr);
+            printf("Redis Connection error: %s\n", c->errstr);
             redisFree(c);
         } else {
             printf("Connection error: can't allocate redis context\n");
         }
         exit(1);
     }
-
-    /* PING server */
-    reply = redisCommand(c,"PING");
-    printf("PING: %s\n", reply->str);
-    freeReplyObject(reply);
 
 	return c;
 }

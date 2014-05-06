@@ -15,20 +15,7 @@
 #include "score.h"
 #include "buzzer.h"
 #include "non_blocking_socket.h"
-
-#ifndef USE_REDIS
-#ifndef USE_MONGODB
-#define USE_MYSQL
-#endif
-#endif
-
-#ifdef USE_MYSQL
-#include "db_mysql.h"
-#endif
-
-#ifdef USE_REDIS
 #include "db_redis.h"
-#endif
 
 //global variables to store address of buzzer and web server
 char webServer[50];
