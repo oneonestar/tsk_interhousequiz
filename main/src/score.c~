@@ -119,7 +119,7 @@ void update(int house, int newscore)
 {
 	score.score_table[house]=newscore;
 	//printf("%d updated to %d, score_table[%d] = %d\n", newscore, house, house, score.score_table[house]);
-	printf("%d added to house %c, new score is %d\n", newscore, index_to_house(house), score.score_table[house]);
+	printf("%d added to house %c, new score is %d\n", newScore, index_to_house(house), score.score_table[house]);
 }
 
 
