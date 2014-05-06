@@ -73,9 +73,6 @@ while True:
 					ss.remove(i)
 					i.close()
 		#start listening from client
-#		s.listen(1)
-#		conn, addr = s.accept()
-#		time.sleep(0.5)
 
 		#start polling
 		#read signal from arduino

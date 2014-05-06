@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<book xmlns='http://docbook.org/ns/docbook' xmlns:xi="http://www.w3.org/2001/XInclude" version="5.0">
+  <title>Design Documentation for Inter-house Quiz Competition</title>
+  <info>
+      <author>
+        <personname>
+        <firstname>Star</firstname><surname>Poon</surname>
+        </personname>
+      </author>
+  </info>
+
+  <part>
+    <title>Overall Design</title>
+    <preface>
+      <title>Frontispiece</title>
+      <para>Date of issue: </para>
+      <para>Status: Draft</para>
+      <para>Version : 1.0.</para>
+      <para>Authorship: Star Poon&lt; oneonestar@gmail.com&gt;</para>
+      <para>Type of Document: Design Documentation</para>
+      <para>Change history:</para>
+    </preface>
+    <chapter>
+      <title>Introduction</title>
+      <section>
+        <title>Purpose</title>
+        <para>my purpose</para>
+      </section>
+      <section>
+        <title>Scope</title>
+        <para>my purpose</para>
+      </section>
+      <section>
+        <title>Context</title>
+        <para>my purpose</para>
+      </section>
+      <section>
+        <title>Summary</title>
+        <para>my purpose</para>
+      </section>
+    </chapter>
+  </part>
+  <xi:include href="arduino.xml"/>
+ <!--  <xi:include href="java_ui.xml"/>
+  <xi:include href="main.xml"/>
+  <xi:include href="raspberrypi.xml"/>
+  <xi:include href="redis.xml"/>
+  <xi:include href="webserver.xml"/> -->
+  <appendix>
+    <title>Optional Appendix</title>
+    <para>
+        Appendixes are optional.
+    </para>
+  </appendix>
+</book>
