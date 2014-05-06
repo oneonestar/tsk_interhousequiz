@@ -15,20 +15,7 @@
 #include "score.h"
 #include "buzzer.h"
 #include "non_blocking_socket.h"
-
-#ifndef USE_REDIS
-#ifndef USE_MONGODB
-#define USE_MYSQL
-#endif
-#endif
-
-#ifdef USE_MYSQL
-#include "db_mysql.h"
-#endif
-
-#ifdef USE_REDIS
 #include "db_redis.h"
-#endif
 
 //global variables to store address of buzzer and web server
 char webServer[50];
@@ -155,6 +142,12 @@ void read_instruction(struct bufferevent *bev, void *ctx)
 			printf("Requesting to show answer\n");
 			send_message(webServer, webPort, "answer:{}");
 			break;
+		case 5:
+			if(intOption==1)
+				send_message(webServer, webPort, "ui:{\"score\":\"show\"}");
+			else if(intOption==2)
+				send_message(webServer, webPort, "ui:{\"score\":\"hide\"}");
+			break;
 	}
 	
 	//clear information
@@ -179,6 +172,9 @@ int parse_instruction(char *instruction)
 	}
 	else if(strcmp(instruction, "Answer")==0) {
 		return 4;
+	}
+	else if(strcmp(instruction, "UI")==0) {
+		return 5;
 	}
 	else if(strcmp(instruction, "Quit")==0) {
 		return 0;
@@ -210,6 +206,14 @@ int parse_option(int instruction, char *option)
 			break;
 		case 4:
 			return 0;
+			break;
+		case 5:
+			if(strcmp(option, "Show")==0) {
+				return 1;
+			}
+			else if(strcmp(option, "Hide")==0) {
+				return 2;
+			}
 			break;
 		case 0:
 			return 0;

@@ -14,22 +14,12 @@ import java.awt.BorderLayout;
 
 public class QuestionListPage extends JPanel
 {
-    private final static JLabel together=new JLabel( "齊答題" );
-    private final static JLabel complusory=new JLabel( "必答題" );
     private static ArrayList<JLabel> Sets;
-    private final static JLabel basicComp=new JLabel( "基本部分" );
-    private final static JLabel AddComp=new JLabel( "附加部分" );
-    private final static JLabel Sci1=new JLabel( "科學1" );
-    private final static JLabel Sci2=new JLabel( "科學2" );
-    private final static JLabel IH1=new JLabel( "綜合人文1" );
-    private final static JLabel IH2=new JLabel( "綜合人文2" );
-    private final static JLabel News1=new JLabel( "時事1" );
-    private final static JLabel News2=new JLabel( "時事2" );
-    private final static JLabel commonsense=new JLabel( "唔識抵死題(常識)" );
     private ArrayList<JButton> togetherB;
     private ArrayList<JButton> complusoryB;
     private ArrayList<JButton> basicCompB;
     private ArrayList<JButton> AddCompB;
+    private ArrayList<JButton> quickB;
     private ArrayList<JPanel> panels;
     private JPanel mainPanel;
     private Communicator c;
@@ -39,23 +29,32 @@ public class QuestionListPage extends JPanel
     private JButton Answer;
     private JTabbedPane tabbedPane;
     private JPanel addPanel;
+    private JTextField quickQuestion;
     private Font f2;
 
     public QuestionListPage( Communicator c, MarksPanel mp )
     {
+        //Settings
+        togetherB=new ArrayList<JButton>();
+        complusoryB=new ArrayList<JButton>();
+        basicCompB=new ArrayList<JButton>();
+        AddCompB=new ArrayList<JButton>();
+        Sets=new ArrayList<JLabel>();
+
         this.setBackground( Color.GRAY );
         BL=new ButtonListener();//create button listener
+
         this.c=c;//get instance of communicator
         this.mp=mp;//get instance of marks panel
-        mainPanel=new JPanel();
-        mainPanel.setLayout( new BoxLayout( mainPanel,BoxLayout.PAGE_AXIS ) );
-        //scrollPane=new JScrollPane(mainPanel);
+
         Answer=new JButton( "Check Answer" );
         Answer.addActionListener( BL );
         Answer.setEnabled( false );
+
         tabbedPane=new JTabbedPane();
         tabbedPane.setBackground( Color.gray );
         this.add( tabbedPane );
+
         //new JPanel as containers for buttons
         panels=new ArrayList<JPanel>();
         for( int a=0; a<20; a++ )
@@ -63,113 +62,104 @@ public class QuestionListPage extends JPanel
             panels.add( new JPanel() );
             panels.get( a ).setBackground( Color.gray );
         }
-        //ArrayList to store buttons
-        togetherB=new ArrayList<JButton>();
-        complusoryB=new ArrayList<JButton>();
-        basicCompB=new ArrayList<JButton>();
-        AddCompB=new ArrayList<JButton>();
-        Sets=new ArrayList<JLabel>();
 
+        //齊答題
+        //4 Questions
+        //Button x 4 => Panel => tabbedPane
         for( int i=0; i<4; i++ )
-        {
             togetherB.add( new JButton( "Question "+( i+1 ) ) );
-
-        }
-
         for( JButton b : togetherB )
-        {
             panels.get( 0 ).add( b );
-            //b.addActionListener(this);
-        }
         tabbedPane.add( "齊答題",panels.get( 0 ) );
 
-
+        //基本部分
+        //7 題目集
+        //7 Label, 28 Button => 7 Panels => "mainPanel" => tabbedPane
         for( int i=0; i<7; i++ )
         {
             Sets.add( new JLabel( "題目集"+( i+1 ) ) );
-
         }
-
         for( int j=0; j<28; j++ )
         {
             basicCompB.add( new JButton( "Question "+( j%4+1 ) ) );
         }
+        mainPanel=new JPanel();
+        mainPanel.setBackground( Color.gray );
+        mainPanel.setLayout( new BoxLayout( mainPanel,BoxLayout.PAGE_AXIS ) );
         int j=0;
         for( int i=0; i<7; i++ )
         {
-
             for( int k=j; k<j+4; k++ )
             {
                 panels.get( i+1 ).add( basicCompB.get( k ) );
                 mainPanel.add( panels.get( i+1 ) );
-                //basicCompB.get(k).addActionListener(this);
             }
             panels.get( i+1 ).add( Sets.get( i ) );
             j+=4;
         }
         tabbedPane.add( "基本部分",mainPanel );
-        mainPanel.setBackground( Color.gray );
-
+        
+        //附加部分
+        //7 題目集
+        //7 Labels, 14 Buttons => 7 Panels => "addPanel"
         AddCompB.add( new JButton( "科學1 1" ) );
-
         AddCompB.add( new JButton( "科學1 2" ) );
-
         AddCompB.add( new JButton( "科學2 1" ) );
-
         AddCompB.add( new JButton( "科學2 2" ) );
-
         AddCompB.add( new JButton( "綜合人文1 1" ) );
-
         AddCompB.add( new JButton( "綜合人文1 2" ) );
-
         AddCompB.add( new JButton( "綜合人文2 1" ) );
-
         AddCompB.add( new JButton( "綜合人文2 2" ) );
-
         AddCompB.add( new JButton( "時事1 1" ) );
-
         AddCompB.add( new JButton( "時事1 2" ) );
-
         AddCompB.add( new JButton( "時事2 1" ) );
-
         AddCompB.add( new JButton( "時事2 2" ) );
-
         AddCompB.add( new JButton( "唔識抵死題(常識) 1" ) );
-
         AddCompB.add( new JButton( "唔識抵死題(常識) 2" ) );
-
-
-        panels.get( 9 ).add( AddComp );
-        panels.get( 9 ).add( Sci1 );
+        panels.get( 9 ).add( new JLabel( "科學1" ) );
         panels.get( 9 ).add( AddCompB.get( 0 ) );
         panels.get( 9 ).add( AddCompB.get( 1 ) );
-        panels.get( 10 ).add( Sci2 );
+        panels.get( 10 ).add( new JLabel( "科學2" ) );
         panels.get( 10 ).add( AddCompB.get( 2 ) );
         panels.get( 10 ).add( AddCompB.get( 3 ) );
-        panels.get( 11 ).add( IH1 );
+        panels.get( 11 ).add( new JLabel( "綜合人文1" ) );
         panels.get( 11 ).add( AddCompB.get( 4 ) );
         panels.get( 11 ).add( AddCompB.get( 5 ) );
-        panels.get( 12 ).add( IH2 );
+        panels.get( 12 ).add( new JLabel( "綜合人文2" ) );
         panels.get( 12 ).add( AddCompB.get( 6 ) );
         panels.get( 12 ).add( AddCompB.get( 7 ) );
-        panels.get( 13 ).add( News1 );
+        panels.get( 13 ).add( new JLabel( "時事1" ) );
         panels.get( 13 ).add( AddCompB.get( 8 ) );
         panels.get( 13 ).add( AddCompB.get( 9 ) );
-        panels.get( 14 ).add( News2 );
+        panels.get( 14 ).add( new JLabel( "時事2" ) );
         panels.get( 14 ).add( AddCompB.get( 10 ) );
         panels.get( 14 ).add( AddCompB.get( 11 ) );
-        panels.get( 15 ).add( commonsense );
+        panels.get( 15 ).add( new JLabel( "唔識抵死題(常識)" ) );
         panels.get( 15 ).add( AddCompB.get( 12 ) );
         panels.get( 15 ).add( AddCompB.get( 13 ) );
-
         addPanel=new JPanel();
         addPanel.setBackground( Color.gray );
-        for( int i=9; i<16; i++ )
+        addPanel.setLayout( new BoxLayout( addPanel, BoxLayout.Y_AXIS ) );
+        for( int i=9; i<=15; i++ )
         {
             addPanel.add( panels.get( i ) );
         }
-        addPanel.setLayout( new BoxLayout( addPanel, BoxLayout.Y_AXIS ) );
         tabbedPane.add( "附加部分", addPanel );
+
+        //搶答題
+        quickQuestion = new JTextField("0", 3);
+        quickQuestion.setFont( new Font( "Big",1,36 ) );
+        quickB = new ArrayList<JButton>();
+        quickB.add(new JButton("-"));
+        quickB.add(new JButton("+"));
+        quickB.add(new JButton("Go"));
+        panels.get( 16 ).add(quickQuestion);
+        panels.get( 16 ).add(quickB.get(0));
+        panels.get( 16 ).add(quickB.get(1));
+        panels.get( 16 ).add(quickB.get(2));
+        tabbedPane.add( "搶答題", panels.get( 16 ) );
+
+
         setLayout( new BoxLayout( this, BoxLayout.LINE_AXIS ) );
         this.add( tabbedPane,BorderLayout.LINE_START );
         //scrollPane.setPreferredSize(new Dimension(600,600));
@@ -195,10 +185,10 @@ public class QuestionListPage extends JPanel
         {
             b.addActionListener( BL );
         }
-
-
-
-
+        for( JButton b : quickB )
+        {
+            b.addActionListener( BL );
+        }
     }
 
 
@@ -265,9 +255,20 @@ public class QuestionListPage extends JPanel
             {
                 c.write( command+"C:"+"7:"+( index-11 ) );
             }
-
-
         }
+        private void QuickCommand( int index )
+        {
+            int i = Integer.parseInt( quickQuestion.getText());
+            if(i < 0 && i > 150)
+                i = 0;
+            if(index == 0)
+                i--;
+            else if(index == 1)
+                i++;
+            quickQuestion.setText( ""+i );
+            c.write( command+"D:1:"+( i ) );
+        }
+        
         @Override
         public void actionPerformed( ActionEvent e )
         {
@@ -289,6 +290,10 @@ public class QuestionListPage extends JPanel
             {
                 AddCompCommand( AddCompB.indexOf( b ) );
                 Answer.setEnabled( true );
+            }
+            if( quickB.contains( b ) )
+            {
+                QuickCommand( quickB.indexOf(b));
             }
 
             if( e.getSource()==Answer )
