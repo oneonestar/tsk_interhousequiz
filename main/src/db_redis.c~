@@ -22,10 +22,10 @@ db_con* db_connect()
     c = redisConnectWithTimeout(hostname, port, timeout);
     if (c == NULL || c->err) {
         if (c) {
-            printf("DEBUG: db_connect(): Connection error: %s\n", c->errstr);
+            printf("Connection error: %s\n", c->errstr);
             redisFree(c);
         } else {
-            printf("DEBUG: db_connect(): can't allocate redis context\n");
+            printf("Connection error: can't allocate redis context\n");
         }
         exit(1);
     }
