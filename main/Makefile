@@ -7,7 +7,7 @@ all:
 	gcc -c src/quiz_server.c -o obj/quiz_server.o -g $(INC)
 	gcc -c src/score.c -o obj/score.o -std=c99 -g $(INC)
 	gcc -c src/buzzer.c -o obj/buzzer.o -g $(INC)
-	gcc -o quiz_server obj/*.o -std=c99 -I./src -levent_core -lhiredis
+	gcc -o bin/quiz_server obj/*.o -std=c99 -I./src -levent_core -lhiredis
 
 clean:
 	rm *.o quiz_server

@@ -2,4 +2,4 @@
 *.class
 *.dat
 *~
-
+main/bin/*
