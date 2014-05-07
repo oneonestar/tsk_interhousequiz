@@ -15,7 +15,20 @@
 #include "score.h"
 #include "buzzer.h"
 #include "non_blocking_socket.h"
+
+#ifndef USE_REDIS
+#ifndef USE_MONGODB
+#define USE_MYSQL
+#endif
+#endif
+
+#ifdef USE_MYSQL
+#include "db_mysql.h"
+#endif
+
+#ifdef USE_REDIS
 #include "db_redis.h"
+#endif
 
 //global variables to store address of buzzer and web server
 char webServer[50];
@@ -81,10 +94,14 @@ void read_instruction(struct bufferevent *bev, void *ctx)
 		printf("invalid instruction!\n");
 	}
 
+	//time structure
+	struct tm * timeinfo;
+	time_t rawtime;
 
 	//parse instructions and options
 	switch(intInstruction) {
-
+		time (&rawtime);
+		timeinfo = localtime (&rawtime);
 		case 0:
 			//end
 			printf("Exiting...\n");
@@ -95,7 +112,7 @@ void read_instruction(struct bufferevent *bev, void *ctx)
 			switch(intOption) {
 				case 1:
 					//to read a question from database
-					printf("Reading Question: %s\n", value);
+					printf("%s: Reading Question: %s\n", asctime(timeinfo), value);
 					
 					//procedure to get json string from database module
 					db_con *con = db_connect();									//initiate mysql connection
@@ -103,7 +120,7 @@ void read_instruction(struct bufferevent *bev, void *ctx)
 					db_close(con);											//close the connection
 					
 					//send message to webserver to show question
-					printf("Sending Question to Web Server: %s\n", buffer);
+					printf("%s: Sending Question to Web Server: %s\n", asctime(timeinfo), buffer);
 					send_message(webServer, webPort, buffer);
 					break;
 			}
@@ -129,24 +146,18 @@ void read_instruction(struct bufferevent *bev, void *ctx)
 			}
 			//push score to webserver
 			save("score_backup.dat");
-			printf("saving score to file\n");
+			printf("%s: saving score to file\n", asctime(timeinfo));
 			pushScore(webServer, webPort);
 			break;
 		case 3:
 			//Buzzer
-			printf("Negotiating with buzzing server\n");
+			printf("%s: negotiating with buzzing server\n");
 			send_message(buzzerServer, buzzerPort, option);
 			break;
 		case 4:
 			//answer
-			printf("Requesting to show answer\n");
+			printf("%s: Requesting to show answer\n", asctime(timeinfo));
 			send_message(webServer, webPort, "answer:{}");
-			break;
-		case 5:
-			if(intOption==1)
-				send_message(webServer, webPort, "ui:{\"score\":\"show\"}");
-			else if(intOption==2)
-				send_message(webServer, webPort, "ui:{\"score\":\"hide\"}");
 			break;
 	}
 	
@@ -172,9 +183,6 @@ int parse_instruction(char *instruction)
 	}
 	else if(strcmp(instruction, "Answer")==0) {
 		return 4;
-	}
-	else if(strcmp(instruction, "UI")==0) {
-		return 5;
 	}
 	else if(strcmp(instruction, "Quit")==0) {
 		return 0;
@@ -207,14 +215,6 @@ int parse_option(int instruction, char *option)
 		case 4:
 			return 0;
 			break;
-		case 5:
-			if(strcmp(option, "Show")==0) {
-				return 1;
-			}
-			else if(strcmp(option, "Hide")==0) {
-				return 2;
-			}
-			break;
 		case 0:
 			return 0;
 			break;
@@ -225,6 +225,7 @@ int parse_option(int instruction, char *option)
 void server()
 {
 	//start score module
+	printf("printing score\n");
 	score_init(0, "score_backup.dat");
 	//push score to webserver
 	pushScore(webServer, webPort);
@@ -238,9 +239,7 @@ void server()
 	if(!base) {
 		printf("Server: cannot open even base\n");
 	}
-
-	printf("Initializing connection to buzzer...\n");
-	buzzer_init(base, buzzerServer, buzzerPort, webServer, webPort);
+	buzzer(base, buzzerServer, buzzerPort, webServer, webPort);
 
 	//setup struction of the address
 	memset(&serv_addr, '0', sizeof(serv_addr));

@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <unistd.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -31,11 +30,11 @@ int send_message(char *address, char *port, char *msg)
 	server_addr.sin_port = htons(atoi(port));
 	inet_pton(AF_INET, address, &server_addr.sin_addr);
 	if(connect(sock, (struct sockaddr*)&server_addr, sizeof(server_addr))) {
-		printf("Connection to %s:%s failed\n", address, port);
+		printf("fail to connect to web server\n");
 	}
 
 	if((n=send(sock, msg, strlen(msg), 0))<=0) {
-		printf("Message %s cannot be sent\n", msg);
+		printf("cannot send to web server\n");
 		close(sock);
 		return -1;
 	}
@@ -68,7 +67,7 @@ int houseToChar(int house)
 	return 'z';
 }
 
-void buzzer_callback(evutil_socket_t sock, short flags, void * args)
+void buzzerCallback(evutil_socket_t sock, short flags, void * args)
 {
 	char buf[5000];  
     int ret = recv(sock, buf, 128, 0);
@@ -104,7 +103,7 @@ static evutil_socket_t make_tcp_socket()
 }  
 
 
-void buzzer_init(struct event_base *base, char *buzzerAddress, char *buzzerPort, char *l_webAddress, char *l_webPort)
+int buzzer(struct event_base *base, char *buzzerAddress, char *buzzerPort, char *l_webAddress, char *l_webPort)
 {
 	evutil_socket_t sock = make_tcp_socket();
 	int n = 0;
@@ -121,12 +120,20 @@ void buzzer_init(struct event_base *base, char *buzzerAddress, char *buzzerPort,
 	inet_pton(AF_INET, buzzerAddress, &serv_addr.sin_addr);
 	connect(sock, (struct sockaddr*)&serv_addr, sizeof(serv_addr));
 
+	printf("TEST\n");
 
 	ev_read = malloc(sizeof(struct event*));
-	ev_read = event_new(base, sock, (short)EV_READ|EV_PERSIST, buzzer_callback, (void*)ev_read);
+	ev_read = event_new(base, sock, (short)EV_READ|EV_PERSIST, buzzerCallback, (void*)ev_read);
 	event_add(ev_read, 0);  
 
 	webPort = l_webPort;
 	webAddress = l_webAddress;
-	printf("Buzzer initialized!\n");
 }
+/*
+int main(int argc, char *argv[])
+{
+	char winner = buzzer(argv[1], atoi(argv[2]), argv[3], atoi(argv[4]));
+	printf("Winner is %c\n", winner);
+	return 0;
+}
+*/
