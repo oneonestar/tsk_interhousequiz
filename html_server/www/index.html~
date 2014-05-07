@@ -10,14 +10,41 @@
 		<script src="js/jquery-ui-1.10.4.custom.js"></script>
 		<script type="text/javascript">
 		var source = new EventSource('/events');
+		var audio = new Audio();
+		audio.src = "beep.mp3";
+		audio._play = audio.play;
+		audio.play = function(){
+			this.currentTime = 0;
+			this.play();
+		};
 
-		function updateConnectionStatus(text, status){
-			if(status) $('#connection').removeClass('disconnected').addClass('connected');
-			else $('#connection').removeClass('disconnected').addClass('connected');
-			
+		function updateConnectionStatus(text, color){
+			$('#connection').removeClass('disconnected').addClass('connected');
+			$('#connection').css('background-color', color);
 			$('#connection span').text(text);
-			$('#connection').delay(500).fadeOut(500);
-		}
+			$('#connection').fadeIn(500).delay(500).fadeOut(500);
+		};
+
+		function getHouseName(char){
+			switch(char){
+				case 'A': return "Augustin"
+					break;
+				case 'D': return "Deusdedit"
+					break;
+				case 'H': return "Honorious"
+					break;
+				case 'J': return "Justus"
+					break;
+				case 'L': return "Laurentius"
+					break;
+				case 'M': return "Mellitus"
+					break;
+			}
+		};
+
+		function getHouseColor(char){
+			return $("#" + char + "_score_box").css('border-left-color');
+		};
 
 		$(function(){
 			source.addEventListener('message', function (e) {
@@ -28,19 +55,19 @@
 			}, false);
 
 			source.addEventListener('open', function (e) {
-				updateConnectionStatus('Connected', true);
+				updateConnectionStatus('Connected', 'green');
 			}, false);
 
 			source.addEventListener('error', function (e) {
 				if (e.eventPhase == 2) { //EventSource.CLOSED
-					updateConnectionStatus('Disconnected', false);
+					updateConnectionStatus('Disconnected', 'red');
 				}
 			}, false);
 
 			source.addEventListener('buzzer', function (e) {
 				var data = JSON.parse(e.data);
 				for (var k in data) {
-					logger.log('>Buzzer:' + k + data[k]);
+					updateConnectionStatus(getHouseName(k), getHouseColor(k));
 					$("#" + k + "_score_box")
 						.fadeIn(300)
 						.fadeOut(300)
@@ -48,11 +75,12 @@
 						.fadeOut(300)
 						.fadeIn(300);
 				}
+				audio.play();
 			});
 
 			source.addEventListener('answer', function (e) {
 				$('#Question_Answer').fadeIn(500);
-				$('.box-option').fadeOut(500);
+				$('.box-option').fadeOut(300);
 			});
 
 			source.addEventListener('score', function (e) {
@@ -87,22 +115,28 @@
 			});
 
 			source.addEventListener('question', function (e) {
-				$(".question_content").text("");
-				$("#Box_Option div").text("");
-				$('#Question_Answer').fadeOut(500);
+				$(".question_content").html("");
+				$("#Box_Option div").html("");
+				$('#Question_Answer').fadeOut(0);
+				$("#Option_A").text("");
+				$("#Option_B").text("");
+				$("#Option_C").text("");
+				$("#Option_D").text("");
 				$('.box-option').fadeIn(500);
-				$("#myImage").fadeOut(500);
+				$("#myImage").fadeOut(0);
 
 				var data = JSON.parse(e.data);
 
 				$("#Question_Catalog").text(data.Catalog);
 				$("#Question_Set").text(data.Set);
 				$("#Question_ID").text(data.ID);
-				$("#Question_Question").text(data.Question);
-				$("#Question_Answer span").text(data.Answer);
+				$("#Question_Question").html(data.Question);
+				$("#Question_Answer span").html(data.Answer);
 
 				if(data.Path.length > 0){
 					$("#myImage").attr("src", data.Path);
+					$("#myImage").fadeIn(0);
+					$("#myImage").css("display", "block");
 				}
 
 				if (data.Options != null) {
@@ -149,8 +183,8 @@
 				<div id="Question_Set" class="col-md-4 question_content"></div>
 			</div>
 			<div id="Box_Question" class="Box">
-				<img id="myImage" src="" alt="image_loc" />
 				<div id="Question_Question" class="question_content"></div>
+				<img id="myImage" src="" alt="image_loc" />
 			</div>
 			<div class="box-option row">
 				<div id="Option_A" class="col-md-6 question_option"></div>
