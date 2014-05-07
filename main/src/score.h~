@@ -3,7 +3,7 @@
 
 struct Score{
 	int score_table[6];
-	char address[50];
+	char address[10];
 };
 
 int server2score[2];
@@ -16,8 +16,8 @@ void update(int, int);
 void save(char*);
 void pushScore(char*, char*);
 int get_score(char);
-int house_to_index(char);
-char index_to_house(int);
+char house_to_index(int);
+int index_to_house(char);
 //void change_score(char, char, int);
 
 #endif
