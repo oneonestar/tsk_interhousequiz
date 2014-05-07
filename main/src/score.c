@@ -111,14 +111,14 @@ void minus(int house, int minus)
 {
 	score.score_table[house]-=minus; 
 	//printf("%d deducted to %d, score_table[%d] = %d\n", minus, house, house, score.score_table[house]);
-	printf("%d added to house %c, new score is %d\n", minus, index_to_house(house), score.score_table[house]);
+	printf("%d deducted from house %c, new score is %d\n", minus, index_to_house(house), score.score_table[house]);
 }
 	 
 void update(int house, int newscore)
 {
 	score.score_table[house]=newscore;
 	//printf("%d updated to %d, score_table[%d] = %d\n", newscore, house, house, score.score_table[house]);
-	printf("%d added to house %c, new score is %d\n", newscore, index_to_house(house), score.score_table[house]);
+	printf("%d updated for house %c, new score is %d\n", newscore, index_to_house(house), score.score_table[house]);
 }
 
 
@@ -147,7 +147,7 @@ void pushScore(char address[], char port[])
 	//get score and convert to character from integer
 	memset(recvBuff, 0, sizeof(recvBuff));					//clean buffer
 	sprintf(recvBuff, "score:{\"A\":\"%d\", \"D\":\"%d\", \"H\":\"%d\", \"J\":\"%d\", \"L\":\"%d\", \"M\":\"%d\"}\n", get_score('A'), get_score('D'), get_score('H'), get_score('J'), get_score('L'), get_score('M'));
-	printf("Pushing new scores to Web Server: %s\n", recvBuff);
+	printf("Pushing updated scores to Web Server: %s\n", recvBuff);
 
 	//setup socket
 	sock = socket(AF_INET, SOCK_STREAM, 0);					//new socket stream
@@ -156,11 +156,11 @@ void pushScore(char address[], char port[])
 	serv_addr.sin_port = htons(atoi(port));					//port = N ie 8888
 	inet_pton(AF_INET, address, &serv_addr.sin_addr);			//combine
 	if(connect(sock, (struct sockaddr*)&serv_addr, sizeof(serv_addr))<0) {
-		printf("Debug: pushScore(): connection to web server failed\n");
+		printf("DEBUG: pushScore(): connection to web server failed\n");
 	}		//connect
 
 	if((n=write(sock, recvBuff, sizeof(recvBuff)))<0) {			//write score to socket to python web server
-		printf("Debug: pushScore(): socket write error\n");
+		printf("DEBUG: pushScore(): socket write error\n");
 	}
 	close(sock);
 }
