@@ -114,7 +114,7 @@
 			source.addEventListener('question', function (e) {
 				$(".question_content").html("");
 				$("#Box_Option div").html("");
-				$('#Question_Answer').fadeOut(300);
+				$('#Question_Answer').fadeOut(0);
 				$("#Option_A").text("");
 				$("#Option_B").text("");
 				$("#Option_C").text("");
@@ -132,8 +132,9 @@
 
 				if(data.Path.length > 0){
 					$("#myImage").attr("src", data.Path);
-					$("#myImage").fadeIn(300);
-					$("#myImage").css("display", "block");
+					$("#myImage").fadeIn(300, function(){
+						$("#myImage").css("display", "block");
+					});
 				}
 
 				if (data.Options != null) {
