@@ -26,6 +26,17 @@
 	}
 }
 
+html {
+	position: fixed;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	width: 100%;
+	height: 100%;
+	overflow: auto;
+}
+
 body {
 	font: 12px Arial, sans-serif;
 	background: #f9f9f9;
@@ -122,6 +133,15 @@ body {
 	text-align: center;
 }
 
+#myImage {
+	display: none;
+	max-width: 960px;
+	max-height: 460px;
+	width: auto;
+	height: auto;
+	margin: 0 auto;
+}
+
 button {
   /*background: -webkit-gradient(linear, 0% 40%, 0% 70%, from(#F9F9F9), to(#E3E3E3));*/
 	border: 1px solid #ccc;
@@ -210,11 +230,6 @@ button[disabled] {
 	width: 100%;
 	font-size: 30px;
 	margin-bottom: 1em;
-}
-
-#myImage {
-	margin: 0 auto;
-	display: none;
 }
 
 .box-option {

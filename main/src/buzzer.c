@@ -31,11 +31,12 @@ int send_message(char *address, char *port, char *msg)
 	server_addr.sin_port = htons(atoi(port));
 	inet_pton(AF_INET, address, &server_addr.sin_addr);
 	if(connect(sock, (struct sockaddr*)&server_addr, sizeof(server_addr))) {
-		printf("Connection to %s:%s failed\n", address, port);
+		printf("DEBUG: send_message(): Connection to %s:%s failed\n", address, port);
 	}
 
+	printf("Sending message: %s to %s:%s\n", msg, address, port);
 	if((n=send(sock, msg, strlen(msg), 0))<=0) {
-		printf("Message %s cannot be sent\n", msg);
+		printf("DEBUG: send_message(): Message %s cannot be sent\n", msg);
 		close(sock);
 		return -1;
 	}
@@ -76,7 +77,8 @@ void buzzer_callback(evutil_socket_t sock, short flags, void * args)
     
     if(ret == 0)  
     {  
-        printf("read_cb connection closed\n");  
+        //printf("DEBUG: buzzer_callback(): read_cb connection closed\n");  
+        printf("Connection to buzzer closed!\n");
         event_del(ev_read);  
         return;
     }
@@ -128,5 +130,5 @@ void buzzer_init(struct event_base *base, char *buzzerAddress, char *buzzerPort,
 
 	webPort = l_webPort;
 	webAddress = l_webAddress;
-	printf("Buzzer initialized!\n");
+	printf("Reading Port for Buzzer initialized!\n");
 }

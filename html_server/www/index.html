@@ -10,13 +10,16 @@
 		<script src="js/jquery-ui-1.10.4.custom.js"></script>
 		<script type="text/javascript">
 		var source = new EventSource('/events');
+		var audio = new Audio();
+		audio.src = "beep.mp3";
 
 		function updateConnectionStatus(text, color){
 			$('#connection').removeClass('disconnected').addClass('connected');
 			$('#connection').css('background-color', color);
 			$('#connection span').text(text);
 			$('#connection').fadeIn(500).delay(500).fadeOut(500);
-		}
+		};
+
 		function getHouseName(char){
 			switch(char){
 				case 'A': return "Augustin"
@@ -32,10 +35,11 @@
 				case 'M': return "Mellitus"
 					break;
 			}
-		}
+		};
+
 		function getHouseColor(char){
 			return $("#" + char + "_score_box").css('border-left-color');
-		}
+		};
 
 		$(function(){
 			source.addEventListener('message', function (e) {
@@ -66,11 +70,14 @@
 						.fadeOut(300)
 						.fadeIn(300);
 				}
+				// play buzzer sound
+				audio.currentTime = 0;
+				audio.play();
 			});
 
 			source.addEventListener('answer', function (e) {
 				$('#Question_Answer').fadeIn(500);
-				$('.box-option').fadeOut(0);
+				$('.box-option').fadeOut(300);
 			});
 
 			source.addEventListener('score', function (e) {
@@ -107,13 +114,13 @@
 			source.addEventListener('question', function (e) {
 				$(".question_content").html("");
 				$("#Box_Option div").html("");
-				$('#Question_Answer').fadeOut(0);
+				$('#Question_Answer').fadeOut(300);
 				$("#Option_A").text("");
 				$("#Option_B").text("");
 				$("#Option_C").text("");
 				$("#Option_D").text("");
 				$('.box-option').fadeIn(500);
-				$("#myImage").fadeOut(0);
+				$("#myImage").fadeOut(300);
 
 				var data = JSON.parse(e.data);
 
@@ -125,8 +132,9 @@
 
 				if(data.Path.length > 0){
 					$("#myImage").attr("src", data.Path);
-					$("#myImage").fadeIn(0);
-					$("#myImage").css("display", "block");
+					$("#myImage").fadeIn(300, function(){
+						$("#myImage").css("display", "block");
+					});
 				}
 
 				if (data.Options != null) {
