@@ -2,5 +2,7 @@
 *.class
 *.dat
 *~
-main/bin/*
+main/bin
+main/obj
 *.swp
+.DS_Store
