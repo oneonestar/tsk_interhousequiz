@@ -115,6 +115,7 @@ public class MarksPanel extends JPanel implements ActionListener
         update=new JButton( "Update" );
         startB=new JButton( "Start Buzzer" );
         stopB=new JButton( "Stop Buzzer" );
+
         add.addActionListener( this );
         minus.addActionListener( this );
         panels.get( 6 ).add( add );
@@ -148,6 +149,11 @@ public class MarksPanel extends JPanel implements ActionListener
         {
             this.add( panels.get( i ) );
         }
+
+
+        startB.setEnabled( false );
+        stopB.setEnabled( false );
+        resetB.setEnabled( false );
     }
     @Override
     public void actionPerformed( ActionEvent e )
