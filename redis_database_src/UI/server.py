@@ -19,8 +19,8 @@ class MyResource(Resource):
 
 	def render_POST(self, request):
 		newdata = request.content.getvalue()
-		newdata = urllib.unquote(newdata).decode('utf8')
 		newdata = newdata.replace("+", " ")
+		newdata = urllib.unquote(newdata).decode('utf8')
 		print newdata
 		# print newdata
 		data = {}
