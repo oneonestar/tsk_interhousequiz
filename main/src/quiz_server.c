@@ -28,8 +28,6 @@ char uiPort[] = "9000";
 int parse_instruction(char *instruction);
 int parse_option(int instruction, char *option);
 
-
-
 //server main loop and call back function to parse instruction from telnet
 void read_instruction(struct bufferevent *bev, void *ctx)
 {
@@ -41,7 +39,7 @@ void read_instruction(struct bufferevent *bev, void *ctx)
 	struct info *inf = ctx;									//get information about the connection
 	size_t len = evbuffer_get_length(input);				//get length
 	if(len) {
-		printf("Data of length %zu received from %s:%s\n", len, inf->address, inf->port);
+		printf("\nData of length %zu received from %s:%s\n", len, inf->address, inf->port);
 		recvBuff = (char*)malloc(sizeof(char)*(len+1));
 		if(evbuffer_remove(input, recvBuff, len)<0) {
 			recvBuff[len] = 0;
@@ -57,10 +55,6 @@ void read_instruction(struct bufferevent *bev, void *ctx)
 	//instruction=command catag, option=action to be taken; value=a char value; data=an int value
 	char instruction[10], option[10], value[100], data;	//for sscanf
 	int intInstruction, intOption, intValue, intData;	//for parsing
-
-	//store pointer to current question
-	int current_question_set[6] = {0};
-	int question_pointer[6] = {0};
 
 	//a buffer for storing returned string from functions
 	char buffer[5000];
@@ -80,7 +74,6 @@ void read_instruction(struct bufferevent *bev, void *ctx)
 	if(intInstruction==-1||intOption==-1) {
 		printf("invalid instruction!\n");
 	}
-
 
 	//parse instructions and options
 	switch(intInstruction) {
@@ -103,7 +96,7 @@ void read_instruction(struct bufferevent *bev, void *ctx)
 					db_close(con);											//close the connection
 					
 					//send message to webserver to show question
-					printf("Sending Question to Web Server: %s\n", buffer);
+					printf("Sending Question to Web Server: ");
 					send_message(webServer, webPort, buffer);
 					break;
 			}
@@ -113,40 +106,65 @@ void read_instruction(struct bufferevent *bev, void *ctx)
 			switch(intOption) {
 				case 1:
 					//call change score
-					//change_score('A', data, atoi(value));
 					add(house_to_index(data), atoi(value));
 					break;
 				case 2:
 					//call update to overwrite
-					//change_score('U', data, atoi(value));
 					update(house_to_index(data), atoi(value));
 					break;
 				case 3:
 					//call change score to minus scores
-					//change_score('M', data, atoi(value));
 					minus(house_to_index(data), atoi(value));
 					break;
 			}
+
 			//push score to webserver
 			save("score_backup.dat");
-			printf("saving score to file\n");
 			pushScore(webServer, webPort);
 			break;
+
 		case 3:
 			//Buzzer
-			printf("Negotiating with buzzing server\n");
-			send_message(buzzerServer, buzzerPort, option);
+			switch(intOption) {
+				//being able to enter this block implies that the 'option' variable is safe to use
+				case 0:
+					printf("Requesting to reset Buzzer\n");
+					send_message(buzzerServer, buzzerPort, option);
+					break;
+
+				case 1:
+					printf("Requesting to enable Buzzer\n");
+					send_message(buzzerServer, buzzerPort, option);
+					break;
+
+				case 2:
+					printf("Requesting to disable Buzzer\n");
+					send_message(buzzerServer, buzzerPort, option);
+					break;
+			}
+			
 			break;
+
 		case 4:
 			//answer
-			printf("Requesting to show answer\n");
+			printf("Requesting to show answer: ");
 			send_message(webServer, webPort, "answer:{}");
 			break;
+
 		case 5:
-			if(intOption==1)
-				send_message(webServer, webPort, "ui:{\"score\":\"show\"}");
-			else if(intOption==2)
-				send_message(webServer, webPort, "ui:{\"score\":\"hide\"}");
+			switch(intOption) {
+			
+				case 1:
+					printf("Requesting to show the score panel: ");
+					send_message(webServer, webPort, "ui:{\"score\":\"show\"}");
+					break;
+			
+				case 2:
+					printf("Requesting to hide the score panel: ");
+					send_message(webServer, webPort, "ui:{\"score\":\"hide\"}");
+					break;
+			}
+
 			break;
 	}
 	
@@ -156,8 +174,6 @@ void read_instruction(struct bufferevent *bev, void *ctx)
 	intInstruction = 0;
 	intOption = 0;
 }
-
-
 
 int parse_instruction(char *instruction)
 {
@@ -185,11 +201,13 @@ int parse_instruction(char *instruction)
 int parse_option(int instruction, char *option)
 {
 	switch(instruction) {
+
 		case 1:
 			if(strcmp(option, "Next")==0) {
 				return 1;
 			}
 			break;
+
 		case 2:
 			if(strcmp(option, "Add")==0) {
 				return 1;
@@ -201,12 +219,23 @@ int parse_option(int instruction, char *option)
 				return 3;
 			}
 			break;
+
 		case 3:
-			return 0;
+			if(strcmp(option, "0")==0) {
+				return 0;
+			}
+			else if(strcmp(option, "1")==0) {
+				return 1;
+			}
+			else if(strcmp(option, "2")==0) {
+				return 2;
+			}
 			break;
+
 		case 4:
 			return 0;
 			break;
+
 		case 5:
 			if(strcmp(option, "Show")==0) {
 				return 1;
@@ -215,6 +244,7 @@ int parse_option(int instruction, char *option)
 				return 2;
 			}
 			break;
+
 		case 0:
 			return 0;
 			break;
