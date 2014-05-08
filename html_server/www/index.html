@@ -114,13 +114,13 @@
 			source.addEventListener('question', function (e) {
 				$(".question_content").html("");
 				$("#Box_Option div").html("");
-				$('#Question_Answer').fadeOut(0);
+				$('#Question_Answer').fadeOut(300);
 				$("#Option_A").text("");
 				$("#Option_B").text("");
 				$("#Option_C").text("");
 				$("#Option_D").text("");
 				$('.box-option').fadeIn(500);
-				$("#myImage").fadeOut(0);
+				$("#myImage").fadeOut(300);
 
 				var data = JSON.parse(e.data);
 
@@ -132,8 +132,9 @@
 
 				if(data.Path.length > 0){
 					$("#myImage").attr("src", data.Path);
-					$("#myImage").fadeIn(0);
-					$("#myImage").css("display", "block");
+					$("#myImage").fadeIn(300, function(){
+						$("#myImage").css("display", "block");
+					});
 				}
 
 				if (data.Options != null) {
