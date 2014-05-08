@@ -12,11 +12,6 @@
 		var source = new EventSource('/events');
 		var audio = new Audio();
 		audio.src = "beep.mp3";
-		audio._play = audio.play;
-		audio.play = function(){
-			this.currentTime = 0;
-			this.play();
-		};
 
 		function updateConnectionStatus(text, color){
 			$('#connection').removeClass('disconnected').addClass('connected');
@@ -75,6 +70,8 @@
 						.fadeOut(300)
 						.fadeIn(300);
 				}
+				// play buzzer sound
+				audio.currentTime = 0;
 				audio.play();
 			});
 
@@ -117,13 +114,13 @@
 			source.addEventListener('question', function (e) {
 				$(".question_content").html("");
 				$("#Box_Option div").html("");
-				$('#Question_Answer').fadeOut(0);
+				$('#Question_Answer').fadeOut(300);
 				$("#Option_A").text("");
 				$("#Option_B").text("");
 				$("#Option_C").text("");
 				$("#Option_D").text("");
 				$('.box-option').fadeIn(500);
-				$("#myImage").fadeOut(0);
+				$("#myImage").fadeOut(300);
 
 				var data = JSON.parse(e.data);
 
@@ -135,7 +132,7 @@
 
 				if(data.Path.length > 0){
 					$("#myImage").attr("src", data.Path);
-					$("#myImage").fadeIn(0);
+					$("#myImage").fadeIn(300);
 					$("#myImage").css("display", "block");
 				}
 
