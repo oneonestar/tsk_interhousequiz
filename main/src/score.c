@@ -28,6 +28,15 @@ void score_init(int initscore, char address[])
 		printf("%s found, loading data for initialization...\n", score.address);
 		char temp[50];
 		FILE *fd = fopen(score.address, "r");
+		if(fd==NULL) {
+			printf("Initialization Error: cannot open %s\n", score.address);
+			//initialize scores
+			for(int i=0; i<6; i++) {
+				score.score_table[i]=initscore;
+			}
+			return;
+		}
+
 		fgets(temp, 49, fd);
 		sscanf(temp, "%d:%d:%d:%d:%d:%d", &score.score_table[0], &score.score_table[1], &score.score_table[2], &score.score_table[3], &score.score_table[4], &score.score_table[5]);
 		fclose(fd);
@@ -91,6 +100,10 @@ void save(char *address)
 {
 	//open file
 	FILE *file = fopen(address, "w");
+	if(file==NULL) {
+		printf("DEBUG: cannot save score!\n");
+		return;
+	}
 
 	//prepare string to save
 	char string[50];
