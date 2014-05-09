@@ -32,6 +32,7 @@ int send_message(char *address, char *port, char *msg)
 	inet_pton(AF_INET, address, &server_addr.sin_addr);
 	if(connect(sock, (struct sockaddr*)&server_addr, sizeof(server_addr))) {
 		printf("DEBUG: send_message(): Connection to %s:%s failed\n", address, port);
+		return -1;
 	}
 
 	printf("Sending message: %s to %s:%s\n", msg, address, port);

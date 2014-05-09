@@ -267,6 +267,7 @@ void server()
 	base = event_base_new();
 	if(!base) {
 		printf("Server: cannot open even base\n");
+		return;
 	}
 
 	printf("Initializing connection to buzzer...\n");
