@@ -1,0 +1,9 @@
+# view AndroidManifest.xml #generated:15
+-keep class com.interhousequiz.controller.DisplayMessageActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:8
+-keep class com.interhousequiz.controller.MainActivity { <init>(...); }
+
+# onClick res/layout/main.xml #generated:17
+-keepclassmembers class * { *** sendMessage(...); }
+

@@ -88,8 +88,9 @@ while True:
 					print("send: "+signal)
 					print(repr(signal))
 			print("")
+                        time.sleep(5)
 		lastSignal = signal
-		time.sleep(0.5)
+		time.sleep(0.1)
 
 	except KeyboardInterrupt:
 		#close socket and exit when receiving ctrl+C interrupt
