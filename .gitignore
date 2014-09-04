@@ -6,3 +6,5 @@ main/bin
 main/obj
 *.swp
 .DS_Store
+*.log
+*.txt
