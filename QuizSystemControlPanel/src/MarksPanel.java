@@ -151,9 +151,9 @@ public class MarksPanel extends JPanel implements ActionListener
         }
 
 
-        startB.setEnabled( false );
-        stopB.setEnabled( false );
-        resetB.setEnabled( false );
+        startB.setEnabled( true );
+        stopB.setEnabled( true );
+        resetB.setEnabled( true );
     }
     @Override
     public void actionPerformed( ActionEvent e )
