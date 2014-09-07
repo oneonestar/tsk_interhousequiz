@@ -26,9 +26,8 @@
 #include <string.h>
 #include <ctype.h>
 #include "link_list.h"
-//#include "server.h"
+#include "server.h"
 #include "layout.h"
-#include "non_blocking_socket.h"
 
 //comparasion for the sorting function
 int cmp(struct Node *a, struct Node *b) {
