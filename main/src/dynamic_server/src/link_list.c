@@ -114,7 +114,8 @@ void list_sort(struct List *list) {					//merge sort
 node *listSearch(char address[], char port[], list *theList) {
 
 	node *p;
-	for(p=theList->start; p!=NULL; p=p->next) {				//search from start of list
+	int i;
+	for(i=0, p=theList->start; i<theList->size; i++, p=p->next) {				//search from start of list
 		if(strcmp(address, p->inf->address)==0 && strcmp(port, p->inf->port)==0)
 			return p;						//return node if found
 	}
@@ -148,32 +149,36 @@ void listAdd(struct bufferevent *bev, struct info *inf, list *theList) {
 
 	theList->size++;						//record new size of list
 
-	if(theList->end==NULL)						//check if word is 1st element
+	if(theList->end==NULL) {					//check if word is 1st element
 		theList->start = theList->end = p;
+		printf("add to empty list\n");
+	}
 	else {
 		theList->end->next = p;
 		theList->end = p;
+		printf("add to end\n");
 	}
 }
 
 void listRemove(node *q, list *theList) {
 
 	node *p;
+	int i;
 	if(q==theList->start) {
 		theList->start = theList->start->next;
 	}
 	else {
-		for(p=theList->start; p!=NULL; p=p->next) {
+		for(i=0, p=theList->start; i<theList->size; i++,p=p->next) {
 			if(p->next==q) {
 				p->next = q->next;
-				if(q->next==NULL) {
-					theList->end = p;
-				}
 				break;
 			}
 		}
 	}
 	theList->size--;
+	if(theList->size==0) {
+		theList->start = theList->end = NULL;
+	}
 	free(q);
 }
 
@@ -184,17 +189,21 @@ void listPrint(list *theList) {
 	int i;
 	werase(client_list);
 	box(client_list, 0, 0);
-	mvwprintw(client_list, 0, 15, "Client List");
+	//mvwprintw(client_list, 0, 15, "Client List");
 	cli_h++;
-	mvwprintw(client_list, cli_h, cli_w, "No.\tAddress\t\tPort");
+	printf("No.\tAddress\t\tPort\n");
+	//mvwprintw(client_list, cli_h, cli_w, "No.\tAddress\t\tPort");
 	cli_h++;
-	mvwprintw(client_list, cli_h, cli_w, "---------------------------------------");
+	//mvwprintw(client_list, cli_h, cli_w, "---------------------------------------");
+	printf("---------------------------------------\n");
 	cli_h++;
-	for(i=1,p=theList->start; p!=NULL; i++,p=p->next) {
-		mvwprintw(client_list, cli_h, cli_w, "%d\t%s\t\t%s", i, p->inf->address, p->inf->port);
+	for(i=1,p=theList->start; i<=theList->size; i++,p=p->next) {
+		printf("%d\t%s\t\t%s\n", i, p->inf->address, p->inf->port);
+		//mvwprintw(client_list, cli_h, cli_w, "%d\t%s\t\t%s", i, p->inf->address, p->inf->port);
 		cli_h++;
 	}
-	wrefresh(client_list);
+	printf("Connected Clients: %d\n", theList->size);
+	//wrefresh(client_list);
 	cli_h = 0;
 }
 

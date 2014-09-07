@@ -35,15 +35,28 @@ void term(int signal) {
 
 void on_read_cb(struct bufferevent *bev, void *ctx) {
 
+	//reset screen if reached last line
+	if(msg_h>=h-1) {
+		//werase(message_box);
+		msg_h = 0;
+		msg_w = 1;
+		box(message_box, 0, 0);
+		//mvwprintw(message_box, 0, 15, "Server Activities");
+		msg_h += 2;
+		////wrefresh(message_box);
+	}
+
 	struct info *inf = ctx;
 	struct evbuffer *input = bufferevent_get_input(bev);
 	size_t len = evbuffer_get_length(input);
 	char *recvBuff;
+	int i;
 
 	if(len) {
-		mvwprintw(message_box, msg_h, msg_w, "\nData of length %zu received from %s:%s\n", len, inf->address, inf->port);
+		printf("Data of length %zu received from %s:%s\n", len, inf->address, inf->port);
+		//mvwprintw(message_box, msg_h, msg_w, "Data of length %zu received from %s:%s", len, inf->address, inf->port);
 		msg_h++;
-		wrefresh(message_box);
+		////wrefresh(message_box);
 		recvBuff = (char*)malloc(sizeof(char)*(len+1));
 		if(evbuffer_remove(input, recvBuff, len)<0) {
 			recvBuff[len] = 0;
@@ -54,16 +67,18 @@ void on_read_cb(struct bufferevent *bev, void *ctx) {
 		}
 	}
 	
-	mvwprintw(message_box, msg_h, msg_w, "Message received: %s\n", recvBuff);
+	//mvwprintw(message_box, msg_h, msg_w, "Message received: %s", recvBuff);
+	printf("Message received: %s\n", recvBuff);
 	msg_h++;
-	wrefresh(message_box);
+	////wrefresh(message_box);
 
 	//printf("msg: %s\n", recvBuff);
 	node *p;
-	for(p=theList->start; p!=NULL; p=p->next) {
-		mvwprintw(message_box, msg_h, msg_w, "Broadcast msg to: %s:%s\n", p->inf->address, p->inf->port);
+	for(i=0, p=theList->start; i<theList->size; i++, p=p->next) {
+		//mvwprintw(message_box, msg_h, msg_w, "Broadcast msg to: %s:%s", p->inf->address, p->inf->port);
+		printf("Broadcast msg to: %s:%s\n", p->inf->address, p->inf->port);
 		msg_h++;
-		wrefresh(message_box);
+		////wrefresh(message_box);
 		bufferevent_write(p->bev, recvBuff, strlen(recvBuff)+1);
 	}
 }
@@ -74,13 +89,14 @@ void on_event_cb(struct bufferevent *bev, short events, void *ctx) {
 	int finished = 0;
 	if (events & BEV_EVENT_EOF) {
 		size_t len = evbuffer_get_length(input);
-		//printf("Got a close from %s:%s.  We drained %lu bytes from it, and have %lu left.\n", inf->address, inf->port, (unsigned long)inf->total_drained, (unsigned long)len);
-		mvwprintw(message_box, msg_h, msg_w, "Got a close from %s:%s.  We drained %lu bytes from it, and have %lu left.\n", inf->address, inf->port, (unsigned long)inf->total_drained, (unsigned long)len);
+		printf("Got a close from %s:%s.  We drained %lu bytes from it, and have %lu left.\n", inf->address, inf->port, (unsigned long)inf->total_drained, (unsigned long)len);
+		//mvwprintw(message_box, msg_h, msg_w, "Got a close from %s:%s.  We drained %lu bytes from it, and have %lu left.", inf->address, inf->port, (unsigned long)inf->total_drained, (unsigned long)len);
 		msg_h++;
 		finished = 1;
 	}
 	if (events & BEV_EVENT_ERROR) {
-		mvwprintw(message_box, msg_h, msg_w,"Got an error from %s: %s\n", inf->address, evutil_socket_error_to_string(EVUTIL_SOCKET_ERROR()));
+		printf("Got an error from %s: %s\n", inf->address, evutil_socket_error_to_string(EVUTIL_SOCKET_ERROR()));
+		//mvwprintw(message_box, msg_h, msg_w,"Got an error from %s: %s", inf->address, evutil_socket_error_to_string(EVUTIL_SOCKET_ERROR()));
 		msg_h++;
 		finished = 1;
 	}
@@ -91,7 +107,7 @@ void on_event_cb(struct bufferevent *bev, short events, void *ctx) {
 		free(ctx);
 		bufferevent_free(bev);
 	}
-	wrefresh(message_box);
+	//wrefresh(message_box);
 }
 
 void on_accept_cb(struct evconnlistener *listener, evutil_socket_t fd, struct sockaddr *address, int socklen, void *cts) {
@@ -104,11 +120,11 @@ void on_accept_cb(struct evconnlistener *listener, evutil_socket_t fd, struct so
 	struct sockaddr_in *sin = (struct sockaddr_in *) address;
 	strcpy(host, inet_ntoa(sin->sin_addr));
 	sprintf(port, "%d", sin->sin_port);
-	//printf("Accepted connection %s:%s\n", host, port);
 	char string[100];
-	mvwprintw(message_box, msg_h, msg_w, "Accepted connection %s:%s", host, port);
+	printf("Accepted connection %s:%s\n", host, port);
+	//mvwprintw(message_box, msg_h, msg_w, "Accepted connection %s:%s", host, port);
 	msg_h++;
-	wrefresh(message_box);
+	//wrefresh(message_box);
 
 	//create connection information
 	struct info *info1 = malloc(sizeof(struct info));
@@ -118,7 +134,6 @@ void on_accept_cb(struct evconnlistener *listener, evutil_socket_t fd, struct so
 
 	//create start reading the connection
 	struct event_base *base = evconnlistener_get_base(listener);
-	//struct event_base *base = evconnlistener_get_base(listener);
 	struct bufferevent *bev = bufferevent_socket_new(base, fd, BEV_OPT_CLOSE_ON_FREE);
 
 	//add connection to list
@@ -130,7 +145,6 @@ void on_accept_cb(struct evconnlistener *listener, evutil_socket_t fd, struct so
 	bufferevent_enable(bev, EV_READ|EV_WRITE);
 }
 
-
 void server() {
 
 	//setup UI listener
@@ -141,7 +155,6 @@ void server() {
 	//setup libevent event base
 	base = event_base_new();
 	if(!base) {
-		printf("Server: cannot open even base\n");
 		return;
 	}
 
@@ -167,31 +180,27 @@ int main(int argc, char *argv[]) {
 	memset(&action, 0, sizeof(struct sigaction));
 	action.sa_handler = term;
 	sigaction(SIGINT, &action, NULL);
-
+/*
 	initscr();
 	getmaxyx(stdscr, h, w);
 
+	msg_h = 0;
+	msg_w = 1;
 	message_box = newwin(h, w/2, 0, 0);
 	scrollok(message_box, TRUE);
 	box(message_box, 0, 0);
-
-	client_list = newwin(h, w-w/2, 0, w/2);
-	scrollok(client_list, TRUE);
-	box(client_list, 0, 0);
-
-	msg_h = 0;
-	msg_w = 1;
-	cli_h = 0;
-	cli_w = 1;
-
 	mvwprintw(message_box, 0, 15, "Server Activities");
 	msg_h += 2;
+	//wrefresh(message_box);
 
+	cli_h = 0;
+	cli_w = 1;
+	client_list = newwin(h, w-w/2, 0, w/2);
 	mvwprintw(client_list, 0, 1, "Client list will be shown here when avaliable.");
-
-	wrefresh(message_box);
-	wrefresh(client_list);
-	
+	scrollok(client_list, TRUE);
+	box(client_list, 0, 0);
+	//wrefresh(client_list);
+*/	
 	listCreate(&theList);
 	server();
 	endwin();
