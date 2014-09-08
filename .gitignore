@@ -11,3 +11,13 @@ main/obj
 deploy
 deploy.pub
 deploy_config
+*.apk
+*.ap_
+*.dex
+bin/
+gen/
+.gradle/
+build/
+local.properties
+proguard/
+
