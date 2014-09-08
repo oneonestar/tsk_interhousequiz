@@ -1,21 +1,14 @@
-#include <event2/listener.h>
-#include <event2/bufferevent.h>
-#include <event2/buffer.h>
-#include <event2/event.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/un.h>
-#include <string.h>
-#include <stdlib.h>
 #include <arpa/inet.h>
-#include <stdio.h>
 #include <errno.h>
-#include "non_blocking_socket.h"
-#include "link_list.h"
-#include "layout.h"
 
-//call back to main file
-void on_read_cb(struct bufferevent*, void*);
+#include "non_blocking_socket.h"
 
 void on_event_cb(struct bufferevent *bev, short events, void *ctx) {
 	struct Info *inf = ctx;

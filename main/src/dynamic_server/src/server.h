@@ -8,4 +8,11 @@ struct info {
 	size_t total_drained;
 };
 
+//global variables to store address of buzzer and web server
+char webServer[50];
+char buzzerServer[50];
+char buzzerPort[5];
+char webPort[5];
+char uiPort[5];
+
 #endif

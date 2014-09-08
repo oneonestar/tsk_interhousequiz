@@ -9,6 +9,8 @@ all:
 	gcc -c src/score.c -o obj/score.o -std=c99 -g $(INC)
 	gcc -c src/buzzer.c -o obj/buzzer.o -g $(INC)
 	gcc -c src/link_list.c -o obj/link_list.o -g $(INC)
+	gcc -c src/utilities.c -o obj/utilities.o -g $(INC)
+	gcc -c src/server_cb.c -o obj/server_cb.o -g $(INC)
 	gcc -c src/quiz_server.c -o obj/quiz_server.o -g $(INC)
 	gcc -o bin/quiz_server obj/*.o -std=c99 -I./src -levent_core -lhiredis -lncurses
 
