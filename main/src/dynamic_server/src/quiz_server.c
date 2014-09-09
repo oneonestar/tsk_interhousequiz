@@ -1,27 +1,14 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
-#include <unistd.h>
-#include <sys/types.h>
-
-#include <netinet/in.h>
-#include <netdb.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
-
-#include <event2/listener.h>
-#include <event2/bufferevent.h>
 #include <event2/buffer.h>
 
-#include <ncurses.h>
-
-#include "link_list.h"
-#include "layout.h"
-#include "score.h"
-#include "buzzer.h"
-#include "non_blocking_socket.h"
+#include "include/server.h"
+#include "include/link_list.h"
+#include "include/layout.h"
+#include "include/score.h"
+#include "include/buzzer.h"
+#include "include/non_blocking_socket.h" /* -> event2/util.h + event2/listener.h */
 
 
 void server()
@@ -29,7 +16,7 @@ void server()
 	//start score module
 	score_init(0, "score_backup.dat");
 	//push score to webserver
-	pushScore(webServer, webPort);
+	push_score(webServer, webPort);
 
 	//setup UI listener
 	struct event_base *base;
@@ -71,9 +58,8 @@ int main(int argc, char *argv[])
 	}
 	//store addresses
 	strcpy(webServer, argv[1]);
-	strcpy(buzzerServer, argv[2]);
-	strcpy(webServer, "8888");
 	strcpy(webPort, "8889");
+	strcpy(buzzerServer, argv[2]);
 	strcpy(uiPort, "9000");
 
 	//initialize linked list

@@ -2,13 +2,15 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include <sys/types.h>
 #include <sys/socket.h>
-#include <sys/un.h>
+#include <event2/bufferevent.h>
 #include <arpa/inet.h>
 #include <errno.h>
 
-#include "non_blocking_socket.h"
+#include "include/non_blocking_socket.h" /* -> event2/util.h + event2/listener.h */
+#include "include/server_cb.h"
+#include "include/layout.h"
+#include "include/link_list.h"
 
 void on_event_cb(struct bufferevent *bev, short events, void *ctx) {
 	struct Info *inf = ctx;

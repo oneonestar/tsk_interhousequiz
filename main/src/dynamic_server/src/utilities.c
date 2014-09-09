@@ -1,14 +1,9 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
 #include <netdb.h>
-#include <sys/types.h>
 
-#include "utilities.h"
+#include "include/utilities.h"
 
 //a function to send a message to whatever destination
 int send_message(char *address, char *port, char *msg)
@@ -38,6 +33,7 @@ int send_message(char *address, char *port, char *msg)
 	return n;
 }
 
+//return char according to index
 int house_to_char(int house)
 {
 	switch(house) {
@@ -61,5 +57,25 @@ int house_to_char(int house)
 			break;
 	}
 	return 'z';
+}
+
+//return array index of a particular house
+int char_to_house(char house)
+{
+	if(house=='A')
+		return 0;
+	else if(house=='D')
+		return 1;
+	else if(house=='H')
+		return 2;
+	else if(house=='J')
+		return 3;
+	else if(house=='L')
+		return 4;
+	else if(house=='M')
+		return 5;
+
+	//error
+	return -1;
 }
 

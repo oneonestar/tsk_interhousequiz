@@ -1,13 +1,8 @@
 #ifndef _NON_BLOCKING_SOCKET_H_
 #define _NON_BLOCKING_SOCKET_H_
-#include <event2/listener.h>
-#include <event2/bufferevent.h>
-#include <event2/buffer.h>
-#include <event2/event.h>
 
-#include "link_list.h"
-#include "layout.h"
-#include "server_cb.h"
+#include <event2/util.h>
+#include <event2/listener.h>
 
 //setup struct info
 struct Info {

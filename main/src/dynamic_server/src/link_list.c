@@ -1,4 +1,4 @@
-/********************************************************************************/
+/**********************************************//**********************************/
 /*Program name: iCountApp							*/
 /*Author: Chien Wei Der								*/
 /*Date of Completion: 12 Mar 2013						*/
@@ -24,11 +24,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
-#include "link_list.h"
-//#include "server.h"
-#include "layout.h"
-#include "non_blocking_socket.h"
+
+#include "include/link_list.h"
+#include "include/layout.h"
+#include "include/non_blocking_socket.h"
 
 //comparasion for the sorting function
 int cmp(struct Node *a, struct Node *b) {
@@ -220,3 +219,21 @@ void listDelete(list *theList) {
 		p = temp;
 	}
 }
+
+int listBroadcast(list *theList, char *msg) {
+
+	node *p;
+	int i=0;
+
+	printf("Broadcast msg: %s\n", msg);
+	for(i=0, p=theList->start; i<theList->size; i++, p=p->next) {
+		//mvwprintw(message_box, msg_h, msg_w, "Broadcast msg to: %s:%s", p->inf->address, p->inf->port);
+		printf("client: %s:%s\n", p->inf->address, p->inf->port);
+		msg_h++;
+		////wrefresh(message_box);
+		bufferevent_write(p->bev, msg, strlen(msg)+1);
+	}
+
+	return 0;
+}
+

@@ -1,23 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
-#include <time.h>
-
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-#include <sys/types.h>
 #include <string.h>
-#include <sys/socket.h>
 
 #include <event2/event.h>
-#include <event2/util.h>
 
-#include "buzzer.h"
-#include "server.h"
-#include "utilities.h"
+#include "include/buzzer.h"
+#include "include/server.h"
+#include "include/utilities.h"
 
-static struct event * ev_read;
 #define PORT 8888
 
 void buzzer_callback(evutil_socket_t sock, short flags, void * args)

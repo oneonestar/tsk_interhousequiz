@@ -4,5 +4,6 @@
 //a function to send a message to whatever destination
 int send_message(char*, char*, char*);
 int house_to_char(int);
+int char_to_house(char);
 
 #endif

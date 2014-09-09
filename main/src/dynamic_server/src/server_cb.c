@@ -2,7 +2,14 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "server_cb.h"
+#include <event2/bufferevent.h>
+
+#include "include/server_cb.h"
+#include "include/server.h"
+#include "include/link_list.h"
+#include "include/non_blocking_socket.h" /* -> event2/util.h + event2/listener.h */
+#include "include/layout.h"
+#include "include/db_redis.h"
 
 //server main loop and call back function to parse instruction from telnet
 void on_read_cb(struct bufferevent *bev, void *ctx)
@@ -82,21 +89,21 @@ void on_read_cb(struct bufferevent *bev, void *ctx)
 			switch(intOption) {
 				case 1:
 					//call change score
-					add(house_to_index(data), atoi(value));
+					add_score(char_to_house(data), atoi(value));
 					break;
 				case 2:
 					//call update to overwrite
-					update(house_to_index(data), atoi(value));
+					update_score(char_to_house(data), atoi(value));
 					break;
 				case 3:
 					//call change score to minus scores
-					minus(house_to_index(data), atoi(value));
+					minus_score(char_to_house(data), atoi(value));
 					break;
 			}
 
 			//push score to webserver
-			save("score_backup.dat");
-			pushScore(webServer, webPort);
+			save_score("score_backup.dat");
+			push_score(webServer, webPort);
 			break;
 
 		case 3:
@@ -145,15 +152,7 @@ void on_read_cb(struct bufferevent *bev, void *ctx)
 	}
 	
 	//broadcast feedback and ack
-	node *p;
-	int i=0;
-	for(i=0, p=theList->start; i<theList->size; i++, p=p->next) {
-		//mvwprintw(message_box, msg_h, msg_w, "Broadcast msg to: %s:%s", p->inf->address, p->inf->port);
-		printf("Broadcast msg to: %s:%s\n", p->inf->address, p->inf->port);
-		msg_h++;
-		////wrefresh(message_box);
-		bufferevent_write(p->bev, "test ack\n", strlen("test ack")+1);
-	}
+	listBroadcast(theList, "ACK from server");
 
 	//clear information
 	memset(&recvBuff, 0, sizeof(recvBuff));

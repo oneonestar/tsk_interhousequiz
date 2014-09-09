@@ -26,5 +26,6 @@ void listAdd(struct bufferevent*, struct Info*, list*);
 void listRemove(node*, list*);
 void listPrint(list*);
 void listDelete(list*);
+int listBroadcast(list*, char*);
 
 #endif
