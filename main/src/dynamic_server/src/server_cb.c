@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include <event2/bufferevent.h>
+#include <event2/buffer.h>
 
 #include "include/server_cb.h"
 #include "include/server.h"
@@ -10,6 +11,8 @@
 #include "include/non_blocking_socket.h" /* -> event2/util.h + event2/listener.h */
 #include "include/layout.h"
 #include "include/db_redis.h"
+#include "include/utilities.h"
+#include "include/score.h"
 
 //server main loop and call back function to parse instruction from telnet
 void on_read_cb(struct bufferevent *bev, void *ctx)
@@ -37,7 +40,7 @@ void on_read_cb(struct bufferevent *bev, void *ctx)
 	//parsing variables
 	//instruction=command catag, option=action to be taken; value=a char value; data=an int value
 	char instruction[10], option[10], value[100], data;	//for sscanf
-	int intInstruction, intOption, intValue, intData;	//for parsing
+	int intInstruction, intOption;				//for parsing
 
 	//a buffer for storing returned string from functions
 	char buffer[5000];

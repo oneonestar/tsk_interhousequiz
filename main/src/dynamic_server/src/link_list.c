@@ -25,6 +25,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <event2/bufferevent.h>
 #include "include/link_list.h"
 #include "include/layout.h"
 #include "include/non_blocking_socket.h"
@@ -114,7 +115,7 @@ void list_sort(struct List *list) {					//merge sort
 node *listSearch(char address[], char port[], list *theList) {
 
 	node *p;
-	int i;
+	int i=0;
 	for(i=0, p=theList->start; i<theList->size; i++, p=p->next) {				//search from start of list
 		if(strcmp(address, p->inf->address)==0 && strcmp(port, p->inf->port)==0)
 			return p;						//return node if found
@@ -210,7 +211,6 @@ void listPrint(list *theList) {
 //function for list deletion
 void listDelete(list *theList) {
 
-	int i = 0;
 	node *p = theList->start;
 
 	while(p!=NULL) {

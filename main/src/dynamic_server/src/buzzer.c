@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <arpa/inet.h>
 #include <event2/event.h>
 
 #include "include/buzzer.h"
@@ -50,12 +51,7 @@ static evutil_socket_t make_tcp_socket()
 void buzzer_init(struct event_base *base)
 {
 	evutil_socket_t sock = make_tcp_socket();
-	int n = 0;
-	char recvBuff[5];
-	char sendBuff[50];
 	struct sockaddr_in serv_addr;	//addr data structure for buzzer
-	int flag = 0;			//indidate if the received button is first one
-	char winner = 0;		//winning house in the buzz
 
 	//setup socket to the buzzer
 	memset(&serv_addr, '0', sizeof(serv_addr));

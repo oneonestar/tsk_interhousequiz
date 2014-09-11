@@ -11,7 +11,7 @@ struct Info {
 	size_t total_drained;
 };
 
-static void on_event_cb(struct bufferevent*, short, void*);
+void on_event_cb(struct bufferevent*, short, void*);
 void on_read_cb(struct bufferevent*, void*);
 void on_accept_cb(struct evconnlistener*, evutil_socket_t, struct sockaddr*, int, void*);
 

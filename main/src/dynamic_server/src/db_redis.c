@@ -11,7 +11,6 @@ void close_db();
 
 db_con* db_connect()
 {
-    redisReply *reply;
     const char *hostname = "127.0.0.1";
     int port = 6379;
 	redisContext *c;
@@ -39,7 +38,6 @@ void db_close(db_con *con)
 
 char* db_get_result(db_con *con, char* cid)
 {	
-	int set = 1;
 	redisReply *reply;
 	reply = redisCommand(con, "GET %s", cid);
 	char *str = (char*)malloc(reply->len+1);
