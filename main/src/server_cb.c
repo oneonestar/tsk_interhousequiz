@@ -1,9 +1,12 @@
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include <event2/bufferevent.h>
 #include <event2/buffer.h>
+
+#include <search.h>
 
 #include "include/server_cb.h"
 #include "include/server.h"
@@ -13,6 +16,96 @@
 #include "include/db_redis.h"
 #include "include/utilities.h"
 #include "include/score.h"
+
+struct Server_func_cb {
+	char name[10];
+	void (*func)(char, char*);
+};
+
+struct hsearch_data func_table;
+
+void display_question_cb(char x, char *value) {
+
+	char question_json[500];
+
+	//to read a question from database
+	printf("Reading Question: %s\n", value);
+	
+	//procedure to get json string from database module
+	db_con *con = db_connect();									//initiate mysql connection
+	sprintf(question_json, "question:%s", db_get_result(con, value));	//get question with question ID and store in buffer
+	db_close(con);											//close the connection
+	
+	//send message to webserver to show question
+	printf("Sending Question to Web Server: ");
+	send_message(webServer, webPort, question_json);
+}
+
+void display_answer_cb(char x, char *value_int) {
+
+	printf("Requesting to show answer: ");
+	send_message(webServer, webPort, "answer:{}");
+}	
+
+//initialize hash tables and store function pointers
+void hash_table_init() {
+
+	memset(&func_table, 0, sizeof(struct hsearch_data));
+	hcreate_r(100, &func_table);
+
+	ENTRY item;
+	ENTRY *ret;
+
+	item.key = "Score+Minus";
+	item.data = (void*)malloc(sizeof(struct Server_func_cb));
+	((struct Server_func_cb*)(item.data))->func = &minus_score;
+	hsearch_r(item, ENTER, &ret, &func_table);
+
+	item.key = "Score+Add";
+	item.data = (void*)malloc(sizeof(struct Server_func_cb));
+	((struct Server_func_cb*)(item.data))->func = &add_score;
+	hsearch_r(item, ENTER, &ret, &func_table);
+
+	item.key = "Score+Update";
+	item.data = (void*)malloc(sizeof(struct Server_func_cb));
+	((struct Server_func_cb*)(item.data))->func = &update_score;
+	hsearch_r(item, ENTER, &ret, &func_table);
+
+
+/*
+	// minus scores
+	struct Hashcell *minus_score_hash = (struct Hashcell*)malloc(sizeof(struct Hashcell));
+	strcpy(minus_score_hash->id, "Score+Minus");
+	minus_score_hash->func = &minus_score;
+	HASH_ADD_STR(func_table, id, minus_score_hash);
+
+	// update scores
+	struct Hashcell *update_score_hash = (struct Hashcell*)malloc(sizeof(struct Hashcell));
+	strcpy(update_score_hash->id, "Score+Update");
+	update_score_hash->func = &update_score;
+	HASH_ADD_STR(func_table, id, update_score_hash);
+
+	// add scores
+	struct Hashcell *add_score_hash = (struct Hashcell*)malloc(sizeof(struct Hashcell));
+	strcpy(update_score_hash->id, "Score+Add");
+	add_score_hash->func = &add_score;
+	HASH_ADD_STR(func_table, id, add_score_hash);
+
+
+	// display questions
+	struct Hashcell *question_push_hash = (struct Hashcell*)malloc(sizeof(struct Hashcell));
+	strcpy(question_push_hash->id, "Question+Next");
+	question_push_hash->func = &display_question_cb;
+	HASH_ADD_STR(func_table, id, question_push_hash);
+
+	// show answer
+	struct Hashcell *answer_push_hash = (struct Hashcell*)malloc(sizeof(struct Hashcell));
+	strcpy(answer_push_hash->id, "Answer+");
+	answer_push_hash->func = &display_answer_cb;
+	HASH_ADD_STR(func_table, id, answer_push_hash);
+*/
+}
+
 
 //server main loop and call back function to parse instruction from telnet
 void on_read_cb(struct bufferevent *bev, void *ctx)
@@ -41,6 +134,7 @@ void on_read_cb(struct bufferevent *bev, void *ctx)
 	//instruction=command catag, option=action to be taken; value=a char value; data=an int value
 	char instruction[10], option[10], value[100], data;	//for sscanf
 	int intInstruction, intOption;				//for parsing
+	//struct Hashcell *hashed_func;
 
 	//a buffer for storing returned string from functions
 	char buffer[5000];
@@ -61,6 +155,23 @@ void on_read_cb(struct bufferevent *bev, void *ctx)
 		printf("invalid instruction!\n");
 	}
 
+	//perform query on hash table
+	sprintf(buffer, "%s+%s", instruction, option);
+	ENTRY entry;
+	entry.key = buffer;
+	ENTRY *found;
+	hsearch_r(entry, FIND, &found, &func_table);
+	//found->data->func(data, value);
+	printf("id is: %s\n", ((struct Server_func_cb*)(found->data))->name);
+	void (*func)(char, char*) = ((struct Server_func_cb*)(found->data))->func;
+	func(data, value);
+
+	//push score to webserver
+	//save_score("score_backup.dat");
+	push_score(webServer, webPort);
+
+	
+/*
 	//parse instructions and options
 	switch(intInstruction) {
 
@@ -153,7 +264,7 @@ void on_read_cb(struct bufferevent *bev, void *ctx)
 
 			break;
 	}
-	
+*/	
 	//broadcast feedback and ack
 	listBroadcast(theList, "ACK from server");
 
@@ -240,4 +351,3 @@ int parse_option(int instruction, char *option)
 	}
 	return -1;
 }
-
