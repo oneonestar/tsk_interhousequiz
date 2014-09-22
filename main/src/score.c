@@ -72,22 +72,31 @@ void save_score(char *address)
 	printf("Transction of score saved!\n");
 }
 
-void add_score(int house, int add)
+void add_score(char house_char, char *add_str)
 {
+	int house = char_to_house(house_char);
+	int add = atoi(add_str);
+
 	score.score_table[house]+=add;
 	//printf("%d added to %d, score_table[%d] = %d\n", add, house, house, score.score_table[house]);
 	printf("%d added to house %c, new score is %d\n", add, house_to_char(house), score.score_table[house]);
 }
 	 
-void minus_score(int house, int minus)
+void minus_score(char house_char, char *minus_str)
 {
+	int house = char_to_house(house_char);
+	int minus = atoi(minus_str);
+
 	score.score_table[house]-=minus; 
 	//printf("%d deducted to %d, score_table[%d] = %d\n", minus, house, house, score.score_table[house]);
 	printf("%d deducted from house %c, new score is %d\n", minus, house_to_char(house), score.score_table[house]);
 }
 	 
-void update_score(int house, int newscore)
+void update_score(char house_char, char *newscore_str)
 {
+	int house = char_to_house(house_char);
+	int newscore = atoi(newscore_str);
+
 	score.score_table[house]=newscore;
 	//printf("%d updated to %d, score_table[%d] = %d\n", newscore, house, house, score.score_table[house]);
 	printf("%d updated for house %c, new score is %d\n", newscore, house_to_char(house), score.score_table[house]);

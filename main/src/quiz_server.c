@@ -3,6 +3,7 @@
 #include <stdlib.h>
 
 #include <event2/buffer.h>
+#include <uthash.h>
 
 #include "include/server.h"
 #include "include/link_list.h"
@@ -10,7 +11,7 @@
 #include "include/score.h"
 #include "include/buzzer.h"
 #include "include/non_blocking_socket.h" /* -> event2/util.h + event2/listener.h */
-
+#include "include/server_cb.h"
 
 void server()
 {
@@ -57,6 +58,7 @@ int main(int argc, char *argv[])
 		printf("usage: quiz [WebServer] [Buzzer]\n");
 		return 1;
 	}
+
 	//store addresses
 	strcpy(webServer, argv[1]);
 	strcpy(webPort, "8889");
@@ -65,6 +67,9 @@ int main(int argc, char *argv[])
 
 	//initialize linked list
 	listCreate(&theList);
+
+	//setup hash table for server callback functions
+	hash_table_init();
 
 	printf("Server starting...\n");
 	server();

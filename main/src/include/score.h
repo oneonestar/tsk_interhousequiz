@@ -7,9 +7,9 @@ struct Score{
 };
 
 void score_init(int, char[]);
-void add_score(int, int);
-void minus_score(int, int);
-void update_score(int, int);
+void add_score(char, char*);
+void minus_score(char, char*);
+void update_score(char, char*);
 void save_score(char*);
 void push_score();
 int get_score(char);
