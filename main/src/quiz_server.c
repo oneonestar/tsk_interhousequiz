@@ -8,17 +8,26 @@
 #include "include/server.h"
 #include "include/link_list.h"
 #include "include/layout.h"
-#include "include/score.h"
 #include "include/buzzer.h"
 #include "include/non_blocking_socket.h" /* -> event2/util.h + event2/listener.h */
 #include "include/server_cb.h"
+#include "include/score_db.h"
+
+/* pending for removal */
+#include "include/score.h"
 
 void server()
 {
+	/* backward compatiblity, pending for removal */
 	//start score module
 	score_init(0, "score_backup.dat");
 	//push score to webserver
 	push_score(webServer, webPort);
+	/* pending for removal */
+
+	// setup score database and push score
+	score_db_init(30);
+	score_publish();
 
 	//setup UI listener
 	struct event_base *base;

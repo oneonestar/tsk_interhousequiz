@@ -1,7 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "score_db.h"
+
+#include "include/score_db.h"
+#include "include/server.h"
+#include "include/utilities.h"
 
 // if database file exist, continue, else create one
 void score_db_init(int question_count) {
@@ -53,7 +56,7 @@ void score_db_init(int question_count) {
 }
 
 // set score for particular team where team=char; value = "QID:Score"
-void score_set(char team, char *value) {
+void score_db_set(char team, char *value) {
 
 	// init variables
 	sqlite3 *db;
@@ -110,7 +113,7 @@ void score_set(char team, char *value) {
 }
 
 // retrieve score for particular team
-int score_get(char team) {
+int score_db_get(char team) {
 
 	// init variables
 	sqlite3 *db;
@@ -136,12 +139,11 @@ int score_get(char team) {
 	return score;
 }
 
-int main(int argc, char *argv[]) {
-	score_db_init(15);
-	score_set('D', "1:10");
-	score_set('D', "2:15");
-	score_set('A', "0:5");
-	score_set('D', "3:5");
-	score_get('D');
-	return 0;
+// push score to web server
+void score_publish() {
+
+	char recvBuff[100];
+	sprintf(recvBuff, "score:{\"A\":\"%d\", \"D\":\"%d\", \"H\":\"%d\", \"J\":\"%d\", \"L\":\"%d\", \"M\":\"%d\"}\n", score_db_get('A'), score_db_get('D'), score_db_get('H'), score_db_get('J'), score_db_get('L'), score_db_get('M'));
+	send_message(webServer, webPort, recvBuff);
+	printf("Pushing updated scores to Web Server: %s\n", recvBuff);
 }

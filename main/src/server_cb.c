@@ -15,6 +15,9 @@
 #include "include/layout.h"
 #include "include/db_redis.h"
 #include "include/utilities.h"
+#include "include/score_db.h"
+
+/* pending for removal */
 #include "include/score.h"
 
 struct Server_func_cb {
@@ -81,6 +84,7 @@ void hash_table_init() {
 	ENTRY item;
 	ENTRY *ret;
 
+	/* old score calculation and storage mechanism, pending for removal */
 	// score operation
 	item.key = "Score+Minus";
 	item.data = (void*)malloc(sizeof(struct Server_func_cb));
@@ -95,6 +99,13 @@ void hash_table_init() {
 	item.key = "Score+Update";
 	item.data = (void*)malloc(sizeof(struct Server_func_cb));
 	((struct Server_func_cb*)(item.data))->func = &update_score;
+	hsearch_r(item, ENTER, &ret, &func_table);
+	/* pending for removal */
+
+	// score database operation
+	item.key = "Score+Answer";
+	item.data = (void*)malloc(sizeof(struct Server_func_cb));
+	((struct Server_func_cb*)(item.data))->func = &score_db_set;
 	hsearch_r(item, ENTER, &ret, &func_table);
 
 	// question answer operation
@@ -188,9 +199,14 @@ void on_read_cb(struct bufferevent *bev, void *ctx)
 		void (*func)(char, char*) = ((struct Server_func_cb*)(found->data))->func;
 		func(data, value);
 
+		/* backward compatibility, pending for removal */
 		//push score to webserver
 		//save_score("score_backup.dat");
 		push_score(webServer, webPort);
+		/* pending for removal */
+
+		// send latest score to web server
+		score_publish();
 
 		//broadcast feedback and ack
 		listBroadcast(theList, "ACK from server");
