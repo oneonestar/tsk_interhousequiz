@@ -1,16 +1,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sqlite3.h>
+#include "score_db.h"
 
-void score_db_init() {
+// if database file exist, continue, else create one
+void score_db_init(int question_count) {
 
-	sqlite3 *db;
-	sqlite3_stmt *stmt;
-	int rc, row;
-	char sql[100];
-	const char *tail;
+	// init
+	sqlite3 *db;		// descriptor for db conn
+	sqlite3_stmt *stmt;	// statement ptr
+	int rc, i;		// rc=error check, i=counter
+	char sql[100];		// sql = statement string
+	const char *tail;	// unexec. statement
 
+	// initialize conn
 	rc = sqlite3_open_v2("score.db", &db, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, NULL);
 	if(rc) {
 		printf("failed to open score.db: %s\n", sqlite3_errmsg(db));
@@ -18,32 +21,152 @@ void score_db_init() {
 		exit(1);
 	}
 
+	// prepare statement
 	strcpy(sql, "select * from score_record;");
-
 	rc = sqlite3_prepare_v2(db, sql, strlen(sql), &stmt, &tail);
 	if(rc!=SQLITE_OK) {
+
 		// database empty, create structure
 		memset(&sql, 0, sizeof(sql));
 		strcpy(sql, "create table score_record(QuestionID int, Team char(1), Score int);");
+
+		// if database created create entries for questions
 		rc = sqlite3_exec(db, sql, 0, 0, 0);
 		if(rc!=SQLITE_OK) {
 			printf("%s\n", sqlite3_errmsg(db));
 			exit(1);
 		}
-		for(int i=0; i<5; i++) {
+
+		// insert record
+		for(i=0; i<question_count; i++) {
 			memset(&sql, 0, sizeof(sql));
-			sprintf(sql, "insert into score_record(QuestionID) values(%d);", i);
+			sprintf(sql, "insert into score_record(QuestionID) values(%d);", i+1);
 			sqlite3_exec(db, sql, 0, 0, 0);
 		}
 	}
 	else {
 		printf("Database ready\n");
-		sqlite3_finalize(stmt);
 	}
+
+	// bye!
 	sqlite3_close(db);
 }
 
+// set score for particular team where team=char; value = "QID:Score"
+void score_set(char team, char *value) {
+
+	// init variables
+	sqlite3 *db;
+	sqlite3_stmt *stmt;
+	int rc;					// error check
+	char *sql = "update score_record set Score=?, Team=? where QuestionID=?";	// update question answering status
+	const char *tail;			// unexec. portion of statement
+	int qid, score;				// holder for question id and score
+
+	// extract score and question ID
+	sscanf(value, "%d:%d", &qid, &score);
+
+	// open database conn
+	rc = sqlite3_open_v2("score.db", &db, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, NULL);
+	if(rc) {
+		printf("failed to open score.db: %s\n", sqlite3_errmsg(db));
+		sqlite3_close(db);
+		exit(1);
+	}
+
+	// prepare update statement
+	rc = sqlite3_prepare_v2(db, sql, -1, &stmt, &tail);
+	if(rc) {
+		printf("failed to prepare statement: %s\n", sqlite3_errmsg(db));
+		sqlite3_close(db);
+		exit(1);
+	}
+
+	// bind score and question id and team to prepared statement
+	rc = sqlite3_bind_int(stmt, 1, score);
+	if(rc!=SQLITE_OK) {
+		printf("cannot bind score: %s\n", sqlite3_errmsg(db));
+		sqlite3_close(db);
+		exit(1);
+	}
+
+	rc = sqlite3_bind_text(stmt, 2, &team, 1, NULL);
+	if(rc!=SQLITE_OK) {
+		printf("cannot bind team: %s\n", sqlite3_errmsg(db));
+		sqlite3_close(db);
+		exit(1);
+	}
+
+	rc = sqlite3_bind_int(stmt, 3, qid);
+	if(rc!=SQLITE_OK) {
+		printf("failed to bind text to statement, %s\n", sqlite3_errmsg(db));
+		sqlite3_close(db);
+		exit(1);
+	}
+
+	// exec statement
+	rc = sqlite3_step(stmt);
+	rc = sqlite3_finalize(stmt);
+	if(rc!=SQLITE_OK) {
+		printf("%s\n", sqlite3_errmsg(db));
+		exit(1);
+	}
+
+	// broadcast msg to clients
+	printf("%d assigned to question %d for team %c\n", score, qid, team);
+	sqlite3_close(db);
+}
+
+// retrieve score for particular team
+int score_get(char team) {
+
+	// init variables
+	sqlite3 *db;
+	sqlite3_stmt *stmt;
+	int rc, score;
+	char *sql = "select sum(Score) from score_record where Team=?;";	// SQL to extract sum of participant
+	const char *tail;							// unexec portion of sql statement
+
+	// open db conn
+	rc = sqlite3_open_v2("score.db", &db, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, NULL);
+	if(rc) {
+		printf("failed to open score.db: %s\n", sqlite3_errmsg(db));
+		sqlite3_close(db);
+		exit(1);
+	}
+
+	// prepare statement
+	rc = sqlite3_prepare_v2(db, sql, -1, &stmt, &tail);
+	if(rc!=SQLITE_OK) {
+		printf("cannot prepare statement for retrieval: %s\n", sqlite3_errmsg(db));
+		sqlite3_close(db);
+		exit(1);
+	}
+
+	// bind participant to prepared statement
+	rc = sqlite3_bind_text(stmt, 1, &team, 1, NULL);
+	if(rc!=SQLITE_OK) {
+		printf("cannot bind team: %s\n", sqlite3_errmsg(db));
+		sqlite3_close(db);
+		exit(1);
+	}
+
+	// step through result; since only one row should be returned no while loop is used
+	if((rc=sqlite3_step(stmt))==SQLITE_ROW) {
+		score = sqlite3_column_int(stmt,0);
+	}
+	sqlite3_finalize(stmt);
+
+	// send to server
+	printf("Total score for %c is %d\n", team, score);
+	return score;
+}
+
 int main(int argc, char *argv[]) {
-	score_db_init();
+	score_db_init(15);
+	score_set('D', "1:10");
+	score_set('D', "2:15");
+	score_set('D', "3:5");
+	score_get('D');
 	return 0;
 }
