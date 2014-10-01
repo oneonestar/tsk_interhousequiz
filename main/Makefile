@@ -30,10 +30,10 @@ buzzer.o: src/buzzer.c
 link_list.o: src/link_list.c
 	$(CC) -c src/link_list.c -o $(OBJ)/link_list.o -Wall -g
 
-server_cb.o: src/server_cb.o
+server_cb.o: src/server_cb.c
 	$(CC) -c src/server_cb.c -o $(OBJ)/server_cb.o -DHASH_DEBUG=1 -Wall -g
 
-quiz_server.o: src/quiz_server.o
+quiz_server.o: src/quiz_server.c
 	$(CC) -c src/quiz_server.c -o $(OBJ)/quiz_server.o -Wall -g
 
 clean:
