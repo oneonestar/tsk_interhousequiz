@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <signal.h>
 
 #include <event2/buffer.h>
 #include <uthash.h>
@@ -12,9 +13,18 @@
 #include "include/non_blocking_socket.h" /* -> event2/util.h + event2/listener.h */
 #include "include/server_cb.h"
 #include "include/score_db.h"
+#include "include/layout.h"	/* ->ncurses.h */
 
 /* pending for removal */
 #include "include/score.h"
+
+void terminate(int signal) {
+
+	endwin();
+	printf("received signal %d, terminating...\n", signal);
+	exit(0);
+}
+
 
 void server()
 {
@@ -36,11 +46,11 @@ void server()
 	//setup libevent event base
 	base = event_base_new();
 	if(!base) {
-		printf("Server: cannot open even base\n");
+		wprintw(msg_content, "Server: cannot open even base\n");
 		return;
 	}
 
-	printf("Initializing connection to buzzer...\n");
+	wprintw(msg_content, "Initializing connection to buzzer...\n");
 	buzzer_init(base);
 
 	//setup struction of the address
@@ -53,9 +63,10 @@ void server()
 	listener = evconnlistener_new_bind(base, on_accept_cb, NULL, LEV_OPT_CLOSE_ON_FREE | LEV_OPT_REUSEABLE, -1, (struct sockaddr*)&serv_addr, sizeof(serv_addr));
 
 	if(!listener) {
-		printf("Server: cannot create listneer\n");
+		wprintw(msg_content, "Server: cannot create listneer\n");
 	}
 	//start event loop
+	wrefresh(msg_content);
 	event_base_dispatch(base);
 }
 
@@ -68,7 +79,13 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	//store addresses
+	// install signal handler for SIGINT
+	struct sigaction action;
+	memset(&action, 0, sizeof(struct sigaction));
+	action.sa_handler = terminate;
+	sigaction(SIGINT, &action, NULL);
+
+	// store addresses
 	strcpy(webServer, argv[1]);
 	strcpy(webPort, "8889");
 	strcpy(buzzerServer, argv[2]);
@@ -81,6 +98,7 @@ int main(int argc, char *argv[])
 	hash_table_init();
 
 	printf("Server starting...\n");
+	init_windows();
 	server();
 
 	return 0;

@@ -128,12 +128,14 @@ void listCreate(list **theList) {
 	
 	(*theList) = (list*)malloc(sizeof(list));				//space allocation
 	if((*theList)==NULL) {
-		printf("\nMemory error! Abort\n");
+		wprintw(msg_content, "\nMemory error! Abort\n");
 		exit(-1);
 	}
 	(*theList)->start = NULL;						//initialize start
 	(*theList)->end = NULL;							//initialize end
 	(*theList)->size = 0;							//initialize list variables
+
+	wrefresh(msg_content);
 }
 
 //function to add a word to list
@@ -141,7 +143,7 @@ void listAdd(struct bufferevent *bev, struct Info *inf, list *theList) {
 
 	node *p = (node*)malloc(sizeof(node));				//create new node for word
 	if(p==NULL) {
-		printf("\nMemory error! Abort\n");
+		wprintw(msg_content, "\nMemory error! Abort\n");
 		exit(-1);
 	}
 
@@ -152,13 +154,15 @@ void listAdd(struct bufferevent *bev, struct Info *inf, list *theList) {
 
 	if(theList->end==NULL) {					//check if word is 1st element
 		theList->start = theList->end = p;
-		printf("add to empty list\n");
+		wprintw(msg_content, "add to empty list\n");
 	}
 	else {
 		theList->end->next = p;
 		theList->end = p;
-		printf("add to end\n");
+		wprintw(msg_content, "add to end\n");
 	}
+
+	wrefresh(msg_content);
 }
 
 void listRemove(node *q, list *theList) {
@@ -188,24 +192,14 @@ void listPrint(list *theList) {
 
 	node *p;
 	int i;
-	werase(client_list);
-	box(client_list, 0, 0);
-	//mvwprintw(client_list, 0, 15, "Client List");
-	cli_h++;
-	printf("No.\tAddress\t\tPort\n");
-	//mvwprintw(client_list, cli_h, cli_w, "No.\tAddress\t\tPort");
-	cli_h++;
-	//mvwprintw(client_list, cli_h, cli_w, "---------------------------------------");
-	printf("---------------------------------------\n");
-	cli_h++;
+	werase(client_content);
+	wprintw(client_content, "No.\tAddress\t\tPort\n");
+	wprintw(client_content, "---------------------------------------\n");
 	for(i=1,p=theList->start; i<=theList->size; i++,p=p->next) {
-		printf("%d\t%s\t\t%s\n", i, p->inf->address, p->inf->port);
-		//mvwprintw(client_list, cli_h, cli_w, "%d\t%s\t\t%s", i, p->inf->address, p->inf->port);
-		cli_h++;
+		wprintw(client_content, "%d\t%s\t\t%s\n", i, p->inf->address, p->inf->port);
 	}
-	printf("Connected Clients: %d\n", theList->size);
-	//wrefresh(client_list);
-	cli_h = 0;
+	wprintw(client_content, "Connected Clients: %d\n", theList->size);
+	wrefresh(client_content);
 }
 
 //function for list deletion
@@ -225,15 +219,13 @@ int listBroadcast(list *theList, char *msg) {
 	node *p;
 	int i=0;
 
-	printf("Broadcast msg: %s\n", msg);
+	wprintw(msg_content, "Broadcast msg: %s\n", msg);
 	for(i=0, p=theList->start; i<theList->size; i++, p=p->next) {
-		//mvwprintw(message_box, msg_h, msg_w, "Broadcast msg to: %s:%s", p->inf->address, p->inf->port);
-		printf("client: %s:%s\n", p->inf->address, p->inf->port);
-		msg_h++;
-		////wrefresh(message_box);
+		wprintw(msg_content, "client: %s:%s\n", p->inf->address, p->inf->port);
 		bufferevent_write(p->bev, msg, strlen(msg)+1);
 	}
 
+	wrefresh(msg_content);
 	return 0;
 }
 

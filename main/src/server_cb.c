@@ -32,21 +32,23 @@ void display_question_cb(char x, char *value) {
 	char question_json[500];
 
 	//to read a question from database
-	printf("Reading Question: %s\n", value);
+	wprintw(msg_content, "Reading Question: %s\n", value);
 	
 	//procedure to get json string from database module
 	db_con *con = db_connect();									//initiate mysql connection
-	sprintf(question_json, "question:%s", db_get_result(con, value));	//get question with question ID and store in buffer
+	sprintf(question_json, "question:%s\n", db_get_result(con, value));	//get question with question ID and store in buffer
 	db_close(con);											//close the connection
 	
 	//send message to webserver to show question
-	printf("Sending Question to Web Server: ");
+	wprintw(msg_content, "Sending Question to Web Server: \n");
+	wrefresh(msg_content);
 	send_message(webServer, webPort, question_json);
 }
 
 void display_answer_cb(char x, char *value_int) {
 
-	printf("Requesting to show answer: ");
+	wprintw(msg_content, "Requesting to show answer: \n");
+	wrefresh(msg_content);
 	send_message(webServer, webPort, "answer:{}");
 }
 
@@ -159,11 +161,13 @@ void on_read_cb(struct bufferevent *bev, void *ctx)
 	struct Info *inf = ctx;									//get information about the connection
 	size_t len = evbuffer_get_length(input);				//get length
 	if(len) {
-		printf("\nData of length %zu received from %s:%s\n", len, inf->address, inf->port);
+		wprintw(msg_content,"Data of length %zu received from %s:%s\n", len, inf->address, inf->port);
+		wrefresh(msg_content);
 		recvBuff = (char*)malloc(sizeof(char)*(len+1));
 		if(evbuffer_remove(input, recvBuff, len)<0) {
 			recvBuff[len] = 0;
-			printf("DEBUG: on_read_cb(): copy form evbuffer failed!\n");
+			wprintw(msg_content, "DEBUG: on_read_cb(): copy form evbuffer failed!\n");
+			wrefresh(msg_content);
 		}
 		else {
 			recvBuff[len] = 0;
@@ -179,7 +183,8 @@ void on_read_cb(struct bufferevent *bev, void *ctx)
 	char buffer[5000];
 	
 	//DEBUG
-	printf("Command Received: %s\n", recvBuff);
+	wprintw(msg_content, "Command Received: %s\n", recvBuff);
+	wrefresh(msg_content);
 
 	//process instruction
 	sscanf(recvBuff, "%s %s %c %s", instruction, option, &data, value);
@@ -189,7 +194,9 @@ void on_read_cb(struct bufferevent *bev, void *ctx)
 	
 	//perform query on hash table
 	sprintf(buffer, "%s+%s", instruction, option);
-	printf("serach: %s\n", buffer);
+	wprintw(msg_content, "serach: %s\n", buffer);
+	wrefresh(msg_content);
+
 	ENTRY entry;
 	entry.key = buffer;
 	ENTRY *found;
@@ -212,7 +219,8 @@ void on_read_cb(struct bufferevent *bev, void *ctx)
 		listBroadcast(theList, "ACK from server");
 	}
 	else {
-		printf("request %s not found in hash table!\n", entry.key);
+		wprintw(msg_content, "request %s not found in hash table!\n", entry.key);
+		wrefresh(msg_content);
 		listBroadcast(theList, "invalid command");
 	}
 	//clear information

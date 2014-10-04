@@ -18,15 +18,11 @@ void on_event_cb(struct bufferevent *bev, short events, void *ctx) {
 	int finished = 0;
 	if (events & BEV_EVENT_EOF) {
 		size_t len = evbuffer_get_length(input);
-		printf("Got a close from %s:%s.  We drained %lu bytes from it, and have %lu left.\n", inf->address, inf->port, (unsigned long)inf->total_drained, (unsigned long)len);
-		//mvwprintw(message_box, msg_h, msg_w, "Got a close from %s:%s.  We drained %lu bytes from it, and have %lu left.", inf->address, inf->port, (unsigned long)inf->total_drained, (unsigned long)len);
-		msg_h++;
+		wprintw(msg_content, "Got a close from %s:%s.  We drained %lu bytes from it, and have %lu left.\n", inf->address, inf->port, (unsigned long)inf->total_drained, (unsigned long)len);
 		finished = 1;
 	}
 	if (events & BEV_EVENT_ERROR) {
-		printf("Got an error from %s: %s\n", inf->address, evutil_socket_error_to_string(EVUTIL_SOCKET_ERROR()));
-		//mvwprintw(message_box, msg_h, msg_w,"Got an error from %s: %s", inf->address, evutil_socket_error_to_string(EVUTIL_SOCKET_ERROR()));
-		msg_h++;
+		wprintw(msg_content, "Got an error from %s: %s\n", inf->address, evutil_socket_error_to_string(EVUTIL_SOCKET_ERROR()));
 		finished = 1;
 	}
 	if (finished) {
@@ -36,7 +32,7 @@ void on_event_cb(struct bufferevent *bev, short events, void *ctx) {
 		free(ctx);
 		bufferevent_free(bev);
 	}
-	//wrefresh(message_box);
+	wrefresh(msg_content);
 }
 
 void on_accept_cb(struct evconnlistener *listener, evutil_socket_t fd, struct sockaddr *address, int socklen, void *cts)

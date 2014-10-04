@@ -8,6 +8,7 @@
 #include "include/buzzer.h"
 #include "include/server.h"
 #include "include/utilities.h"
+#include "include/layout.h"
 
 #define PORT 8888
 
@@ -20,11 +21,12 @@ void buzzer_callback(evutil_socket_t sock, short flags, void * args)
     if(ret == 0)  
     {  
         //printf("DEBUG: buzzer_callback(): read_cb connection closed\n");  
-        printf("Connection to buzzer closed!\n");
+        wprintw(msg_content, "Connection to buzzer closed!\n");
         event_del(ev_read);  
         return;
     }
-	printf("%s\n", buf);
+	wprintw(msg_content, "%s\n", buf);
+	wrefresh(msg_content);
 	char buffer[5000];
 	char buffer2[5000];
 	strcpy(buffer, "buzzer:{\"");
@@ -65,5 +67,4 @@ void buzzer_init(struct event_base *base)
 	ev_read = event_new(base, sock, (short)EV_READ|EV_PERSIST, buzzer_callback, (void*)ev_read);
 	event_add(ev_read, 0);  
 
-	printf("Reading Port for Buzzer initialized!\n");
 }

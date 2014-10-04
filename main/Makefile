@@ -3,14 +3,13 @@ INC=-I../
 BIN=bin
 OBJ=obj
 
-LIBS=-lncurses -lhiredis -levent -lsqlite3
-LDFLAGS=-I./src
+LDFLAGS=-lncurses -lhiredis -levent -lsqlite3
 CFLAGS=-Wall -g
 
 $(shell mkdir -p $(BIN) $(OBJ)) 
 
-all: utilities.o db_redis.o non_blocking_socket.o score.o buzzer.o link_list.o quiz_server.o server_cb.o score_db.o
-	$(CC) $(OBJ)/*.o -o $(BIN)/quiz_server $(CFLAGS) $(LDFLAGS) $(LIBS) $(CFLAGS)
+all: utilities.o db_redis.o non_blocking_socket.o score.o buzzer.o link_list.o quiz_server.o server_cb.o score_db.o layout.o
+	$(CC) $(OBJ)/*.o -o $(BIN)/quiz_server $(CFLAGS) $(LDFLAGS) $(CFLAGS)
 
 utilities.o: src/utilities.c	
 	$(CC) -c src/utilities.c -o $(OBJ)/utilities.o $(CFLAGS)
@@ -39,6 +38,9 @@ quiz_server.o: src/quiz_server.c
 
 score_db.o: src/score_db.c
 	$(CC) -c src/score_db.c -o $(OBJ)/score_db.o $(CFLAGS)
+
+layout.o: src/layout.c
+	$(CC) -c src/layout.c -o $(OBJ)/layout.o $(CFLAGS) -lncurses
 
 clean:
 	rm $(OBJ)/*.o $(BIN)/*

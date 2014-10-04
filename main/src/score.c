@@ -9,6 +9,7 @@
 #include "include/score.h"
 #include "include/utilities.h"
 #include "include/server.h"
+#include "include/layout.h"
 
 #define UPDATE 0
 #define ADD 1
@@ -24,11 +25,11 @@ void score_init(int initscore, char address[])
 {
 	strcpy(score.address, address);
 	if(access(score.address, F_OK)!=-1) {
-		printf("%s found, loading data for initialization...\n", score.address);
+		wprintw(msg_content, "%s found, loading data for initialization...\n", score.address);
 		char temp[50];
 		FILE *fd = fopen(score.address, "r");
 		if(fd==NULL) {
-			printf("Initialization Error: cannot open %s\n", score.address);
+			wprintw(msg_content, "Initialization Error: cannot open %s\n", score.address);
 			//initialize scores
 			for(int i=0; i<6; i++) {
 				score.score_table[i]=initscore;
@@ -40,11 +41,11 @@ void score_init(int initscore, char address[])
 		sscanf(temp, "%d:%d:%d:%d:%d:%d", &score.score_table[0], &score.score_table[1], &score.score_table[2], &score.score_table[3], &score.score_table[4], &score.score_table[5]);
 		fclose(fd);
 
-		printf("Scores loaded...\n");
+		wprintw(msg_content, "Scores loaded...\n");
 		for(int i=0; i<6; i++) {
-			printf("house %c: %d\n", house_to_char(i), score.score_table[i]);
+			wprintw(msg_content, "house %c: %d\n", house_to_char(i), score.score_table[i]);
 		}
-		printf("\n");
+		wprintw(msg_content, "\n");
 	}
 	else {
 		//initialize scores
@@ -52,6 +53,8 @@ void score_init(int initscore, char address[])
 			score.score_table[i]=initscore; 
 		}
 	}
+
+	wrefresh(msg_content);
 }
 
 //save scores to file
@@ -60,7 +63,7 @@ void save_score(char *address)
 	//open file
 	FILE *file = fopen(address, "w");
 	if(file==NULL) {
-		printf("DEBUG: cannot save score!\n");
+		wprintw(msg_content, "DEBUG: cannot save score!\n");
 		return;
 	}
 
@@ -69,7 +72,8 @@ void save_score(char *address)
 	sprintf(string, "%d:%d:%d:%d:%d:%d", score.score_table[0], score.score_table[1], score.score_table[2], score.score_table[3], score.score_table[4], score.score_table[5]);
 	fprintf(file, "%s", string);
 	fclose(file);
-	printf("Transction of score saved!\n");
+	wprintw(msg_content, "Transction of score saved!\n");
+	wrefresh(msg_content);
 }
 
 void add_score(char house_char, char *add_str)
@@ -78,8 +82,8 @@ void add_score(char house_char, char *add_str)
 	int add = atoi(add_str);
 
 	score.score_table[house]+=add;
-	//printf("%d added to %d, score_table[%d] = %d\n", add, house, house, score.score_table[house]);
-	printf("%d added to house %c, new score is %d\n", add, house_to_char(house), score.score_table[house]);
+	wprintw(msg_content, "%d added to house %c, new score is %d\n", add, house_to_char(house), score.score_table[house]);
+	wrefresh(msg_content);
 }
 	 
 void minus_score(char house_char, char *minus_str)
@@ -88,8 +92,8 @@ void minus_score(char house_char, char *minus_str)
 	int minus = atoi(minus_str);
 
 	score.score_table[house]-=minus; 
-	//printf("%d deducted to %d, score_table[%d] = %d\n", minus, house, house, score.score_table[house]);
-	printf("%d deducted from house %c, new score is %d\n", minus, house_to_char(house), score.score_table[house]);
+	wprintw(msg_content, "%d deducted from house %c, new score is %d\n", minus, house_to_char(house), score.score_table[house]);
+	wrefresh(msg_content);
 }
 	 
 void update_score(char house_char, char *newscore_str)
@@ -98,8 +102,8 @@ void update_score(char house_char, char *newscore_str)
 	int newscore = atoi(newscore_str);
 
 	score.score_table[house]=newscore;
-	//printf("%d updated to %d, score_table[%d] = %d\n", newscore, house, house, score.score_table[house]);
-	printf("%d updated for house %c, new score is %d\n", newscore, house_to_char(house), score.score_table[house]);
+	wprintw(msg_content, "%d updated for house %c, new score is %d\n", newscore, house_to_char(house), score.score_table[house]);
+	wrefresh(msg_content);
 }
 
 
@@ -128,5 +132,4 @@ void push_score()
 
 	//send message to web server
 	send_message(webServer, webPort, recvBuff);
-	printf("Pushing updated scores to Web Server: %s\n", recvBuff);
 }

@@ -7,6 +7,7 @@
 #include <netdb.h>
 
 #include "include/utilities.h"
+#include "include/layout.h"
 
 //a function to send a message to whatever destination
 int send_message(char *address, char *port, char *msg)
@@ -22,13 +23,15 @@ int send_message(char *address, char *port, char *msg)
 	server_addr.sin_port = htons(atoi(port));
 	inet_pton(AF_INET, address, &server_addr.sin_addr);
 	if(connect(sock, (struct sockaddr*)&server_addr, sizeof(server_addr))) {
-		printf("DEBUG: send_message(): Connection to %s:%s failed\n", address, port);
+		wprintw(msg_content, "DEBUG: send_message(): Connection to %s:%s failed\n", address, port);
 		return -1;
 	}
 
-	printf("Sending message: %s to %s:%s\n", msg, address, port);
+	wprintw(msg_content,"Sending message: %s to %s:%s\n", msg, address, port);
+	wrefresh(msg_content);
 	if((n=send(sock, msg, strlen(msg), 0))<=0) {
-		printf("DEBUG: send_message(): Message %s cannot be sent\n", msg);
+		wprintw(msg_content, "DEBUG: send_message(): Message %s cannot be sent\n", msg);
+		wrefresh(msg_content);
 		close(sock);
 		return -1;
 	}

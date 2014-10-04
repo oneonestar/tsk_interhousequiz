@@ -5,6 +5,7 @@
 #include "include/score_db.h"
 #include "include/server.h"
 #include "include/utilities.h"
+#include "include/layout.h"	/* ->ncurses.h */
 
 // if database file exist, continue, else create one
 void score_db_init(int question_count) {
@@ -19,7 +20,7 @@ void score_db_init(int question_count) {
 	// initialize conn
 	rc = sqlite3_open_v2("score.db", &db, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, NULL);
 	if(rc) {
-		printf("failed to open score.db: %s\n", sqlite3_errmsg(db));
+		wprintw(msg_content, "failed to open score.db: %s\n", sqlite3_errmsg(db));
 		sqlite3_close(db);
 		exit(1);
 	}
@@ -36,7 +37,7 @@ void score_db_init(int question_count) {
 		// if database created create entries for questions
 		rc = sqlite3_exec(db, sql, 0, 0, 0);
 		if(rc!=SQLITE_OK) {
-			printf("%s\n", sqlite3_errmsg(db));
+			wprintw(msg_content, "%s\n", sqlite3_errmsg(db));
 			exit(1);
 		}
 
@@ -48,11 +49,12 @@ void score_db_init(int question_count) {
 		}
 	}
 	else {
-		printf("Database ready\n");
+		wprintw(msg_content, "Database ready\n");
 	}
 
 	// bye!
 	sqlite3_close(db);
+	wrefresh(msg_content);
 }
 
 // set score for particular team where team=char; value = "QID:Score"
@@ -73,7 +75,7 @@ void score_db_set(char team, char *value) {
 	// open database conn
 	rc = sqlite3_open_v2("score.db", &db, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, NULL);
 	if(rc) {
-		printf("failed to open score.db: %s\n", sqlite3_errmsg(db));
+		wprintw(msg_content, "failed to open score.db: %s\n", sqlite3_errmsg(db));
 		sqlite3_close(db);
 		exit(1);
 	}
@@ -86,7 +88,7 @@ void score_db_set(char team, char *value) {
 		sqlite3_bind_int(stmt, 3, score);
 		rc = sqlite3_step(stmt);
 		if(rc!=SQLITE_DONE) {
-			printf("failed to insert special scoring: %s\n", sqlite3_errmsg(db));
+			wprintw(msg_content, "failed to insert special scoring: %s\n", sqlite3_errmsg(db));
 			sqlite3_close(db);
 			exit(1);
 		}
@@ -101,15 +103,16 @@ void score_db_set(char team, char *value) {
 		sqlite3_bind_int(stmt, 3, qid);
 		rc = sqlite3_step(stmt);
 		if(rc!=SQLITE_DONE) {
-			printf("%s\n", sqlite3_errmsg(db));
+			wprintw(msg_content, "%s\n", sqlite3_errmsg(db));
 			exit(1);
 		}
 		sqlite3_finalize(stmt);
 	}
 
 	// broadcast msg to clients
-	printf("%d assigned to question %d for team %c\n", score, qid, team);
+	wprintw(msg_content, "%d assigned to question %d for team %c\n", score, qid, team);
 	sqlite3_close(db);
+	wrefresh(msg_content);
 }
 
 // retrieve score for particular team
@@ -135,7 +138,6 @@ int score_db_get(char team) {
 	sqlite3_finalize(stmt);
 
 	// send to server
-	printf("Total score for %c is %d\n", team, score);
 	return score;
 }
 
@@ -143,7 +145,25 @@ int score_db_get(char team) {
 void score_publish() {
 
 	char recvBuff[100];
-	sprintf(recvBuff, "score:{\"A\":\"%d\", \"D\":\"%d\", \"H\":\"%d\", \"J\":\"%d\", \"L\":\"%d\", \"M\":\"%d\"}\n", score_db_get('A'), score_db_get('D'), score_db_get('H'), score_db_get('J'), score_db_get('L'), score_db_get('M'));
+	int A = score_db_get('A');
+	int D = score_db_get('D');
+	int H = score_db_get('H');
+	int J = score_db_get('J');
+	int L = score_db_get('L');
+	int M = score_db_get('M');
+
+	sprintf(recvBuff, "score:{\"A\":\"%d\", \"D\":\"%d\", \"H\":\"%d\", \"J\":\"%d\", \"L\":\"%d\", \"M\":\"%d\"}\n", A, D, H, J, L, M);
 	send_message(webServer, webPort, recvBuff);
-	printf("Pushing updated scores to Web Server: %s\n", recvBuff);
+	//wprintw(msg_content, "Pushing updated scores to Web Server: %s\n", recvBuff);
+
+	werase(score_content);
+	wprintw(score_content, "A\t%d\n", A);
+	wprintw(score_content, "D\t%d\n", D);
+	wprintw(score_content, "H\t%d\n", H);
+	wprintw(score_content, "J\t%d\n", J);
+	wprintw(score_content, "L\t%d\n", L);
+	wprintw(score_content, "M\t%d\n", M);
+
+	wrefresh(score_content);
+	wrefresh(msg_content);
 }
