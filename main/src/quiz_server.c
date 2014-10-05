@@ -18,13 +18,8 @@
 /* pending for removal */
 #include "include/score.h"
 
-void terminate(int signal) {
-
-	endwin();
-	printf("received signal %d, terminating...\n", signal);
-	exit(0);
-}
-
+struct sigaction sigint_action;
+struct sigaction sigwinch_action;
 
 void server()
 {
@@ -70,6 +65,31 @@ void server()
 	event_base_dispatch(base);
 }
 
+// window resize handler
+void sigwinch_handler(int signal) {
+	endwin();
+	init_windows();
+}
+
+// keyboard interrupt handler
+void terminate_handler(int signal) {
+
+	endwin();
+	printf("received signal %d, terminating...\n", signal);
+	exit(0);
+}
+
+// initialize signal handlers
+void signal_handler_init() {
+
+	memset(&sigint_action, 0, sizeof(struct sigaction));
+	sigint_action.sa_handler = terminate_handler;
+	sigaction(SIGINT, &sigint_action, NULL);
+
+	memset(&sigwinch_action, 0, sizeof(struct sigaction));
+	sigwinch_action.sa_handler = sigwinch_handler;
+	sigaction(SIGWINCH, &sigwinch_action, NULL);
+}
 
 int main(int argc, char *argv[])
 {
@@ -79,11 +99,8 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	// install signal handler for SIGINT
-	struct sigaction action;
-	memset(&action, 0, sizeof(struct sigaction));
-	action.sa_handler = terminate;
-	sigaction(SIGINT, &action, NULL);
+	// install signal handlers
+	signal_handler_init();
 
 	// store addresses
 	strcpy(webServer, argv[1]);
@@ -97,10 +114,10 @@ int main(int argc, char *argv[])
 	//setup hash table for server callback functions
 	hash_table_init();
 
-	printf("Server starting...\n");
 	init_windows();
+	wprintw(msg_content, "Server starting...\n");
+	wrefresh(msg_content);
 	server();
 
 	return 0;
 }
-

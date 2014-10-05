@@ -10,5 +10,6 @@ int msg_window_size_x, msg_window_size_y;
 WINDOW *score_window, *score_content, *client_window, *client_content, *msg_window, *msg_content;
 
 void init_windows();
+void resize_windows();
 
 #endif
