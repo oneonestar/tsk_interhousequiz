@@ -58,6 +58,7 @@ void on_accept_cb(struct evconnlistener *listener, evutil_socket_t fd, struct so
 
 	//add connection to list
 	listAdd(bev, info1, theList);
+	
 	listPrint(theList);
 
 	//assign callback functions

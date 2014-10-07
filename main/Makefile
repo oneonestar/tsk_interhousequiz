@@ -3,13 +3,18 @@ INC=-I../
 BIN=bin
 OBJ=obj
 
+
 LDFLAGS=-lncurses -lhiredis -levent -lsqlite3
 CFLAGS=-Wall -g
+
+# for linking against glib
+GLIB_CFLAGS=`pkg-config --cflags glib-2.0`
+GLIB_LDFLAGS=`pkg-config --libs glib-2.0`
 
 $(shell mkdir -p $(BIN) $(OBJ)) 
 
 all: utilities.o db_redis.o non_blocking_socket.o score.o buzzer.o link_list.o quiz_server.o server_cb.o score_db.o layout.o
-	$(CC) $(OBJ)/*.o -o $(BIN)/quiz_server $(CFLAGS) $(LDFLAGS) $(CFLAGS)
+	$(CC) $(OBJ)/*.o -o $(BIN)/quiz_server $(CFLAGS) $(LDFLAGS) $(CFLAGS) $(GLIB_CFLAGS) $(GLIB_LDFLAGS)
 
 utilities.o: src/utilities.c	
 	$(CC) -c src/utilities.c -o $(OBJ)/utilities.o $(CFLAGS)
@@ -31,7 +36,7 @@ link_list.o: src/link_list.c
 	$(CC) -c src/link_list.c -o $(OBJ)/link_list.o $(CFLAGS)
 
 server_cb.o: src/server_cb.c
-	$(CC) -c src/server_cb.c -o $(OBJ)/server_cb.o $(CFLAGS)
+	$(CC) -c src/server_cb.c -o $(OBJ)/server_cb.o $(CFLAGS) $(GLIB_CFLAGS) $(GLIB_LDFLAGS)
 
 quiz_server.o: src/quiz_server.c
 	$(CC) -c src/quiz_server.c -o $(OBJ)/quiz_server.o $(CFLAGS)

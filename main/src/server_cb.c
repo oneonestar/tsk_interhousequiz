@@ -3,10 +3,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <glib.h>
 #include <event2/bufferevent.h>
 #include <event2/buffer.h>
-
-#include <search.h>
 
 #include "include/server_cb.h"
 #include "include/server.h"
@@ -20,12 +19,8 @@
 /* pending for removal */
 #include "include/score.h"
 
-struct Server_func_cb {
-	char name[10];
-	void (*func)(char, char*);
-};
-
-struct hsearch_data func_table;
+//struct hsearch_data func_table;
+GHashTable *func_table;
 
 void display_question_cb(char x, char *value) {
 
@@ -80,74 +75,30 @@ void ui_hide_score_cb(char x, char *value) {
 //initialize hash tables and store function pointers
 void hash_table_init() {
 
-	memset(&func_table, 0, sizeof(struct hsearch_data));
-	hcreate_r(100, &func_table);
-
-	ENTRY item;
-	ENTRY *ret;
+	func_table = g_hash_table_new(g_str_hash, g_str_equal);
 
 	/* old score calculation and storage mechanism, pending for removal */
 	// score operation
-	item.key = "Score+Minus";
-	item.data = (void*)malloc(sizeof(struct Server_func_cb));
-	((struct Server_func_cb*)(item.data))->func = &minus_score;
-	hsearch_r(item, ENTER, &ret, &func_table);
-
-	item.key = "Score+Add";
-	item.data = (void*)malloc(sizeof(struct Server_func_cb));
-	((struct Server_func_cb*)(item.data))->func = &add_score;
-	hsearch_r(item, ENTER, &ret, &func_table);
-
-	item.key = "Score+Update";
-	item.data = (void*)malloc(sizeof(struct Server_func_cb));
-	((struct Server_func_cb*)(item.data))->func = &update_score;
-	hsearch_r(item, ENTER, &ret, &func_table);
+	g_hash_table_insert(func_table, "Score+Minus", minus_score);
+	g_hash_table_insert(func_table, "Score+Add", add_score);
+	g_hash_table_insert(func_table, "Score+Update", update_score);
 	/* pending for removal */
 
 	// score database operation
-	item.key = "Score+Answer";
-	item.data = (void*)malloc(sizeof(struct Server_func_cb));
-	((struct Server_func_cb*)(item.data))->func = &score_db_set;
-	hsearch_r(item, ENTER, &ret, &func_table);
+	g_hash_table_insert(func_table, "Score+Answer", score_db_set);
 
 	// question answer operation
-	item.key = "Question+Next";
-	item.data = (void*)malloc(sizeof(struct Server_func_cb));
-	((struct Server_func_cb*)(item.data))->func = &display_question_cb;
-	hsearch_r(item, ENTER, &ret, &func_table);
-
-	item.key = "Answer+";
-	item.data = (void*)malloc(sizeof(struct Server_func_cb));
-	((struct Server_func_cb*)(item.data))->func = &display_answer_cb;
-	hsearch_r(item, ENTER, &ret, &func_table);
+	g_hash_table_insert(func_table, "Question+Next", display_question_cb);
+	g_hash_table_insert(func_table, "Answer+", display_answer_cb);
 
 	// buzzer operation
-	item.key = "Buzzer+0";
-	item.data = (void*)malloc(sizeof(struct Server_func_cb));
-	((struct Server_func_cb*)(item.data))->func = &buzzer_reset_cb;
-	hsearch_r(item, ENTER, &ret, &func_table);
-
-	item.key = "Buzzer+1";
-	item.data = (void*)malloc(sizeof(struct Server_func_cb));
-	((struct Server_func_cb*)(item.data))->func = &buzzer_enable_cb;
-	hsearch_r(item, ENTER, &ret, &func_table);
-
-	item.key = "Buzzer+2";
-	item.data = (void*)malloc(sizeof(struct Server_func_cb));
-	((struct Server_func_cb*)(item.data))->func = &buzzer_enable_cb;
-	hsearch_r(item, ENTER, &ret, &func_table);
+	g_hash_table_insert(func_table, "Buzzer+0", buzzer_reset_cb);
+	g_hash_table_insert(func_table, "Buzzer+1", buzzer_enable_cb);
+	g_hash_table_insert(func_table, "Buzzer+2", buzzer_disable_cb);
 
 	// UI operation
-	item.key = "UI+Show";
-	item.data = (void*)malloc(sizeof(struct Server_func_cb));
-	((struct Server_func_cb*)(item.data))->func = &ui_show_score_cb;
-	hsearch_r(item, ENTER, &ret, &func_table);
-
-	item.key = "UI+Hide";
-	item.data = (void*)malloc(sizeof(struct Server_func_cb));
-	((struct Server_func_cb*)(item.data))->func = &ui_hide_score_cb;;
-	hsearch_r(item, ENTER, &ret, &func_table);
-
+	g_hash_table_insert(func_table, "UI+Show", ui_show_score_cb);
+	g_hash_table_insert(func_table, "UI+Hide", ui_hide_score_cb);
 }
 
 //server main loop and call back function to parse instruction from telnet
@@ -197,13 +148,9 @@ void on_read_cb(struct bufferevent *bev, void *ctx)
 	wprintw(msg_content, "serach: %s\n", buffer);
 	wrefresh(msg_content);
 
-	ENTRY entry;
-	entry.key = buffer;
-	ENTRY *found;
-
-	if(hsearch_r(entry, FIND, &found, &func_table)!=0) {
-		//found->data->func(data, value);
-		void (*func)(char, char*) = ((struct Server_func_cb*)(found->data))->func;
+	gpointer *found;
+	if((found=g_hash_table_lookup(func_table, buffer))!=NULL) {
+		void (*func)(char, char*) = (void*)found;
 		func(data, value);
 
 		/* backward compatibility, pending for removal */
@@ -219,7 +166,7 @@ void on_read_cb(struct bufferevent *bev, void *ctx)
 		listBroadcast(theList, "ACK from server");
 	}
 	else {
-		wprintw(msg_content, "request %s not found in hash table!\n", entry.key);
+		wprintw(msg_content, "request %s not found in hash table!\n", buffer);
 		wrefresh(msg_content);
 		listBroadcast(theList, "invalid command");
 	}
