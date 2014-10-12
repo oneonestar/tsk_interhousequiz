@@ -4,7 +4,6 @@
 #include <signal.h>
 
 #include <event2/buffer.h>
-#include <uthash.h>
 
 #include "include/server.h"
 #include "include/link_list.h"

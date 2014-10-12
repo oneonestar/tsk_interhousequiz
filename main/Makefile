@@ -4,7 +4,7 @@ BIN=bin
 OBJ=obj
 
 
-LDFLAGS=-lncurses -lhiredis -levent -lsqlite3
+LDFLAGS=-lncurses -levent -lsqlite3
 CFLAGS=-Wall -g
 
 # for linking against glib
@@ -13,14 +13,14 @@ GLIB_LDFLAGS=`pkg-config --libs glib-2.0`
 
 $(shell mkdir -p $(BIN) $(OBJ)) 
 
-all: utilities.o db_redis.o non_blocking_socket.o score.o buzzer.o link_list.o quiz_server.o server_cb.o score_db.o layout.o
+all: utilities.o non_blocking_socket.o score.o buzzer.o link_list.o quiz_server.o server_cb.o score_db.o layout.o question_db.o
 	$(CC) $(OBJ)/*.o -o $(BIN)/quiz_server $(CFLAGS) $(LDFLAGS) $(CFLAGS) $(GLIB_CFLAGS) $(GLIB_LDFLAGS)
 
 utilities.o: src/utilities.c	
 	$(CC) -c src/utilities.c -o $(OBJ)/utilities.o $(CFLAGS)
 
-db_redis.o: src/db_redis.c
-	$(CC) -c src/db_redis.c -o $(OBJ)/db_redis.o $(CFLAGS)
+question_db.o: src/question_db.c
+	$(CC) -c src/question_db.c -o $(OBJ)/question_db.o $(CFLAGS) -lsqite3
 
 non_blocking_socket.o: src/non_blocking_socket.c
 	$(CC) -c src/non_blocking_socket.c -o $(OBJ)/non_blocking_socket.o $(CFLAGS)

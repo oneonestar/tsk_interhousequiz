@@ -12,9 +12,9 @@
 #include "include/link_list.h"
 #include "include/non_blocking_socket.h" /* -> event2/util.h + event2/listener.h */
 #include "include/layout.h"
-#include "include/db_redis.h"
 #include "include/utilities.h"
 #include "include/score_db.h"
+#include "include/question_db.h"
 
 /* pending for removal */
 #include "include/score.h"
@@ -24,20 +24,18 @@ GHashTable *func_table;
 
 void display_question_cb(char x, char *value) {
 
-	char question_json[500];
-
 	//to read a question from database
+	char question_msg[1000];
 	wprintw(msg_content, "Reading Question: %s\n", value);
-	
-	//procedure to get json string from database module
-	db_con *con = db_connect();									//initiate mysql connection
-	sprintf(question_json, "question:%s\n", db_get_result(con, value));	//get question with question ID and store in buffer
-	db_close(con);											//close the connection
+	char *question_json = db_get_result(value);
+
+	sprintf(question_msg, "question:%s\n", question_json);	//get question with question ID and store in buffer
 	
 	//send message to webserver to show question
 	wprintw(msg_content, "Sending Question to Web Server: \n");
 	wrefresh(msg_content);
-	send_message(webServer, webPort, question_json);
+	send_message(webServer, webPort, question_msg);
+	free(question_json);
 }
 
 void display_answer_cb(char x, char *value_int) {
@@ -129,6 +127,10 @@ void on_read_cb(struct bufferevent *bev, void *ctx)
 	//parsing variables
 	//instruction=command catag, option=action to be taken; value=a char value; data=an int value
 	char instruction[10], option[10], value[100], data;	//for sscanf
+	memset(instruction, 0, sizeof(instruction));
+	memset(option, 0, sizeof(option));
+	memset(value, 0, sizeof(value));
+	data = 0;
 
 	//a buffer for storing returned string from functions
 	char buffer[5000];
