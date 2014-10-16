@@ -11,7 +11,7 @@ The system consists of four major components: the database, event driven web ser
 
 ### Database ###
 
-A SQLite or Redis database is used for storage of questions and answers as well of scores obtained by participants.
+SQLite is used for storage of questions and answers as well of scores obtained by participants.
 
 ### Event-driven web server ###
 
@@ -50,19 +50,15 @@ Sub system of the system can be started and restarted individually. In case of t
 
 Enter the directory where the server exists. Start the server by issuing the command as root: python server.py. Make sure that port 80 is not occupied by other program(i.e. Apache).
 
-2. Database (redis)
-
-Enter the direction of the database server, Start the server by ./redis-server. Make sure the database dump file exists in the same folder.
-
-3. Buzzing system
+2. Buzzing system
 
 First make sure the Arduino is properly connected to the Raspbery Pi and powered. Execute the python program on Raspberry Pi and it will start waiting for connection.
 
-4. Quiz Server
+3. Quiz Server
 
 The Quiz Server should be started when all sub systems are running. Execute by ./quiz_server [IP addr of web server] [IP addr of the buzzing system(raspberry pi)]. The quiz server communicates with the web server through port 8889 and buzzing server through 8888.
 
-5. User Control Panel
+4. User Control Panel
 
 The control panel is starting by inputting the IP address of quiz server. The default port of communication is 9000. 
 
