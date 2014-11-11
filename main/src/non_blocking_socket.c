@@ -44,7 +44,7 @@ void on_accept_cb(struct evconnlistener *listener, evutil_socket_t fd, struct so
 	struct sockaddr_in *sin = (struct sockaddr_in *) address;
 	strcpy(host, inet_ntoa(sin->sin_addr));
 	sprintf(port, "%d", sin->sin_port);
-	printf("Accepted connection %s:%s\n", host, port);
+	wprintw(msg_content, "Accepted connection %s:%s\n", host, port);
 
 	//create connection information
 	struct Info *info1 = malloc(sizeof(struct Info));
