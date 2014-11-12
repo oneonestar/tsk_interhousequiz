@@ -171,14 +171,23 @@ void listRemove(node *q, list *theList) {
 	int i;
 	if(q==theList->start) {
 		theList->start = theList->start->next;
+		wprintw(msg_content, "remove from start\n");
+		wrefresh(msg_content);
 	}
 	else {
 		for(i=0, p=theList->start; i<theList->size; i++,p=p->next) {
 			if(p->next==q) {
-				p->next = q->next;
+				if(theList->end==q) {
+					theList->end = p;
+				}
+				else {
+					p->next = q->next;
+				}
 				break;
 			}
 		}
+		wprintw(msg_content, "remove from tail\n");
+		wrefresh(msg_content);
 	}
 	theList->size--;
 	if(theList->size==0) {
@@ -193,13 +202,18 @@ void listPrint(list *theList) {
 	node *p;
 	int i;
 	werase(client_content);
+	wprintw(msg_content, "list size: %d\n", theList->size);
+	wrefresh(msg_content);
 	wprintw(client_content, "No.\tAddress\t\tPort\n");
 	wprintw(client_content, "---------------------------------------\n");
 	for(i=1,p=theList->start; i<=theList->size; i++,p=p->next) {
 		wprintw(client_content, "%d\t%s\t\t%s\n", i, p->inf->address, p->inf->port);
+		wrefresh(client_content);
 	}
 	wprintw(client_content, "Connected Clients: %d\n", theList->size);
 	wrefresh(client_content);
+	wprintw(msg_content, "updated list\n");
+	wrefresh(msg_content);
 }
 
 //function for list deletion

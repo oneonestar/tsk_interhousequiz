@@ -58,9 +58,10 @@ void on_accept_cb(struct evconnlistener *listener, evutil_socket_t fd, struct so
 
 	//add connection to list
 	listAdd(bev, info1, theList);
-	
 	listPrint(theList);
-
+	wprintw(msg_content, "hello");
+	wrefresh(msg_content);
+	
 	//assign callback functions
 	bufferevent_setcb(bev, on_read_cb, NULL, on_event_cb, info1);
 	bufferevent_enable(bev, EV_READ|EV_WRITE);
