@@ -1,0 +1,16 @@
+erver
+	Module to communicate with pi and client
+	Module to withdraw questions from SQL server
+	Score and time counting module
+	Data editing module(score and others)
+	Buzzing module(relay message from pi to client for display)
+
+Client
+	Module to communicate with server
+	Module to display questions
+	Update module(to receive 'push' from server)
+	Sundry(score and time)
+	Process data from server(questions and answer) and proceed to display
+
+Arduino/Pi
+	(done for now)

@@ -1,1 +1,0 @@
-gcc example.c -I../testing/include/hiredis -L../testing/lib -Wl,-R\$ORIGIN -lhiredis

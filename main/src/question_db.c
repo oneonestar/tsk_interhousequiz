@@ -23,7 +23,7 @@ char* db_get_result( char* cid ) {
         fprintf( stderr, "Opened database successfully\n" );
     }
 
-    sql = "SELECT data FROM questions where ID=?;";
+    sql = "SELECT data FROM question where ID=?;";
     rc = sqlite3_prepare_v2( db, sql, strlen( sql ), &stmt, NULL );
     sqlite3_bind_text( stmt, 1, cid, strlen( cid ), NULL );
 
