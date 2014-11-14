@@ -22,6 +22,8 @@ struct sigaction sigwinch_action;
 
 void server()
 {
+	//initialize linked list
+	listCreate(&theList);
 	/* backward compatiblity, pending for removal */
 	//start score module
 	score_init(0, "score_backup.dat");
@@ -36,42 +38,59 @@ void server()
 	//setup UI listener
 	struct event_base *base;
 	struct evconnlistener *listener;
-	struct sockaddr_in serv_addr;
+
 	//setup libevent event base
 	base = event_base_new();
-	if(!base) {
-		wprintw(msg_content, "Server: cannot open even base\n");
+	if(!base)
+	{
+		wprintw(msg_content, "Server: cannot open event base\n");
 		return;
 	}
 
 	wprintw(msg_content, "Initializing connection to buzzer...\n");
 	buzzer_init(base);
 
-	//setup struction of the address
+#ifndef IPv6
+	struct sockaddr_in6 serv_addr;
+	memset(&serv_addr, '0', sizeof(serv_addr));
+	serv_addr.sin6_family = AF_INET6;
+	serv_addr.sin6_addr = in6addr_any;
+	serv_addr.sin6_port = htons(atoi(uiPort));
+#else
+	struct sockaddr_in serv_addr;
 	memset(&serv_addr, '0', sizeof(serv_addr));
 	serv_addr.sin_family = AF_INET;
 	serv_addr.sin_addr.s_addr = INADDR_ANY;
 	serv_addr.sin_port = htons(atoi(uiPort));
+#endif
+
 
 	//bind event to call bcak "on_accept_cb", which will then call on_read_cb()
 	listener = evconnlistener_new_bind(base, on_accept_cb, NULL, LEV_OPT_CLOSE_ON_FREE | LEV_OPT_REUSEABLE, -1, (struct sockaddr*)&serv_addr, sizeof(serv_addr));
 
-	if(!listener) {
-		wprintw(msg_content, "Server: cannot create listneer\n");
+	if(!listener)
+	{
+		endwin();
+		printf("Server: cannot create listener\n");
+		exit(-1);
 	}
+	evconnlistener_set_error_cb(listener, on_accept_errorcb);
+
 	//start event loop
 	wrefresh(msg_content);
 	event_base_dispatch(base);
 }
 
 // window resize handler
-void sigwinch_handler(int signal) {
+void sigwinch_handler(int signal)
+{
 	endwin();
 	init_windows();
 }
 
 // keyboard interrupt handler
-void terminate_handler(int signal) {
+void terminate_handler(int signal)
+{
 
 	endwin();
 	printf("received signal %d, terminating...\n", signal);
@@ -79,7 +98,8 @@ void terminate_handler(int signal) {
 }
 
 // initialize signal handlers
-void signal_handler_init() {
+void signal_handler_init()
+{
 
 	memset(&sigint_action, 0, sizeof(struct sigaction));
 	sigint_action.sa_handler = terminate_handler;
@@ -97,18 +117,14 @@ int main(int argc, char *argv[])
 		printf("usage: quiz [WebServer] [Buzzer]\n");
 		return 1;
 	}
-
-	// install signal handlers
-	signal_handler_init();
-
 	// store addresses
 	strcpy(webServer, argv[1]);
 	strcpy(webPort, "8889");
 	strcpy(buzzerServer, argv[2]);
 	strcpy(uiPort, "9000");
 
-	//initialize linked list
-	listCreate(&theList);
+	// install signal handlers
+	signal_handler_init();
 
 	//setup hash table for server callback functions
 	hash_table_init();

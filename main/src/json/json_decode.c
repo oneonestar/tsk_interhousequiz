@@ -4,7 +4,8 @@
 
 #include <json/json.h>
 
-void decode_msg(char *json, char instruction[], char action[], char *team, char value[]) {
+void decode_msg(char *json, char instruction[], char action[], char *team, char value[])
+{
 
 	// create json objects and parse json string
 	json_object *json_obj = json_tokener_parse(json);
@@ -28,7 +29,8 @@ void decode_msg(char *json, char instruction[], char action[], char *team, char 
 
 }
 
-char *encode_msg(char *instruction, char *action, char *team, char *value) {
+char *encode_msg(char *instruction, char *action, char *team, char *value)
+{
 
 	json_object *jobj = json_object_new_object();
 	json_object_object_add(jobj, "Instruction", json_object_new_string(instruction));
@@ -41,7 +43,8 @@ char *encode_msg(char *instruction, char *action, char *team, char *value) {
 	return json;
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
 	char buf[] = "{ \"Instruction\": \"Score\", \"Action\": \"add\", \"Team\": \"A\", \"Value\": \"10\" }";
 	char inst[10], act[10], team[2], val[10];
 	decode_msg(buf, inst, act, team, val);

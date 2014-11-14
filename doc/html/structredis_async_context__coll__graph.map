@@ -1,0 +1,8 @@
+<map id="redisAsyncContext" name="redisAsyncContext">
+<area shape="rect" id="node2" href="$structredis_context.html" title="redisContext" alt="" coords="189,199,285,225"/>
+<area shape="rect" id="node3" href="$structredis_reader.html" title="redisReader" alt="" coords="191,95,283,121"/>
+<area shape="rect" id="node4" href="$structredis_read_task.html" title="redisReadTask" alt="" coords="5,5,116,32"/>
+<area shape="rect" id="node5" href="$structredis_reply_object_functions.html" title="redisReplyObjectFunctions" alt="" coords="206,5,385,32"/>
+<area shape="rect" id="node6" href="$structredis_callback_list.html" title="redisCallbackList" alt="" coords="309,199,431,225"/>
+<area shape="rect" id="node7" href="$structredis_callback.html" title="redisCallback" alt="" coords="319,95,421,121"/>
+</map>

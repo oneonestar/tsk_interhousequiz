@@ -24,14 +24,17 @@ struct Score score;
 void score_init(int initscore, char address[])
 {
 	strcpy(score.address, address);
-	if(access(score.address, F_OK)!=-1) {
+	if(access(score.address, F_OK)!=-1)
+	{
 		wprintw(msg_content, "%s found, loading data for initialization...\n", score.address);
 		char temp[50];
 		FILE *fd = fopen(score.address, "r");
-		if(fd==NULL) {
+		if(fd==NULL)
+		{
 			wprintw(msg_content, "Initialization Error: cannot open %s\n", score.address);
 			//initialize scores
-			for(int i=0; i<6; i++) {
+			for(int i=0; i<6; i++)
+			{
 				score.score_table[i]=initscore;
 			}
 			return;
@@ -42,15 +45,18 @@ void score_init(int initscore, char address[])
 		fclose(fd);
 
 		wprintw(msg_content, "Scores loaded...\n");
-		for(int i=0; i<6; i++) {
+		for(int i=0; i<6; i++)
+		{
 			wprintw(msg_content, "house %c: %d\n", house_to_char(i), score.score_table[i]);
 		}
 		wprintw(msg_content, "\n");
 	}
-	else {
+	else
+	{
 		//initialize scores
-		for(int i=0; i<6; i++) {
-			score.score_table[i]=initscore; 
+		for(int i=0; i<6; i++)
+		{
+			score.score_table[i]=initscore;
 		}
 	}
 
@@ -62,7 +68,8 @@ void save_score(char *address)
 {
 	//open file
 	FILE *file = fopen(address, "w");
-	if(file==NULL) {
+	if(file==NULL)
+	{
 		wprintw(msg_content, "DEBUG: cannot save score!\n");
 		return;
 	}
@@ -85,17 +92,17 @@ void add_score(char house_char, char *add_str)
 	wprintw(msg_content, "%d added to house %c, new score is %d\n", add, house_to_char(house), score.score_table[house]);
 	wrefresh(msg_content);
 }
-	 
+
 void minus_score(char house_char, char *minus_str)
 {
 	int house = char_to_house(house_char);
 	int minus = atoi(minus_str);
 
-	score.score_table[house]-=minus; 
+	score.score_table[house]-=minus;
 	wprintw(msg_content, "%d deducted from house %c, new score is %d\n", minus, house_to_char(house), score.score_table[house]);
 	wrefresh(msg_content);
 }
-	 
+
 void update_score(char house_char, char *newscore_str)
 {
 	int house = char_to_house(house_char);

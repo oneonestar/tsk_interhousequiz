@@ -1,0 +1,4 @@
+<map id="List" name="List">
+<area shape="rect" id="node2" href="$struct_node.html" title="Structure for storing each connection. " alt="" coords="5,95,59,121"/>
+<area shape="rect" id="node3" href="$struct_info.html" title="Structure for storing the IP and address in char*. " alt="" coords="10,5,54,32"/>
+</map>

@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from twisted.internet import protocol, reactor, stdio
 from twisted.protocols import basic
 from twisted.web import server, resource, static, script

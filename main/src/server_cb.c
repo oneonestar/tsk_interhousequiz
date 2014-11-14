@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 #include <glib.h>
 #include <event2/bufferevent.h>
@@ -22,7 +23,32 @@
 //struct hsearch_data func_table;
 GHashTable *func_table;
 
-void display_question_cb(char x, char *value) {
+/* Print Ctrl character. eg. convert the \n into "0xA"... */
+void buffrepr(const char * buff, int size, char * result, int resultSize)
+{
+  while (size && resultSize)
+  {
+    int print_count; 
+    if (!isalpha(*buff))
+    	print_count = snprintf(result, resultSize, "0x%X", *buff);
+    else
+    	print_count = snprintf(result, resultSize, "%c", *buff);
+    resultSize -= print_count;
+    result += print_count;
+    --size;
+    ++buff;
+
+    if (size && resultSize)
+    {
+      int print_count = snprintf(result, resultSize, " ");
+      resultSize -= print_count;
+      result += print_count;
+    }
+  }
+}
+
+void display_question_cb(char x, char *value)
+{
 
 	//to read a question from database
 	char question_msg[1000];
@@ -30,7 +56,7 @@ void display_question_cb(char x, char *value) {
 	char *question_json = db_get_result(value);
 
 	sprintf(question_msg, "question:%s\n", question_json);	//get question with question ID and store in buffer
-	
+
 	//send message to webserver to show question
 	wprintw(msg_content, "Sending Question to Web Server: \n");
 	wrefresh(msg_content);
@@ -38,40 +64,47 @@ void display_question_cb(char x, char *value) {
 	free(question_json);
 }
 
-void display_answer_cb(char x, char *value_int) {
+void display_answer_cb(char x, char *value_int)
+{
 
 	wprintw(msg_content, "Requesting to show answer: \n");
 	wrefresh(msg_content);
 	send_message(webServer, webPort, "answer:{}");
 }
 
-void buzzer_reset_cb(char x, char *value) {
+void buzzer_reset_cb(char x, char *value)
+{
 
 	send_message(buzzerServer, buzzerPort, "0");
 }
 
-void buzzer_enable_cb(char x, char *value) {
+void buzzer_enable_cb(char x, char *value)
+{
 
 	send_message(buzzerServer, buzzerPort, "1");
 }
 
-void buzzer_disable_cb(char x, char *value) {
+void buzzer_disable_cb(char x, char *value)
+{
 
 	send_message(buzzerServer, buzzerPort, "w");
 }
 
-void ui_show_score_cb(char x, char *value) {
+void ui_show_score_cb(char x, char *value)
+{
 
 	send_message(webServer, webPort, "ui:{\"score\":\"show\"}");
 }
 
-void ui_hide_score_cb(char x, char *value) {
+void ui_hide_score_cb(char x, char *value)
+{
 
 	send_message(webServer, webPort, "ui:{\"score\":\"hide\"}");
 }
 
 //initialize hash tables and store function pointers
-void hash_table_init() {
+void hash_table_init()
+{
 
 	func_table = g_hash_table_new(g_str_hash, g_str_equal);
 
@@ -109,19 +142,22 @@ void on_read_cb(struct bufferevent *bev, void *ctx)
 	struct evbuffer *input = bufferevent_get_input(bev);	//read the buffer
 	struct Info *inf = ctx;									//get information about the connection
 	size_t len = evbuffer_get_length(input);				//get length
-	if(len) {
-		wprintw(msg_content,"Data of length %zu received from %s:%s\n", len, inf->address, inf->port);
+	if(len)
+	{
+		wprintw(msg_content,"\nData of length %zu received from %s:%d\n", len, get_address_string(inf), get_port_int(inf));
 		wrefresh(msg_content);
 		recvBuff = (char*)malloc(sizeof(char)*(len+1));
-		if(evbuffer_remove(input, recvBuff, len)<0) {
+		if(evbuffer_remove(input, recvBuff, len)<0)
+		{
 			recvBuff[len] = 0;
 			wprintw(msg_content, "DEBUG: on_read_cb(): copy form evbuffer failed!\n");
 			wrefresh(msg_content);
 		}
-		else {
+		else
+		{
 			recvBuff[len] = 0;
 		}
-		
+
 	}
 
 	//parsing variables
@@ -134,9 +170,13 @@ void on_read_cb(struct bufferevent *bev, void *ctx)
 
 	//a buffer for storing returned string from functions
 	char buffer[5000];
-	
+
 	//DEBUG
-	wprintw(msg_content, "Command Received: %s\n", recvBuff);
+	char printBuffer[5000];
+
+	buffrepr(recvBuff, len, printBuffer, sizeof(printBuffer));
+
+	wprintw(msg_content, "Command Received: %s\n", printBuffer);
 	wrefresh(msg_content);
 
 	//process instruction
@@ -144,14 +184,15 @@ void on_read_cb(struct bufferevent *bev, void *ctx)
 
 	//free recvBuff after use
 	free(recvBuff);
-	
+
 	//perform query on hash table
 	sprintf(buffer, "%s+%s", instruction, option);
-	wprintw(msg_content, "serach: %s\n", buffer);
+	wprintw(msg_content, "search: %s\n", buffer);
 	wrefresh(msg_content);
 
 	gpointer *found;
-	if((found=g_hash_table_lookup(func_table, buffer))!=NULL) {
+	if((found=g_hash_table_lookup(func_table, buffer))!=NULL)
+	{
 		void (*func)(char, char*) = (void*)found;
 		func(data, value);
 
@@ -167,7 +208,8 @@ void on_read_cb(struct bufferevent *bev, void *ctx)
 		//broadcast feedback and ack
 		listBroadcast(theList, "ACK from server");
 	}
-	else {
+	else
+	{
 		wprintw(msg_content, "request %s not found in hash table!\n", buffer);
 		wrefresh(msg_content);
 		listBroadcast(theList, "invalid command");
@@ -176,3 +218,4 @@ void on_read_cb(struct bufferevent *bev, void *ctx)
 	memset(&recvBuff, 0, sizeof(recvBuff));
 	memset(&buffer, 0, sizeof(buffer));
 }
+

@@ -14,17 +14,17 @@
 
 void buzzer_callback(evutil_socket_t sock, short flags, void * args)
 {
-	char buf[5000];  
-    int ret = recv(sock, buf, 128, 0);
-    buf[ret] = 0;
-    
-    if(ret == 0)  
-    {  
-        //printf("DEBUG: buzzer_callback(): read_cb connection closed\n");  
-        wprintw(msg_content, "Connection to buzzer closed!\n");
-        event_del(ev_read);  
-        return;
-    }
+	char buf[5000];
+	int ret = recv(sock, buf, 128, 0);
+	buf[ret] = 0;
+
+	if(ret == 0)
+	{
+		//printf("DEBUG: buzzer_callback(): read_cb connection closed\n");
+		wprintw(msg_content, "Connection to buzzer closed!\n");
+		event_del(ev_read);
+		return;
+	}
 	wprintw(msg_content, "%s\n", buf);
 	wrefresh(msg_content);
 	char buffer[5000];
@@ -38,16 +38,16 @@ void buzzer_callback(evutil_socket_t sock, short flags, void * args)
 	send_message(webServer, webPort, buffer);
 }
 
-static evutil_socket_t make_tcp_socket()  
-{  
-    int on = 1;  
-    evutil_socket_t sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);  
-  
-    evutil_make_socket_nonblocking(sock); 
-    setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (void *)&on, sizeof(on));  
-  
-    return sock;  
-}  
+static evutil_socket_t make_tcp_socket()
+{
+	int on = 1;
+	evutil_socket_t sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+
+	evutil_make_socket_nonblocking(sock);
+	setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (void *)&on, sizeof(on));
+
+	return sock;
+}
 
 
 void buzzer_init(struct event_base *base)
@@ -65,6 +65,6 @@ void buzzer_init(struct event_base *base)
 
 	ev_read = malloc(sizeof(struct event*));
 	ev_read = event_new(base, sock, (short)EV_READ|EV_PERSIST, buzzer_callback, (void*)ev_read);
-	event_add(ev_read, 0);  
+	event_add(ev_read, 0);
 
 }

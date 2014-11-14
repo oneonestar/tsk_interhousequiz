@@ -1,0 +1,64 @@
+\hypertarget{structredis_async_context}{\section{redis\+Async\+Context Struct Reference}
+\label{structredis_async_context}\index{redis\+Async\+Context@{redis\+Async\+Context}}
+}
+
+
+Collaboration diagram for redis\+Async\+Context\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structredis_async_context__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Data Fields}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{structredis_async_context_ae38dc5745b52b68e1f600aa5a7eae103}{\hyperlink{structredis_context}{redis\+Context} {\bfseries c}}\label{structredis_async_context_ae38dc5745b52b68e1f600aa5a7eae103}
+
+\item 
+\hypertarget{structredis_async_context_a6ce68847c12434f60d1b2654a3dc3409}{int {\bfseries err}}\label{structredis_async_context_a6ce68847c12434f60d1b2654a3dc3409}
+
+\item 
+\hypertarget{structredis_async_context_ac3a29d5a3e50771c8ce7cf18bc093a6e}{char $\ast$ {\bfseries errstr}}\label{structredis_async_context_ac3a29d5a3e50771c8ce7cf18bc093a6e}
+
+\item 
+\hypertarget{structredis_async_context_a735984d41155bc1032e09bece8f8d66d}{void $\ast$ {\bfseries data}}\label{structredis_async_context_a735984d41155bc1032e09bece8f8d66d}
+
+\item 
+\hypertarget{structredis_async_context_a4f609ed6e648fc42472489333f5df7ad}{\begin{tabbing}
+xx\=xx\=xx\=xx\=xx\=xx\=xx\=xx\=xx\=\kill
+struct \{\\
+\>void $\ast$ {\bfseries data}\\
+\>void($\ast$ {\bfseries addRead} )(void $\ast$privdata)\\
+\>void($\ast$ {\bfseries delRead} )(void $\ast$privdata)\\
+\>void($\ast$ {\bfseries addWrite} )(void $\ast$privdata)\\
+\>void($\ast$ {\bfseries delWrite} )(void $\ast$privdata)\\
+\>void($\ast$ {\bfseries cleanup} )(void $\ast$privdata)\\
+\} {\bfseries ev}}\label{structredis_async_context_a4f609ed6e648fc42472489333f5df7ad}
+\\
+
+\end{tabbing}\item 
+\hypertarget{structredis_async_context_a2d62a74ecafb742a5a906df197287729}{redis\+Disconnect\+Callback $\ast$ {\bfseries on\+Disconnect}}\label{structredis_async_context_a2d62a74ecafb742a5a906df197287729}
+
+\item 
+\hypertarget{structredis_async_context_aef0f2225e2b45f0bfefe9e5509cf64fe}{redis\+Connect\+Callback $\ast$ {\bfseries on\+Connect}}\label{structredis_async_context_aef0f2225e2b45f0bfefe9e5509cf64fe}
+
+\item 
+\hypertarget{structredis_async_context_aae693597b070de3cc1bb31b87caf8d54}{\hyperlink{structredis_callback_list}{redis\+Callback\+List} {\bfseries replies}}\label{structredis_async_context_aae693597b070de3cc1bb31b87caf8d54}
+
+\item 
+\hypertarget{structredis_async_context_aea0e73f5f93b82ea40f6291733a840e8}{\begin{tabbing}
+xx\=xx\=xx\=xx\=xx\=xx\=xx\=xx\=xx\=\kill
+struct \{\\
+\>\hyperlink{structredis_callback_list}{redisCallbackList} {\bfseries invalid}\\
+\>struct dict $\ast$ {\bfseries channels}\\
+\>struct dict $\ast$ {\bfseries patterns}\\
+\} {\bfseries sub}}\label{structredis_async_context_aea0e73f5f93b82ea40f6291733a840e8}
+\\
+
+\end{tabbing}\end{DoxyCompactItemize}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/home/onestar/\+Documents/\+Inter\+House\+Quiz/main/src/include/hiredis/async.\+h\end{DoxyCompactItemize}

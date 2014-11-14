@@ -1,0 +1,201 @@
+\hypertarget{link__list_8h}{\section{/home/onestar/\+Documents/\+Inter\+House\+Quiz/main/src/include/link\+\_\+list.h File Reference}
+\label{link__list_8h}\index{/home/onestar/\+Documents/\+Inter\+House\+Quiz/main/src/include/link\+\_\+list.\+h@{/home/onestar/\+Documents/\+Inter\+House\+Quiz/main/src/include/link\+\_\+list.\+h}}
+}
+
+
+Linked list for storing the current connections.  
+
+
+\subsection*{Data Structures}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{struct_node}{Node}
+\begin{DoxyCompactList}\small\item\em Structure for storing each connection. \end{DoxyCompactList}\item 
+struct \hyperlink{struct_list}{List}
+\begin{DoxyCompactList}\small\item\em A list storing all the connections. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{link__list_8h_a682f531e759e6edca2fba6c56a0b6298}{typedef struct \hyperlink{struct_node}{Node} \hyperlink{link__list_8h_a682f531e759e6edca2fba6c56a0b6298}{node}}\label{link__list_8h_a682f531e759e6edca2fba6c56a0b6298}
+
+\begin{DoxyCompactList}\small\item\em Structure for storing each connection. \end{DoxyCompactList}\item 
+\hypertarget{link__list_8h_a109860c2e14bbeb03ea3d54a112ce4f2}{typedef struct \hyperlink{struct_list}{List} \hyperlink{link__list_8h_a109860c2e14bbeb03ea3d54a112ce4f2}{list}}\label{link__list_8h_a109860c2e14bbeb03ea3d54a112ce4f2}
+
+\begin{DoxyCompactList}\small\item\em A list storing all the connections. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{link__list_8h_a682f531e759e6edca2fba6c56a0b6298}{node} $\ast$ \hyperlink{link__list_8h_a00b335e95c7a5d601ceb46a7195abafb}{list\+Search} (const struct bufferevent $\ast$bev, const \hyperlink{link__list_8h_a109860c2e14bbeb03ea3d54a112ce4f2}{list} $\ast$the\+List)
+\begin{DoxyCompactList}\small\item\em Searching the connection using the address. and port. \end{DoxyCompactList}\item 
+void \hyperlink{link__list_8h_a658cc3d2128a7207a96f75b2837e4c55}{list\+Create} (struct \hyperlink{struct_list}{List} $\ast$$\ast$\hyperlink{link__list_8h_a109860c2e14bbeb03ea3d54a112ce4f2}{list})
+\begin{DoxyCompactList}\small\item\em Create and initialize the linked list. \end{DoxyCompactList}\item 
+void \hyperlink{link__list_8h_aa1ec9c8b9f1c56f861e653508a4a832f}{list\+Add} (struct bufferevent $\ast$bev, struct \hyperlink{struct_info}{Info} $\ast$\hyperlink{structinfo}{info}, struct \hyperlink{struct_list}{List} $\ast$\hyperlink{link__list_8h_a109860c2e14bbeb03ea3d54a112ce4f2}{list})
+\begin{DoxyCompactList}\small\item\em Create and add a new node into the list. \end{DoxyCompactList}\item 
+void \hyperlink{link__list_8h_a87c5c319d01ed2a866d9e42d116da21b}{list\+Remove} (struct \hyperlink{struct_node}{Node} $\ast$\hyperlink{link__list_8h_a682f531e759e6edca2fba6c56a0b6298}{node}, struct \hyperlink{struct_list}{List} $\ast$\hyperlink{link__list_8h_a109860c2e14bbeb03ea3d54a112ce4f2}{list})
+\begin{DoxyCompactList}\small\item\em Remove the node from the list. \end{DoxyCompactList}\item 
+void \hyperlink{link__list_8h_a6da5203fd20a34d1d9d9a07fdf339e0f}{list\+Print} (struct \hyperlink{struct_list}{List} $\ast$\hyperlink{link__list_8h_a109860c2e14bbeb03ea3d54a112ce4f2}{list})
+\begin{DoxyCompactList}\small\item\em Print the node to wprintw(). \end{DoxyCompactList}\item 
+void \hyperlink{link__list_8h_ab8a7cdec2167d1f1de1c732d06528154}{list\+Delete} (struct \hyperlink{struct_list}{List} $\ast$\hyperlink{link__list_8h_a109860c2e14bbeb03ea3d54a112ce4f2}{list})
+\begin{DoxyCompactList}\small\item\em Delete all the nodes in the list. \end{DoxyCompactList}\item 
+int \hyperlink{link__list_8h_a66a143a1ccdc887eba693b933a347d3c}{list\+Broadcast} (\hyperlink{link__list_8h_a109860c2e14bbeb03ea3d54a112ce4f2}{list} $\ast$, char $\ast$)
+\begin{DoxyCompactList}\small\item\em Broadcast the msg to all connections in the list. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{link__list_8h_a4c82b9b311bc880c5cf25a6a07fe1925}{struct \hyperlink{struct_list}{List} $\ast$ {\bfseries the\+List}}\label{link__list_8h_a4c82b9b311bc880c5cf25a6a07fe1925}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Linked list for storing the current connections. 
+
+\begin{DoxyAuthor}{Author}
+Steven Chien 
+
+Star Poon (\href{mailto:oneonestar@gmail.com}{\tt oneonestar@gmail.\+com}) 
+\end{DoxyAuthor}
+\begin{DoxyVersion}{Version}
+1.\+0 
+\end{DoxyVersion}
+\begin{DoxyDate}{Date}
+2013-\/2014 
+\end{DoxyDate}
+\begin{DoxyCopyright}{Copyright}
+G\+N\+U General Public License v3.\+0 
+\end{DoxyCopyright}
+
+
+\subsection{Function Documentation}
+\hypertarget{link__list_8h_aa1ec9c8b9f1c56f861e653508a4a832f}{\index{link\+\_\+list.\+h@{link\+\_\+list.\+h}!list\+Add@{list\+Add}}
+\index{list\+Add@{list\+Add}!link\+\_\+list.\+h@{link\+\_\+list.\+h}}
+\subsubsection[{list\+Add}]{\setlength{\rightskip}{0pt plus 5cm}void list\+Add (
+\begin{DoxyParamCaption}
+\item[{struct bufferevent $\ast$}]{bev, }
+\item[{struct {\bf Info} $\ast$}]{info, }
+\item[{struct {\bf List} $\ast$}]{list}
+\end{DoxyParamCaption}
+)}}\label{link__list_8h_aa1ec9c8b9f1c56f861e653508a4a832f}
+
+
+Create and add a new node into the list. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em bev} & the bufferevent bounded to that connection. \\
+\hline
+{\em info} & the info structure bounded to that connection. \\
+\hline
+{\em list} & the bufferevent send to the callback function. \\
+\hline
+\end{DoxyParams}
+\hypertarget{link__list_8h_a66a143a1ccdc887eba693b933a347d3c}{\index{link\+\_\+list.\+h@{link\+\_\+list.\+h}!list\+Broadcast@{list\+Broadcast}}
+\index{list\+Broadcast@{list\+Broadcast}!link\+\_\+list.\+h@{link\+\_\+list.\+h}}
+\subsubsection[{list\+Broadcast}]{\setlength{\rightskip}{0pt plus 5cm}int list\+Broadcast (
+\begin{DoxyParamCaption}
+\item[{{\bf list} $\ast$}]{, }
+\item[{char $\ast$}]{}
+\end{DoxyParamCaption}
+)}}\label{link__list_8h_a66a143a1ccdc887eba693b933a347d3c}
+
+
+Broadcast the msg to all connections in the list. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em list} & the \hyperlink{struct_list}{List} structure which containing the connections. \\
+\hline
+{\em msg} & the message wanted to broadcast. \\
+\hline
+\end{DoxyParams}
+\hypertarget{link__list_8h_a658cc3d2128a7207a96f75b2837e4c55}{\index{link\+\_\+list.\+h@{link\+\_\+list.\+h}!list\+Create@{list\+Create}}
+\index{list\+Create@{list\+Create}!link\+\_\+list.\+h@{link\+\_\+list.\+h}}
+\subsubsection[{list\+Create}]{\setlength{\rightskip}{0pt plus 5cm}void list\+Create (
+\begin{DoxyParamCaption}
+\item[{struct {\bf List} $\ast$$\ast$}]{list}
+\end{DoxyParamCaption}
+)}}\label{link__list_8h_a658cc3d2128a7207a96f75b2837e4c55}
+
+
+Create and initialize the linked list. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em list} & the bufferevent send to the callback function. \\
+\hline
+\end{DoxyParams}
+\hypertarget{link__list_8h_ab8a7cdec2167d1f1de1c732d06528154}{\index{link\+\_\+list.\+h@{link\+\_\+list.\+h}!list\+Delete@{list\+Delete}}
+\index{list\+Delete@{list\+Delete}!link\+\_\+list.\+h@{link\+\_\+list.\+h}}
+\subsubsection[{list\+Delete}]{\setlength{\rightskip}{0pt plus 5cm}void list\+Delete (
+\begin{DoxyParamCaption}
+\item[{struct {\bf List} $\ast$}]{list}
+\end{DoxyParamCaption}
+)}}\label{link__list_8h_ab8a7cdec2167d1f1de1c732d06528154}
+
+
+Delete all the nodes in the list. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em list} & The \hyperlink{struct_list}{List} structure which containing the connections. \\
+\hline
+\end{DoxyParams}
+\hypertarget{link__list_8h_a6da5203fd20a34d1d9d9a07fdf339e0f}{\index{link\+\_\+list.\+h@{link\+\_\+list.\+h}!list\+Print@{list\+Print}}
+\index{list\+Print@{list\+Print}!link\+\_\+list.\+h@{link\+\_\+list.\+h}}
+\subsubsection[{list\+Print}]{\setlength{\rightskip}{0pt plus 5cm}void list\+Print (
+\begin{DoxyParamCaption}
+\item[{struct {\bf List} $\ast$}]{list}
+\end{DoxyParamCaption}
+)}}\label{link__list_8h_a6da5203fd20a34d1d9d9a07fdf339e0f}
+
+
+Print the node to wprintw(). 
+
+
+\begin{DoxyParams}{Parameters}
+{\em list} & The \hyperlink{struct_list}{List} structure which containing the connections. \\
+\hline
+\end{DoxyParams}
+\hypertarget{link__list_8h_a87c5c319d01ed2a866d9e42d116da21b}{\index{link\+\_\+list.\+h@{link\+\_\+list.\+h}!list\+Remove@{list\+Remove}}
+\index{list\+Remove@{list\+Remove}!link\+\_\+list.\+h@{link\+\_\+list.\+h}}
+\subsubsection[{list\+Remove}]{\setlength{\rightskip}{0pt plus 5cm}void list\+Remove (
+\begin{DoxyParamCaption}
+\item[{struct {\bf Node} $\ast$}]{node, }
+\item[{struct {\bf List} $\ast$}]{list}
+\end{DoxyParamCaption}
+)}}\label{link__list_8h_a87c5c319d01ed2a866d9e42d116da21b}
+
+
+Remove the node from the list. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em node} & The node needed to be removed from the list. \\
+\hline
+{\em list} & The \hyperlink{struct_list}{List} structure which containing the connections. \\
+\hline
+\end{DoxyParams}
+\hypertarget{link__list_8h_a00b335e95c7a5d601ceb46a7195abafb}{\index{link\+\_\+list.\+h@{link\+\_\+list.\+h}!list\+Search@{list\+Search}}
+\index{list\+Search@{list\+Search}!link\+\_\+list.\+h@{link\+\_\+list.\+h}}
+\subsubsection[{list\+Search}]{\setlength{\rightskip}{0pt plus 5cm}{\bf node}$\ast$ list\+Search (
+\begin{DoxyParamCaption}
+\item[{const struct bufferevent $\ast$}]{bev, }
+\item[{const {\bf list} $\ast$}]{the\+List}
+\end{DoxyParamCaption}
+)}}\label{link__list_8h_a00b335e95c7a5d601ceb46a7195abafb}
+
+
+Searching the connection using the address. and port. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em bev} & the bufferevent send to the callback function. \\
+\hline
+{\em the\+List} & the linked list containin the connections. \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em return} & null if not found. \\
+\hline
+\end{DoxyRetVals}

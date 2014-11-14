@@ -8,7 +8,8 @@
 #include "include/layout.h"	/* ->ncurses.h */
 
 // if database file exist, continue, else create one
-void score_db_init(int question_count) {
+void score_db_init(int question_count)
+{
 
 	// init
 	sqlite3 *db;		// descriptor for db conn
@@ -19,7 +20,8 @@ void score_db_init(int question_count) {
 
 	// initialize conn
 	rc = sqlite3_open_v2("score.db", &db, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, NULL);
-	if(rc) {
+	if(rc)
+	{
 		wprintw(msg_content, "failed to open score.db: %s\n", sqlite3_errmsg(db));
 		sqlite3_close(db);
 		exit(1);
@@ -28,7 +30,8 @@ void score_db_init(int question_count) {
 	// prepare statement
 	strcpy(sql, "select * from score_record;");
 	rc = sqlite3_prepare_v2(db, sql, strlen(sql), &stmt, &tail);
-	if(rc!=SQLITE_OK) {
+	if(rc!=SQLITE_OK)
+	{
 
 		// database empty, create structure
 		memset(&sql, 0, sizeof(sql));
@@ -36,19 +39,22 @@ void score_db_init(int question_count) {
 
 		// if database created create entries for questions
 		rc = sqlite3_exec(db, sql, 0, 0, 0);
-		if(rc!=SQLITE_OK) {
+		if(rc!=SQLITE_OK)
+		{
 			wprintw(msg_content, "%s\n", sqlite3_errmsg(db));
 			exit(1);
 		}
 
 		// insert record
-		for(i=0; i<question_count; i++) {
+		for(i=0; i<question_count; i++)
+		{
 			memset(&sql, 0, sizeof(sql));
 			sprintf(sql, "insert into score_record(QuestionID) values(%d);", i+1);
 			sqlite3_exec(db, sql, 0, 0, 0);
 		}
 	}
-	else {
+	else
+	{
 		wprintw(msg_content, "Database ready\n");
 	}
 
@@ -58,7 +64,8 @@ void score_db_init(int question_count) {
 }
 
 // set score for particular team where team=char; value = "QID:Score"
-void score_db_set(char team, char *value) {
+void score_db_set(char team, char *value)
+{
 
 	// init variables
 	sqlite3 *db;
@@ -74,27 +81,31 @@ void score_db_set(char team, char *value) {
 
 	// open database conn
 	rc = sqlite3_open_v2("score.db", &db, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, NULL);
-	if(rc) {
+	if(rc)
+	{
 		wprintw(msg_content, "failed to open score.db: %s\n", sqlite3_errmsg(db));
 		sqlite3_close(db);
 		exit(1);
 	}
 
-	if(qid==0) {
-		
+	if(qid==0)
+	{
+
 		sqlite3_prepare_v2(db, sql_special, strlen(sql_special), &stmt, &tail);
 		sqlite3_bind_int(stmt, 1, qid);
 		sqlite3_bind_text(stmt, 2, &team, 1, NULL);
 		sqlite3_bind_int(stmt, 3, score);
 		rc = sqlite3_step(stmt);
-		if(rc!=SQLITE_DONE) {
+		if(rc!=SQLITE_DONE)
+		{
 			wprintw(msg_content, "failed to insert special scoring: %s\n", sqlite3_errmsg(db));
 			sqlite3_close(db);
 			exit(1);
 		}
 		sqlite3_finalize(stmt);
 	}
-	else {
+	else
+	{
 		// prepare update statement
 		sqlite3_prepare_v2(db, sql, -1, &stmt, &tail);
 		// bind score and question id and team to prepared statement
@@ -102,7 +113,8 @@ void score_db_set(char team, char *value) {
 		sqlite3_bind_text(stmt, 2, &team, 1, NULL);
 		sqlite3_bind_int(stmt, 3, qid);
 		rc = sqlite3_step(stmt);
-		if(rc!=SQLITE_DONE) {
+		if(rc!=SQLITE_DONE)
+		{
 			wprintw(msg_content, "%s\n", sqlite3_errmsg(db));
 			exit(1);
 		}
@@ -116,7 +128,8 @@ void score_db_set(char team, char *value) {
 }
 
 // retrieve score for particular team
-int score_db_get(char team) {
+int score_db_get(char team)
+{
 
 	// init variables
 	sqlite3 *db;
@@ -132,7 +145,8 @@ int score_db_get(char team) {
 	sqlite3_bind_text(stmt, 1, &team, 1, NULL);
 
 	// step through result; since only one row should be returned no while loop is used
-	if((rc=sqlite3_step(stmt))==SQLITE_ROW) {
+	if((rc=sqlite3_step(stmt))==SQLITE_ROW)
+	{
 		score = sqlite3_column_int(stmt,0);
 	}
 	sqlite3_finalize(stmt);
@@ -142,7 +156,8 @@ int score_db_get(char team) {
 }
 
 // push score to web server
-void score_publish() {
+void score_publish()
+{
 
 	char recvBuff[100];
 	int A = score_db_get('A');

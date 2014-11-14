@@ -5,7 +5,8 @@
 
 #include "include/layout.h"
 
-void init_windows() {
+void init_windows()
+{
 
 	initscr();
 	noecho();

@@ -1,0 +1,127 @@
+\subsection*{Introduction}
+
+This is the repository of Inter-\/house quiz competition system, originally developed for S\+K\+H Tang Shiu Kin Secondary School of Hong Kong by One\+One Star, Steven Chien, Charlie Shum and Alfred Tai. This R\+E\+A\+D\+M\+E would normally document whatever steps are necessary to get your application up and running.
+
+\subsection*{Summary}
+
+The system consists of four major components\+: the database, event driven web server, main quiz server and buzzing system.
+
+\subsubsection*{Database}
+
+S\+Q\+Lite is used for storage of questions and answers as well of scores obtained by participants.
+
+\subsubsection*{Event-\/driven web server}
+
+A python web server utilizing Twisted library is used to receive instruction from quiz server and push changes to client web browsers.
+
+\subsubsection*{Quiz Server}
+
+A single threaded, non-\/blocking server written in C is used to act as a centralized server to store states of the game and communicate with various sub systems. The server uses libevent for buffering and create non-\/blocking sockets, S\+Q\+Lite A\+P\+I for database communication.
+
+\subsubsection*{User Interface App}
+
+The App acts as the control panel for the game maker where he can\+:
+
+
+\begin{DoxyItemize}
+\item Assign scores to participants
+\item Display questions
+\item Display answers
+\item Control the display of elements in web page
+\item Initiate and stop buzzing
+
+All by communicating directly with the quiz server. The application is written in Java and undergoing transition to become an Android App.
+\end{DoxyItemize}
+
+\subsubsection*{Buzzing System}
+
+A buzzing system consists of physical buttons where the first player who pressed the button gets to answer the question. The system consists of a Arduino Uno with program written in C++ and Raspberry Pi where communication between quiz server and Arduino is being bridged by program written in Python. The buzzing system is being controlled by the User Interface App.
+
+\subsection*{Version}
+
+The system was initially released in fall 2013.
+
+\subsection*{Setup}
+
+Sub system of the system can be started and restarted individually. In case of the buzzing system, it is started alone and connected to the network where the quiz server is hosted.
+
+\subsubsection*{Start up}
+
+
+\begin{DoxyEnumerate}
+\item Web Server
+\end{DoxyEnumerate}
+
+Enter the directory where the server exists. Start the server by issuing the command as root\+: python server.\+py. Make sure that port 80 is not occupied by other program(i.\+e. Apache).
+
+
+\begin{DoxyEnumerate}
+\item Buzzing system
+\end{DoxyEnumerate}
+
+First make sure the Arduino is properly connected to the Raspbery Pi and powered. Execute the python program on Raspberry Pi and it will start waiting for connection.
+
+
+\begin{DoxyEnumerate}
+\item Quiz Server
+\end{DoxyEnumerate}
+
+The Quiz Server should be started when all sub systems are running. Execute by ./quiz\+\_\+server \mbox{[}I\+P addr of web server\mbox{]} \mbox{[}I\+P addr of the buzzing system(raspberry pi)\mbox{]}. The quiz server communicates with the web server through port 8889 and buzzing server through 8888.
+
+
+\begin{DoxyEnumerate}
+\item User Control Panel
+\end{DoxyEnumerate}
+
+The control panel is starting by inputting the I\+P address of quiz server. The default port of communication is 9000.
+
+When all the above are started properly, the system should be ready to go.
+
+\subsection*{Configuration}
+
+The system occupies port 80, 8888, 8889 and 9000. Please make sure they are all open and not occupied on both sides.
+
+\subsection*{Dependencies}
+
+The system uses the below libraries\+:
+
+
+\begin{DoxyItemize}
+\item libevent
+\item S\+Q\+Lite
+\item Ncurses
+\item G\+Lib
+\item Various Linux system libraries
+\end{DoxyItemize}
+
+It is assumed the system will be used on Linux/\+U\+N\+I\+X platform.
+
+\subsection*{Database setup}
+
+The S\+Q\+Lite database for scores will be initialized if not exist or else the existing database will be used and scores will be automatically loaded upon initialization.
+
+The S\+Q\+Lite database for questions should exist prior to initialization.
+
+\subsection*{Compilation}
+
+Compile the quiz server by executing make in the main folder. Make sure the aforementioned dependencies are installed properly.
+
+\subsection*{Credit}
+
+
+\begin{DoxyItemize}
+\item One\+One Star\+: Web Server and database
+\item Steven Chien\+: Quiz Server, S\+Q\+Lite database embedding and software part of buzzing system
+\item Charlie Shum\+: Java user control panel/\+Android control panel
+\item Alfred Tai\+: Hardware part of buzzing System
+\end{DoxyItemize}
+
+\subsection*{License}
+
+Copyright 2013, 2014 Star Poon, Steven Chen, Charlie Shum, Alfred Tai.
+
+This program is free software\+: you can redistribute it and/or modify it under the terms of the G\+N\+U General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but W\+I\+T\+H\+O\+U\+T A\+N\+Y W\+A\+R\+R\+A\+N\+T\+Y; without even the implied warranty of M\+E\+R\+C\+H\+A\+N\+T\+A\+B\+I\+L\+I\+T\+Y or F\+I\+T\+N\+E\+S\+S F\+O\+R A P\+A\+R\+T\+I\+C\+U\+L\+A\+R P\+U\+R\+P\+O\+S\+E. See the G\+N\+U General Public License for more details.
+
+You should have received a copy of the G\+N\+U General Public License along with this program. If not, see \href{http://www.gnu.org/licenses/}{\tt http\+://www.\+gnu.\+org/licenses/}. 

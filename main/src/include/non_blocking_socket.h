@@ -4,15 +4,22 @@
 #include <event2/util.h>
 #include <event2/listener.h>
 
-//setup struct info
+/**
+ * @brief Structure for storing the IP and address in char*
+ */
 struct Info {
-	char *address;
-	char *port;
-	size_t total_drained;
+	struct sockaddr_storage address;
+	int total_drained;
 };
+
+char* get_address_string(const struct Info*);
+int get_port_int(const struct Info*);
+
+
 
 void on_event_cb(struct bufferevent*, short, void*);
 void on_read_cb(struct bufferevent*, void*);
 void on_accept_cb(struct evconnlistener*, evutil_socket_t, struct sockaddr*, int, void*);
+void on_accept_errorcb(struct evconnlistener *listener, void *ptr);
 
 #endif
