@@ -5,15 +5,16 @@
 
 #include "include/layout.h"
 
+/* initialize ncurses lib */
 void init_windows()
 {
-
+	/* init ncurses */
 	initscr();
 	noecho();
 
 	getmaxyx(stdscr, y_max, x_max);
 
-	// score window
+	/* score window */
 	score_window_size_y = y_max / 2;
 	score_window_size_x = x_max / 3;
 	score_window = newwin(score_window_size_y, score_window_size_x, 0, x_max/3*2);
@@ -25,7 +26,7 @@ void init_windows()
 	score_content = newwin(score_window_size_y-4, score_window_size_x-4, 1, x_max/3*2+1);
 	wrefresh(score_content);
 
-	// client window
+	/* client window */
 	client_window_size_y = y_max / 2;
 	client_window_size_x = x_max / 3;
 	client_window = newwin(client_window_size_y, client_window_size_x, y_max/2, x_max/3*2);
@@ -37,7 +38,7 @@ void init_windows()
 	client_content = newwin(client_window_size_y-4, client_window_size_x-4, y_max/2+1, x_max/3*2+1);
 	wrefresh(client_content);
 
-	// msg window
+	/* msg window */
 	msg_window_size_y = y_max;
 	msg_window_size_x = x_max * 2 / 3;
 	msg_window = newwin(msg_window_size_y, msg_window_size_x, 0,0);

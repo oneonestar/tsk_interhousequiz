@@ -14,42 +14,35 @@
 #include "include/score_db.h"
 #include "include/layout.h"	/* ->ncurses.h */
 
-/* pending for removal */
-#include "include/score.h"
-
+/* signal handlers */
 struct sigaction sigint_action;
 struct sigaction sigwinch_action;
 
 void server()
 {
-	//initialize linked list
+	/* initialize linked list */
 	listCreate(&theList);
-	/* backward compatiblity, pending for removal */
-	//start score module
-	score_init(0, "score_backup.dat");
-	//push score to webserver
-	push_score(webServer, webPort);
-	/* pending for removal */
 
-	// setup score database and push score
+	/* setup score database and push score to HTML server*/
 	score_db_init(30);
 	score_publish();
 
-	//setup UI listener
+	/* setup UI listener */
 	struct event_base *base;
 	struct evconnlistener *listener;
 
-	//setup libevent event base
+	/* setup libevent event base */
 	base = event_base_new();
-	if(!base)
-	{
+	if(!base) {
 		wprintw(msg_content, "Server: cannot open event base\n");
 		return;
 	}
 
+	/* initialize connection to buzzer server */
 	wprintw(msg_content, "Initializing connection to buzzer...\n");
 	buzzer_init(base);
 
+	/* define socket data structure for IPv6 or IPv4 */
 #ifndef IPv6
 	struct sockaddr_in6 serv_addr;
 	memset(&serv_addr, '0', sizeof(serv_addr));
@@ -64,43 +57,45 @@ void server()
 	serv_addr.sin_port = htons(atoi(uiPort));
 #endif
 
+	/* bind event to call bcak "on_accept_cb", which will then call on_read_cb() */
+	listener = evconnlistener_new_bind(base,
+					on_accept_cb,
+					NULL,
+					LEV_OPT_CLOSE_ON_FREE | LEV_OPT_REUSEABLE,
+					-1,
+					(struct sockaddr*)&serv_addr, sizeof(serv_addr));
 
-	//bind event to call bcak "on_accept_cb", which will then call on_read_cb()
-	listener = evconnlistener_new_bind(base, on_accept_cb, NULL, LEV_OPT_CLOSE_ON_FREE | LEV_OPT_REUSEABLE, -1, (struct sockaddr*)&serv_addr, sizeof(serv_addr));
-
-	if(!listener)
-	{
+	if(!listener) {
+		/* cleanup ncurses */
 		endwin();
 		printf("Server: cannot create listener\n");
 		exit(-1);
 	}
 	evconnlistener_set_error_cb(listener, on_accept_errorcb);
 
-	//start event loop
+	/* start event loop */
 	wrefresh(msg_content);
 	event_base_dispatch(base);
 }
 
-// window resize handler
+/* window resize handler */
 void sigwinch_handler(int signal)
 {
 	endwin();
 	init_windows();
 }
 
-// keyboard interrupt handler
+/* keyboard interrupt handler */
 void terminate_handler(int signal)
 {
-
 	endwin();
 	printf("received signal %d, terminating...\n", signal);
 	exit(0);
 }
 
-// initialize signal handlers
+/* initialize signal handlers */
 void signal_handler_init()
 {
-
 	memset(&sigint_action, 0, sizeof(struct sigaction));
 	sigint_action.sa_handler = terminate_handler;
 	sigaction(SIGINT, &sigint_action, NULL);
@@ -112,24 +107,26 @@ void signal_handler_init()
 
 int main(int argc, char *argv[])
 {
-	if (argc != 3)
-	{
+	if(argc != 3) {
 		printf("usage: quiz [WebServer] [Buzzer]\n");
 		return 1;
 	}
-	// store addresses
+
+	/* store addresses */
 	strcpy(webServer, argv[1]);
 	strcpy(webPort, "8889");
 	strcpy(buzzerServer, argv[2]);
 	strcpy(uiPort, "9000");
 
-	// install signal handlers
+	/* install signal handlers */
 	signal_handler_init();
 
-	//setup hash table for server callback functions
+	/* setup hash table for server callback functions */
 	hash_table_init();
 
+	/*/ initialize ncurses and windows */
 	init_windows();
+
 	wprintw(msg_content, "Server starting...\n");
 	wrefresh(msg_content);
 	server();

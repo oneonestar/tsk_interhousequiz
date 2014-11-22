@@ -18,8 +18,7 @@ void buzzer_callback(evutil_socket_t sock, short flags, void * args)
 	int ret = recv(sock, buf, 128, 0);
 	buf[ret] = 0;
 
-	if(ret == 0)
-	{
+	if(ret == 0) {
 		//printf("DEBUG: buzzer_callback(): read_cb connection closed\n");
 		wprintw(msg_content, "Connection to buzzer closed!\n");
 		event_del(ev_read);

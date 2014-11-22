@@ -9,66 +9,67 @@
 #include "include/utilities.h"
 #include "include/layout.h"
 
-//a function to send a message to whatever destination
+/* a function to send a message to whatever destination */
 int send_message(char *address, char *port, char *msg)
 {
-	//temp variable
+	/* temp variable */
 	int n;
 
-	//setup socket to the web server
+	/* setup socket to the web server */
 	int sock = socket(AF_INET, SOCK_STREAM, 0);
 	struct sockaddr_in server_addr;
 	memset(&server_addr, '0', sizeof(server_addr));
 	server_addr.sin_family = AF_INET;
 	server_addr.sin_port = htons(atoi(port));
 	inet_pton(AF_INET, address, &server_addr.sin_addr);
-	if(connect(sock, (struct sockaddr*)&server_addr, sizeof(server_addr)))
-	{
+
+	if(connect(sock, (struct sockaddr*)&server_addr, sizeof(server_addr))) {
 		wprintw(msg_content, "DEBUG: send_message(): Connection to %s:%s failed\n", address, port);
 		return -1;
 	}
 
 	wprintw(msg_content,"Sending message: %s to %s:%s\n", msg, address, port);
 	wrefresh(msg_content);
-	if((n=send(sock, msg, strlen(msg), 0))<=0)
-	{
+
+	if((n=send(sock, msg, strlen(msg), 0)) <= 0) {
 		wprintw(msg_content, "DEBUG: send_message(): Message %s cannot be sent\n", msg);
 		wrefresh(msg_content);
 		close(sock);
 		return -1;
 	}
+
 	close(sock);
 	return n;
 }
 
-//return char according to index
+/* return char according to index */
 int house_to_char(int house)
 {
-	switch(house)
-	{
-	case 0:
-		return 'A';
-		break;
-	case 1:
-		return 'D';
-		break;
-	case 2:
-		return 'H';
-		break;
-	case 3:
-		return 'J';
-		break;
-	case 4:
-		return 'L';
-		break;
-	case 5:
-		return 'M';
-		break;
+	switch(house) {
+		case 0:
+			return 'A';
+			break;
+		case 1:
+			return 'D';
+			break;
+		case 2:
+			return 'H';
+			break;
+		case 3:
+			return 'J';
+			break;
+		case 4:
+			return 'L';
+			break;
+		case 5:
+			return 'M';
+			break;
 	}
+
 	return 'z';
 }
 
-//return array index of a particular house
+/* return array index of a particular house */
 int char_to_house(char house)
 {
 	if(house=='A')
@@ -87,4 +88,3 @@ int char_to_house(char house)
 	//error
 	return -1;
 }
-

@@ -3,7 +3,6 @@ INC=-I../
 BIN=bin
 OBJ=obj
 
-
 LDFLAGS=-lncurses -levent -lsqlite3
 CFLAGS=-Wall -g
 
@@ -13,7 +12,7 @@ GLIB_LDFLAGS=`pkg-config --libs glib-2.0`
 
 $(shell mkdir -p $(BIN) $(OBJ)) 
 
-all: utilities.o non_blocking_socket.o score.o buzzer.o link_list.o quiz_server.o server_cb.o score_db.o layout.o question_db.o
+all: utilities.o non_blocking_socket.o buzzer.o link_list.o quiz_server.o server_cb.o score_db.o layout.o question_db.o
 	$(CC) $(OBJ)/*.o -o $(BIN)/quiz_server $(CFLAGS) $(LDFLAGS) $(CFLAGS) $(GLIB_CFLAGS) $(GLIB_LDFLAGS)
 
 utilities.o: src/utilities.c	
@@ -24,10 +23,6 @@ question_db.o: src/question_db.c
 
 non_blocking_socket.o: src/non_blocking_socket.c
 	$(CC) -c src/non_blocking_socket.c -o $(OBJ)/non_blocking_socket.o $(CFLAGS)
-
-# pending for removal
-score.o: src/score.c
-	$(CC) -c src/score.c -o $(OBJ)/score.o -std=c99 $(CFLAGS)
 
 buzzer.o: src/buzzer.c
 	$(CC) -c src/buzzer.c -o $(OBJ)/buzzer.o $(CFLAGS)
