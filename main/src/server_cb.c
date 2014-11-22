@@ -17,6 +17,9 @@
 #include "include/score_db.h"
 #include "include/question_db.h"
 
+/* migrating to msg in json */
+#include "include/json_msg.h"
+
 /* function table for server event callback */
 GHashTable *func_table;
 
@@ -173,8 +176,7 @@ void on_read_cb(struct bufferevent *bev, void *ctx)
 	wrefresh(msg_content);
 
 	gpointer *found;
-	if((found=g_hash_table_lookup(func_table, buffer)) != NULL)
-	{
+	if((found=g_hash_table_lookup(func_table, buffer)) != NULL) {
 		void (*func)(char, char*) = (void*)found;
 		func(data, value);
 
@@ -182,7 +184,11 @@ void on_read_cb(struct bufferevent *bev, void *ctx)
 		score_publish();
 
 		/* broadcast feedback and ack */
-		listBroadcast(theList, "ACK from server");
+		char *str = (gchar*)encode_json(instruction, option, &data, value, 1);
+		wprintw(msg_content, "%s", str);
+		wrefresh(msg_content);
+		listBroadcast(theList, str);
+		g_free(str);
 	} else {
 		wprintw(msg_content, "request %s not found in hash table!\n", buffer);
 		wrefresh(msg_content);
