@@ -3,57 +3,66 @@
 </head>
 
 <body>
+	{{> loginButtons}}
+
+	{{#if currentUser}}
+		{{> score_board}}
+		{{> question_board}}
+	{{/if}}
+</body>
+
+<template name="score_board">
 	<div class="house_container">
 		<div class="row">
 			<div class="col-md-4">
-				<div id="A_score_box">0</div>
+				<div id="A_score_box">{{A_score.score}}</div>
 			</div>
 			<div class="col-md-4">
-				<div id="D_score_box">0</div>
+				<div id="D_score_box">{{D_score.score}}</div>
 			</div>
 			<div class="col-md-4">
-				<div id="H_score_box">0</div>
+				<div id="H_score_box">{{H_score.score}}</div>
 			</div>
 		</div>
 		<div class="row">
 			<div class="col-md-4">
-				<div id="J_score_box">0</div>
+				<div id="J_score_box">{{J_score.score}}</div>
 			</div>
 			<div class="col-md-4">
-				<div id="L_score_box">0</div>
+				<div id="L_score_box">{{L_score.score}}</div>
 			</div>
 			<div class="col-md-4">
-				<div id="M_score_box">0</div>
+				<div id="M_score_box">{{M_score.score}}</div>
 			</div>
 		</div>
 	</div>
+</template>
+
+<template name="question_board">
 	<!--Questions-->
 	<div id="QuestionContainer">
 		<div class="row">
-			<div id="Question_Catalog" class="col-md-4 question_content"></div>
-			<div id="Question_ID" class="col-md-4 question_content"></div>
+			<div id="Question_Catalog" class="col-md-4 question_content">{{question.catalog}}</div>
+			<div id="Question_ID" class="col-md-4 question_content">{{question.Id}}</div>
 			<div id="Question_Set" class="col-md-4 question_content"></div>
 		</div>
 		<div id="Box_Question" class="Box">
-			<div id="Question_Question" class="question_content"></div>
-				<img id="myImage" src="" alt="image_loc" />
+			<div id="Question_Question" class="question_content">{{question.content}}</div>
+				<img id="myImage" src="{{question.image}}" alt="image_loc" />
 			</div>
 			<div class="box-option row">
-				<div id="Option_A" class="col-md-6 question_option"></div>
-				<div id="Option_B" class="col-md-6 question_option"></div>
+				<div id="Option_A" class="col-md-6 question_option">{{answer.optionA}}</div>
+				<div id="Option_B" class="col-md-6 question_option">{{answer.optionB}}</div>
 			</div>
 			<div class="box-option row">
-				<div id="Option_C" class="col-md-6 question_option"></div>
-				<div id="Option_D" class="col-md-6 question_option"></div>
+				<div id="Option_C" class="col-md-6 question_option">{{answer.optionC}}</div>
+				<div id="Option_D" class="col-md-6 question_option">{{answer.optionD}}</div>
 			</div>
-		<div id="Question_Answer">Answer: <span></span></div>
+		<div id="Question_Answer">Answer: <span>{{answer.correct}}</span></div>
 	</div>
+	<!--
 	<div id="connection">
 		<span>Connecting...</span>
 	</div>
-</body>
-
-<template name="hello">
-  <button>Click Me</button>
-  <p>You've pressed the button {{counter}} times.</p>
+	-->
 </template>
