@@ -41,6 +41,11 @@ if (Meteor.isServer) {
 	Meteor.startup(function () {
 		// code to run on server at startup
 
+		// drop collections to reset
+		Scores.remove({});
+		Questions.remove({});
+		Answers.remove({});
+
 		// initialize scores
 		Scores.insert({ house: 'A', score: 0 });
 		Scores.insert({ house: 'D', score: 0 });
