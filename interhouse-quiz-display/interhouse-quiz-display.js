@@ -57,6 +57,11 @@ if (Meteor.isServer) {
 		// initialze questions
 		Questions.insert({ catalog: "catalog", Id: 1, content: "content", image: "" });
 		Answers.insert({ optionA: "Option A", optionB: "Option B", optionC: "Option C", optionD: "Option D", correct: "Correct Answer" });
+
+		// setup collection api on score
+		collectionApi = new CollectionAPI({ authToken: 'hello' });
+		collectionApi.addCollection(Scores, 'scores');
+		collectionApi.start();
 	});
 
 	Meteor.publish('theScores', function() {
