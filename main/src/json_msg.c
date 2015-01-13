@@ -69,7 +69,7 @@ gchar *encode_json(char *instruction, char *action, char *team, char *value, int
 	JsonGenerator *generator = json_generator_new();
 	JsonNode *root = json_builder_get_root(builder);
 	json_generator_set_root(generator, root);
-	json_generator_set_pretty(generator, 1);
+	json_generator_set_pretty(generator, 0);	/* set message not to be pretty to prevent any return char because client determine end of msg by return char */
 
 	/* retrieve json string with memory alloted for return, free with g_free() after use*/
 	gchar *json = json_generator_to_data (generator, NULL);
