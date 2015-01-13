@@ -11,11 +11,15 @@ GLIB_CFLAGS=`pkg-config --cflags glib-2.0`
 GLIB_LDFLAGS=`pkg-config --libs glib-2.0`
 JSON_CFLAGS=`pkg-config --cflags json-glib-1.0`
 JSON_LDFLAGS=`pkg-config --libs json-glib-1.0`
+MONGOC_FLAGS=`pkg-config --libs --cflags libmongoc-1.0`
 
 $(shell mkdir -p $(BIN) $(OBJ)) 
 
 all: utilities.o non_blocking_socket.o buzzer.o link_list.o quiz_server.o json_msg.o server_cb.o score_db.o layout.o question_db.o
 	$(CC) $(OBJ)/*.o -o $(BIN)/quiz_server $(CFLAGS) $(LDFLAGS) $(CFLAGS) $(GLIB_CFLAGS) $(GLIB_LDFLAGS) $(JSON_CFLAGS) $(JSON_LDFLAGS)
+
+push2web.o: src/push2web.c
+	$(CC) -c src/push2web.c -o $(OBJ)/push2web.o $(CFLAGS) $(MONGOC_FLAGS)
 
 utilities.o: src/utilities.c	
 	$(CC) -c src/utilities.c -o $(OBJ)/utilities.o $(CFLAGS)
@@ -46,6 +50,7 @@ score_db.o: src/score_db.c
 
 layout.o: src/layout.c
 	$(CC) -c src/layout.c -o $(OBJ)/layout.o $(CFLAGS) -lncurses
+
 
 clean:
 	rm $(OBJ)/*.o $(BIN)/*
