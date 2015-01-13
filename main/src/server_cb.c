@@ -147,11 +147,11 @@ void on_read_cb(struct bufferevent *bev, void *ctx)
 
 	/* parsing variables */
 	/* instruction=command catag, option=action to be taken; value=a char value; data=an int value */
-	char instruction[10], option[10], value[100], data;	/* for sscanf */
+	char instruction[10], option[10], value[100], data[2];	/* for sscanf */
 	memset(instruction, 0, sizeof(instruction));
 	memset(option, 0, sizeof(option));
 	memset(value, 0, sizeof(value));
-	data = 0;
+	memset(data, 0, sizeof(data));
 
 	/* a buffer for storing returned string from functions */
 	char buffer[5000];
@@ -165,7 +165,7 @@ void on_read_cb(struct bufferevent *bev, void *ctx)
 	wrefresh(msg_content);
 
 	/* process instruction */
-	sscanf(recvBuff, "%s %s %c %s", instruction, option, &data, value);
+	sscanf(recvBuff, "%s %s %s %s", instruction, option, data, value);
 
 	/* free recvBuff after use */
 	free(recvBuff);
@@ -178,21 +178,25 @@ void on_read_cb(struct bufferevent *bev, void *ctx)
 	gpointer *found;
 	if((found=g_hash_table_lookup(func_table, buffer)) != NULL) {
 		void (*func)(char, char*) = (void*)found;
-		func(data, value);
+		func(data[0], value);
 
 		/* send latest score to web server */
 		score_publish();
 
-		/* broadcast feedback and ack */
-		char *str = (gchar*)encode_json(instruction, option, &data, value, 1);
+		/* broadcast feedback and ack, free returned json string after use */
+		char *str = encode_json(instruction, option, data, value, 1);
 		wprintw(msg_content, "%s", str);
 		wrefresh(msg_content);
 		listBroadcast(theList, str);
-		g_free(str);
+		free(str);
 	} else {
+		/* show that request is invalid */
+		char *str = encode_json(instruction, option, data, value, 0);
 		wprintw(msg_content, "request %s not found in hash table!\n", buffer);
+		wprintw(msg_content, "%s", str);
 		wrefresh(msg_content);
-		listBroadcast(theList, "invalid command");
+		listBroadcast(theList, str);
+		free(str);
 	}
 
 	/* clear information */

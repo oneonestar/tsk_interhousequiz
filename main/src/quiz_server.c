@@ -124,6 +124,9 @@ int main(int argc, char *argv[])
 	/* setup hash table for server callback functions */
 	hash_table_init();
 
+	/* initialize web server connector */
+	//initialize_web_server("localhost", "3001");
+
 	/*/ initialize ncurses and windows */
 	init_windows();
 

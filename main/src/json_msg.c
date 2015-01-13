@@ -74,23 +74,16 @@ gchar *encode_json(char *instruction, char *action, char *team, char *value, int
 	/* retrieve json string with memory alloted for return, free with g_free() after use*/
 	gchar *json = json_generator_to_data (generator, NULL);
 
+	/* copy string to heap memory and append null char. */
+	char *json_string = (char*)malloc(strlen(json)+1);
+	strcpy(json_string, json);
+	json_string[strlen(json)] = '\n';
+
 	/* free resources */
 	json_node_free(root);
 	g_object_unref(builder);
 	g_object_unref(generator);
+	g_free(json);
 
-	return json;
+	return json_string;
 }
-
-/*
-int main(int argc, char **argv)
-{
-	char buf[] = "{ \"Instruction\": \"Score\", \"Action\": \"add\", \"Team\": \"A\", \"Value\": \"10\" }";
-	char inst[10], act[10], team[2], val[10];
-	decode_json(buf, inst, act, team, val);
-	printf("%s,%s,%c,%s\n", inst,act,team[0],val);
-	char *json = encode_json("hello", "world", "D", "world", 1);
-	decode_json(buf, inst, act, team, val);
-	printf("%s\n", json);
-}
-*/

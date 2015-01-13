@@ -5,6 +5,6 @@
 #include <json-glib/json-gobject.h>
 
 void decode_json(char *json, char instruction[], char action[], char team[], char value[]);
-gchar *encode_json(char *instruction, char *action, char *team, char *value, int status);
+char *encode_json(char *instruction, char *action, char *team, char *value, int status);
 
 #endif
