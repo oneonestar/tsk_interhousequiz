@@ -6,6 +6,7 @@
 #include "include/server.h"
 #include "include/utilities.h"
 #include "include/layout.h"	/* ->ncurses.h */
+#include "include/webserver_connector.h"
 
 /* if database file exist, continue, else create one */
 void score_db_init(int question_count)
@@ -159,6 +160,12 @@ void score_publish()
 	sprintf(recvBuff, "score:{\"A\":\"%d\", \"D\":\"%d\", \"H\":\"%d\", \"J\":\"%d\", \"L\":\"%d\", \"M\":\"%d\"}\n", A, D, H, J, L, M);
 	send_message(webServer, webPort, recvBuff);
 	//wprintw(msg_content, "Pushing updated scores to Web Server: %s\n", recvBuff);
+	webserver_update_score("A", A);
+	webserver_update_score("D", D);
+	webserver_update_score("H", H);
+	webserver_update_score("J", J);
+	webserver_update_score("L", L);
+	webserver_update_score("M", M);
 
 	werase(score_content);
 	wprintw(score_content, "A\t%d\n", A);

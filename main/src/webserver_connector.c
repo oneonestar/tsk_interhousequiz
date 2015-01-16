@@ -13,7 +13,7 @@ void log_handler(mongoc_log_level_t log_level, const char *log_domain, const cha
 void webserver_init(char *host, char *port)
 {
 	mongoc_log_set_handler(log_handler, NULL);
-	sprintf(address_str, "mongodb://%s:%s/", "127.0.0.1", "3001");
+	sprintf(address_str, "mongodb://%s:%s/", host, port);
 	sprintf(collection_str, "%s", "scores");
 }
 

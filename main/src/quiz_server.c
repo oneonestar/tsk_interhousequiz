@@ -13,6 +13,7 @@
 #include "include/server_cb.h"
 #include "include/score_db.h"
 #include "include/layout.h"	/* ->ncurses.h */
+#include "include/webserver_connector.h"
 
 /* signal handlers */
 struct sigaction sigint_action;
@@ -125,7 +126,7 @@ int main(int argc, char *argv[])
 	hash_table_init();
 
 	/* initialize web server connector */
-	//initialize_web_server("localhost", "3001");
+	webserver_init(webServer, "3001");
 
 	/*/ initialize ncurses and windows */
 	init_windows();

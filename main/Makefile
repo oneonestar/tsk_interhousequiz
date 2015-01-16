@@ -15,11 +15,11 @@ MONGOC_FLAGS=`pkg-config --libs --cflags libmongoc-1.0`
 
 $(shell mkdir -p $(BIN) $(OBJ)) 
 
-all: utilities.o non_blocking_socket.o buzzer.o link_list.o quiz_server.o json_msg.o server_cb.o score_db.o layout.o question_db.o
-	$(CC) $(OBJ)/*.o -o $(BIN)/quiz_server $(CFLAGS) $(LDFLAGS) $(CFLAGS) $(GLIB_CFLAGS) $(GLIB_LDFLAGS) $(JSON_CFLAGS) $(JSON_LDFLAGS)
+all: utilities.o non_blocking_socket.o buzzer.o link_list.o quiz_server.o json_msg.o server_cb.o score_db.o layout.o question_db.o webserver_connector.o
+	$(CC) $(OBJ)/*.o -o $(BIN)/quiz_server $(CFLAGS) $(LDFLAGS) $(CFLAGS) $(GLIB_CFLAGS) $(GLIB_LDFLAGS) $(JSON_CFLAGS) $(JSON_LDFLAGS) $(MONGOC_FLAGS)
 
-push2web.o: src/push2web.c
-	$(CC) -c src/push2web.c -o $(OBJ)/push2web.o $(CFLAGS) $(MONGOC_FLAGS)
+webserver_connector.o: src/webserver_connector.c
+	$(CC) -c src/webserver_connector.c -o $(OBJ)/webserver_connector.o $(CFLAGS) $(MONGOC_FLAGS)
 
 utilities.o: src/utilities.c	
 	$(CC) -c src/utilities.c -o $(OBJ)/utilities.o $(CFLAGS)
