@@ -5,6 +5,8 @@ Answers = new Mongo.Collection('answers');
 if (Meteor.isClient) {
 
 	Meteor.subscribe('theScores');
+	Meteor.subscribe('theQuestions');
+	Meteor.subscribe('theAnswers');
 
 	Template.score_board.helpers({
 		'A_score': function() {
@@ -56,11 +58,17 @@ if (Meteor.isServer) {
 
 		// initialze questions
 		Questions.insert({ catalog: "catalog", Id: 1, content: "content", image: "" });
-		Answers.insert({ optionA: "Option A", optionB: "Option B", optionC: "Option C", optionD: "Option D", correct: "Correct Answer" });
+		Answers.insert({ Id: 1, optionA: "Option A", optionB: "Option B", optionC: "Option C", optionD: "Option D", correct: "Correct Answer" });
 
 	});
 
 	Meteor.publish('theScores', function() {
 		return Scores.find({},{ house: 1, score: 1 });
+	});
+	Meteor.publish('theAnswers', function() {
+		return Answers.find({});
+	});
+	Meteor.publish('theQuestions', function() {
+		return Questions.find({});
 	});
 }

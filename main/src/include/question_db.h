@@ -1,6 +1,6 @@
 #ifndef _DB_SQLITE_H_
 #define _DB_SQLITE_H_
 
-char* db_get_result(char*);
+char *get_db_question(char*);
 
 #endif

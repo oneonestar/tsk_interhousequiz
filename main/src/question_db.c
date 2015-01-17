@@ -5,7 +5,7 @@
 #include "include/layout.h" /* -> ncurses.h */
 #include "include/question_db.h"
 
-char *db_get_result(char *cid)
+char *get_db_question(char *cid)
 {
 	/* initialized db connection and io string buffers */
 	sqlite3 *db;

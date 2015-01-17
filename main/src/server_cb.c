@@ -53,9 +53,15 @@ void display_question_cb(char x, char *value)
 	/* to read a question from database */
 	char question_msg[1000];
 	wprintw(msg_content, "Reading Question: %s\n", value);
-	char *question_json = db_get_result(value);
+	char *question_json = get_db_question(value);
+
+	char *question = NULL, *A = NULL, *B = NULL, *C = NULL, *D = NULL, *correct = NULL;
+	decode_question(question_json, &question, &A, &B, &C, &D, &correct);
+	webserver_update_question(question, A, B, C, D, correct);
+	free(question); free(A); free(B); free(C); free(D); free(correct);
 
 	sprintf(question_msg, "question:%s\n", question_json);	/* get question with question ID and store in buffer */
+	wprintw(msg_content, "%s\n", question_json);
 
 	/* send message to webserver to show question */
 	wprintw(msg_content, "Sending Question to Web Server: \n");

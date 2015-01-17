@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "include/json_msg.h"	/* ->json_glib/json_glib.h; ->json_glib/json_gobject.h */
+#include <json-glib/json-glib.h>
+//#include "include/json_msg.h"	/* ->json_glib/json_glib.h; ->json_glib/json_gobject.h */
 
 /* decode json msg from control panels */
 void decode_json(char *json, char instruction[], char action[], char team[], char value[])
@@ -28,6 +29,58 @@ void decode_json(char *json, char instruction[], char action[], char team[], cha
 
 	json_reader_read_member(reader, "Value");
 	strcpy(value, (char*)json_reader_get_string_value(reader));
+	json_reader_end_member(reader);
+
+	/* free resources */
+	g_object_unref(reader);
+	g_object_unref(parser);
+}
+
+void decode_question(char *json, char **question, char **A, char **B, char **C, char **D, char **correct)
+{
+	JsonParser *parser = json_parser_new();
+	json_parser_load_from_data(parser, json, -1, NULL);
+	
+	JsonReader *reader = json_reader_new(json_parser_get_root(parser));
+	gint element_count = json_reader_count_members(reader);
+
+	json_reader_read_member(reader, "Question");
+	(*question) = (char*)malloc(sizeof(char)*strlen((char*)json_reader_get_string_value(reader))+1);
+	strcpy(*question, (char*)json_reader_get_string_value(reader));
+	json_reader_end_member(reader);
+
+	if(element_count>7) {
+		json_reader_read_member(reader, "Options");
+
+		json_reader_read_element(reader, 0);
+		(*A) = malloc(sizeof(char)*strlen((char*)json_reader_get_string_value(reader))+1);
+		strcpy(*A, (char*)json_reader_get_string_value(reader));
+		json_reader_end_member(reader);
+
+		json_reader_read_element(reader, 1);
+		(*B) = malloc(sizeof(char)*strlen((char*)json_reader_get_string_value(reader))+1);
+		strcpy(*B, (char*)json_reader_get_string_value(reader));
+		json_reader_end_member(reader);
+
+		json_reader_read_element(reader, 2);
+		(*C) = malloc(sizeof(char)*strlen((char*)json_reader_get_string_value(reader))+1);
+		strcpy(*C, (char*)json_reader_get_string_value(reader));
+		json_reader_end_member(reader);
+
+		json_reader_read_element(reader, 3);
+		(*D) = malloc(sizeof(char)*strlen((char*)json_reader_get_string_value((reader))+1));
+		strcpy(*D, (char*)json_reader_get_string_value(reader));
+		json_reader_end_member(reader);
+
+		json_reader_end_member(reader);
+	}
+	else {
+		A = NULL; B = NULL; C = NULL; D = NULL;
+	}
+
+	json_reader_read_member(reader, "Answer");
+	(*correct) = malloc(sizeof(char)*strlen((char*)json_reader_get_string_value((reader))+1));
+	strcpy(*correct, (char*)json_reader_get_string_value(reader));
 	json_reader_end_member(reader);
 
 	/* free resources */
