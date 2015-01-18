@@ -55,10 +55,10 @@ void display_question_cb(char x, char *value)
 	wprintw(msg_content, "Reading Question: %s\n", value);
 	char *question_json = get_db_question(value);
 
-	char *question = NULL, *A = NULL, *B = NULL, *C = NULL, *D = NULL, *correct = NULL;
-	decode_question(question_json, &question, &A, &B, &C, &D, &correct);
-	webserver_update_question(question, A, B, C, D, correct);
-	free(question); free(A); free(B); free(C); free(D); free(correct);
+	char *question = NULL, *A = NULL, *B = NULL, *C = NULL, *D = NULL, *path = NULL, *correct = NULL;
+	decode_question(question_json, &question, &A, &B, &C, &D, &path, &correct);
+	webserver_update_question(question, A, B, C, D, path, correct);
+	free(question); free(A); free(B); free(C); free(D); free(path); free(correct);
 
 	sprintf(question_msg, "question:%s\n", question_json);	/* get question with question ID and store in buffer */
 	wprintw(msg_content, "%s\n", question_json);
@@ -74,7 +74,8 @@ void display_answer_cb(char x, char *value_int)
 {
 	wprintw(msg_content, "Requesting to show answer: \n");
 	wrefresh(msg_content);
-	send_message(webServer, webPort, "answer:{}");
+	//send_message(webServer, webPort, "answer:{}");
+	webserver_update_answer(1);
 }
 
 void buzzer_reset_cb(char x, char *value)

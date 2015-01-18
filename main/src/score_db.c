@@ -148,32 +148,36 @@ int score_db_get(char team)
 /* push score to web server */
 void score_publish()
 {
-
+	int i;
 	char recvBuff[100];
-	int A = score_db_get('A');
-	int D = score_db_get('D');
-	int H = score_db_get('H');
-	int J = score_db_get('J');
-	int L = score_db_get('L');
-	int M = score_db_get('M');
+	char **house = (char**)malloc(sizeof(char*)*6);
+	for(i=0; i<6; i++) {
+		house[i] = (char*)malloc(sizeof(char));
+	}
+	strcpy(house[0], "A");
+	strcpy(house[1], "D");
+	strcpy(house[2], "H");
+	strcpy(house[3], "J");
+	strcpy(house[4], "L");
+	strcpy(house[5], "M");
+	int score[6];
 
-	sprintf(recvBuff, "score:{\"A\":\"%d\", \"D\":\"%d\", \"H\":\"%d\", \"J\":\"%d\", \"L\":\"%d\", \"M\":\"%d\"}\n", A, D, H, J, L, M);
-	send_message(webServer, webPort, recvBuff);
+	score[0] = score_db_get('A');
+	score[1] = score_db_get('D');
+	score[2] = score_db_get('H');
+	score[3] = score_db_get('J');
+	score[4] = score_db_get('L');
+	score[5] = score_db_get('M');
+
+	//sprintf(recvBuff, "score:{\"A\":\"%d\", \"D\":\"%d\", \"H\":\"%d\", \"J\":\"%d\", \"L\":\"%d\", \"M\":\"%d\"}\n", A, D, H, J, L, M);
+	//send_message(webServer, webPort, recvBuff);
 	//wprintw(msg_content, "Pushing updated scores to Web Server: %s\n", recvBuff);
-	webserver_update_score("A", A);
-	webserver_update_score("D", D);
-	webserver_update_score("H", H);
-	webserver_update_score("J", J);
-	webserver_update_score("L", L);
-	webserver_update_score("M", M);
+	webserver_update_score(house, score, 6);
 
 	werase(score_content);
-	wprintw(score_content, "A\t%d\n", A);
-	wprintw(score_content, "D\t%d\n", D);
-	wprintw(score_content, "H\t%d\n", H);
-	wprintw(score_content, "J\t%d\n", J);
-	wprintw(score_content, "L\t%d\n", L);
-	wprintw(score_content, "M\t%d\n", M);
+	for(i=0; i<6; i++) {
+		wprintw(score_content, "%s\t%d\n", house[i], score[i]);
+	}
 
 	wrefresh(score_content);
 	wrefresh(msg_content);

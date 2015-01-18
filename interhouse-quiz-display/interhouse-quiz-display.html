@@ -48,21 +48,17 @@
 		</div>
 		<div id="Box_Question" class="Box">
 			<div id="Question_Question" class="question_content">{{question.content}}</div>
-				<img id="myImage" src="{{question.image}}" alt="image_loc" />
-			</div>
-			<div class="box-option row">
-				<div id="Option_A" class="col-md-6 question_option">{{answer.optionA}}</div>
-				<div id="Option_B" class="col-md-6 question_option">{{answer.optionB}}</div>
-			</div>
-			<div class="box-option row">
-				<div id="Option_C" class="col-md-6 question_option">{{answer.optionC}}</div>
-				<div id="Option_D" class="col-md-6 question_option">{{answer.optionD}}</div>
-			</div>
-		<div id="Question_Answer">Answer: <span>{{answer.correct}}</span></div>
+			<div id="myImage" {{img_state}}><img src="{{question.path}}" alt="image_loc"/></div>
+			<!--<img src="{{question.path}}" alt="image_loc"/>-->
+		</div>
+		<div class="box-option row">
+			<div id="Option_A" class="col-md-6 question_option">{{answer.optionA}}</div>
+			<div id="Option_B" class="col-md-6 question_option">{{answer.optionB}}</div>
+		</div>
+		<div class="box-option row">
+			<div id="Option_C" class="col-md-6 question_option">{{answer.optionC}}</div>
+			<div id="Option_D" class="col-md-6 question_option">{{answer.optionD}}</div>
+		</div>
+		<div id="Question_Answer" {{answer.state}}>Answer: <span>{{answer.correct}}</span></div>
 	</div>
-	<!--
-	<div id="connection">
-		<span>Connecting...</span>
-	</div>
-	-->
 </template>

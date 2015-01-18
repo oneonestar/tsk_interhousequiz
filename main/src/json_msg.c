@@ -36,7 +36,7 @@ void decode_json(char *json, char instruction[], char action[], char team[], cha
 	g_object_unref(parser);
 }
 
-void decode_question(char *json, char **question, char **A, char **B, char **C, char **D, char **correct)
+void decode_question(char *json, char **question, char **A, char **B, char **C, char **D, char **path, char **correct)
 {
 	JsonParser *parser = json_parser_new();
 	json_parser_load_from_data(parser, json, -1, NULL);
@@ -47,6 +47,11 @@ void decode_question(char *json, char **question, char **A, char **B, char **C, 
 	json_reader_read_member(reader, "Question");
 	(*question) = (char*)malloc(sizeof(char)*strlen((char*)json_reader_get_string_value(reader))+1);
 	strcpy(*question, (char*)json_reader_get_string_value(reader));
+	json_reader_end_member(reader);
+
+	json_reader_read_member(reader, "Path");
+	(*path) = (char*)malloc(sizeof(char)*strlen((char*)json_reader_get_string_value(reader))+1);
+	strcpy(*path, (char*)json_reader_get_string_value(reader));
 	json_reader_end_member(reader);
 
 	if(element_count>7) {

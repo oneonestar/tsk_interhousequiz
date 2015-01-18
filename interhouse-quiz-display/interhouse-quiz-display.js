@@ -7,6 +7,7 @@ if (Meteor.isClient) {
 	Meteor.subscribe('theScores');
 	Meteor.subscribe('theQuestions');
 	Meteor.subscribe('theAnswers');
+	Session.set("imgState", "hidden");
 
 	Template.score_board.helpers({
 		'A_score': function() {
@@ -31,7 +32,16 @@ if (Meteor.isClient) {
 
 	Template.question_board.helpers({
 		'question': function() {
-			return Questions.findOne();
+			var question = Questions.findOne();
+			if(question.path=="")
+				Session.set("imgState", "hidden");
+			else
+				Session.set("imgState", "");
+
+			return question;
+		},
+		'img_state': function() {
+			return Session.get("imgState");
 		},
 		'answer': function() {
 			return Answers.findOne();
@@ -57,8 +67,8 @@ if (Meteor.isServer) {
 		Scores.insert({ house: 'M', score: 0 });
 
 		// initialze questions
-		Questions.insert({ catalog: "catalog", Id: 1, content: "content", image: "" });
-		Answers.insert({ Id: 1, optionA: "Option A", optionB: "Option B", optionC: "Option C", optionD: "Option D", correct: "Correct Answer" });
+		Questions.insert({ catalog: "catalog", Id: 1, content: "content", image: "", path: "" });
+		Answers.insert({ Id: 1, optionA: "Option A", optionB: "Option B", optionC: "Option C", optionD: "Option D", correct: "Correct Answer", state: "" });
 
 	});
 
