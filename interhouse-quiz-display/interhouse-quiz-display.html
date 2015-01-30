@@ -52,13 +52,13 @@
 			<!--<img src="{{question.path}}" alt="image_loc"/>-->
 		</div>
 		<div class="box-option row">
-			<div id="Option_A" class="col-md-6 question_option">{{answer.optionA}}</div>
-			<div id="Option_B" class="col-md-6 question_option">{{answer.optionB}}</div>
+			<div id="Option_A" class="col-md-6 question_option">{{question.optionA}}</div>
+			<div id="Option_B" class="col-md-6 question_option">{{question.optionB}}</div>
 		</div>
 		<div class="box-option row">
-			<div id="Option_C" class="col-md-6 question_option">{{answer.optionC}}</div>
-			<div id="Option_D" class="col-md-6 question_option">{{answer.optionD}}</div>
+			<div id="Option_C" class="col-md-6 question_option">{{question.optionC}}</div>
+			<div id="Option_D" class="col-md-6 question_option">{{question.optionD}}</div>
 		</div>
-		<div id="Question_Answer" {{answer.state}}>Answer: <span>{{answer.correct}}</span></div>
+		<div id="Question_Answer" {{answer.state}}>Answer: <span>{{question.correct}}</span></div>
 	</div>
 </template>
