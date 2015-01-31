@@ -13,9 +13,10 @@ if (Meteor.isClient) {
 	/*
 	 * obtain scores, which question to display and hide the img panel by default
 	 */
-	Meteor.subscribe('theScores');
-	Meteor.subscribe('display_ctl');
-	Session.set("imgState", "hidden");
+	Meteor.subscribe('theScores');		// subscribe to provide info to score panel
+	Meteor.subscribe('display_ctl');	// subscribe to collection with status of what and what not to display
+	Session.set("imgState", false);		// session variable to provide info: hide to angular
+	Session.set("optionState", false);	// hide option panels if no option exist
 
 	/*
 	 * score board helpers
@@ -55,16 +56,46 @@ if (Meteor.isClient) {
 			var question = Questions.findOne();
 
 			// check if the program has image attached, if not hide image panel
-			if(question.path=="")
-				Session.set("imgState", "hidden");	/* reactive */
+			if(question.path==null)
+				Session.set("imgState", false);	/* reactive */
 			else
-				Session.set("imgState", "");
+				Session.set("imgState", true);
+
+			// disable option boxes if question is not MC
+			if(question.optionA==null)
+				Session.set("optionState", false);
+			else
+				Session.set("optionState", true);
 
 			return question;
 		},
 		'img_state': function() {
-			return Session.get("imgState");	/* reactive */
+			var image_state = Session.get("imgState");
+			if(image_state==true) {
+				return "";
+			}
+			else if(image_state==false) {
+				return "hidden";
+			}
 		},
+		'option': function() {
+			var option_state = Session.get("optionState");
+			if(option_state==true) {
+				return "";
+			}
+			else if(option_state==false) {
+				return "hidden";
+			}
+		},
+		'answer': function() {
+			var state = Control.findOne({ control_id: 1 });
+			if(state.answer_status==true) {
+				return "";
+			}
+			else if(state.answer_status==false) {
+				return "hidden";
+			}
+		}
 	});
 }
 
@@ -87,10 +118,12 @@ if (Meteor.isServer) {
 
 		// initialize display controller
 		Control.insert({ control_id: 0, question_id: { catalog: "A", group: 1, qid: 1 } });
+		Control.insert({ control_id: 1, answer_status: false });
 
 		// initialze questions
-		Questions.insert({ Id: { catalog: "A", group: 1, qid: 1 }, content: "content", image: "", path: "", optionA: "Option A", optionB: "Option B", optionC: "Option C", optionD: "Option D", correct: "Correct Answer", state: "" });
-		Questions.insert({ Id: { catalog: "B", group: 2, qid: 1 }, content: "content2", image: "", path: "", optionA: "Option A2", optionB: "Option B", optionC: "Option C", optionD: "Option D", correct: "Correct Answer", state: "" });
+		Questions.insert({ Id: { catalog: "A", group: 1, qid: 1 }, content: "content", optionA: "Option A", optionB: "Option B", optionC: "Option C", optionD: "Option D", correct: "Correct Answer" });
+		Questions.insert({ Id: { catalog: "B", group: 2, qid: 1 }, content: "content2", optionA: "Option A2", optionB: "Option B", optionC: "Option C", optionD: "Option D", correct: "Correct Answer2" });
+		Questions.insert({ Id: { catalog: "C", group: 1, qid: 1 }, content: "content", path: "imgs/B_2_3.png", correct: "Correct Answer" });
 
 	});
 
@@ -105,12 +138,11 @@ if (Meteor.isServer) {
 		return Scores.find({},{ house: 1, score: 1 });
 	});
 
-
 	Meteor.publish('theQuestions', function(qid) {
-		var current_question = Control.findOne({ control_id: 0 });
-		console.log(qid.catalog+' '+qid.group+' '+qid.qid)
-		//if(current_question.question_id==qid) {
-			return Questions.find({ Id: { catalog: qid.catalog, group: qid.group, qid: qid.qid } });
-		//}
+		var current_question = Control.findOne({ control_id: 0 }).question_id;
+		if(current_question.catalog==qid.catalog && current_question.group==qid.group && current_question.qid==qid.qid) {
+			Control.update({ control_id: 1 },{ $set: { answer_status: false } });
+			return Questions.find({ Id: qid });
+		}
 	});
 }
