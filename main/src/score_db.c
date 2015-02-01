@@ -149,7 +149,6 @@ int score_db_get(char team)
 void score_publish()
 {
 	int i;
-	char recvBuff[100];
 	char **house = (char**)malloc(sizeof(char*)*6);
 	for(i=0; i<6; i++) {
 		house[i] = (char*)malloc(sizeof(char));

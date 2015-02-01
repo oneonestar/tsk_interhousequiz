@@ -20,6 +20,9 @@
 /* migrating to msg in json */
 #include "include/json_msg.h"
 
+/* work in progress */
+#include "include/webserver_connector.h"
+
 /* function table for server event callback */
 GHashTable *func_table;
 
@@ -48,34 +51,22 @@ void buffrepr(const char * buff, int size, char * result, int resultSize)
 	}
 }
 
+/* control which question to display */
 void display_question_cb(char x, char *value)
 {
-	/* to read a question from database */
-	char question_msg[1000];
-	wprintw(msg_content, "Reading Question: %s\n", value);
-	char *question_json = get_db_question(value);
-
-	char *question = NULL, *A = NULL, *B = NULL, *C = NULL, *D = NULL, *path = NULL, *correct = NULL;
-	decode_question(question_json, &question, &A, &B, &C, &D, &path, &correct);
-	webserver_update_question(question, A, B, C, D, path, correct);
-	free(question); free(A); free(B); free(C); free(D); free(path); free(correct);
-
-	sprintf(question_msg, "question:%s\n", question_json);	/* get question with question ID and store in buffer */
-	wprintw(msg_content, "%s\n", question_json);
-
-	/* send message to webserver to show question */
-	wprintw(msg_content, "Sending Question to Web Server: \n");
+	/* alter reactive cursor controling display of question */
+	webserver_update_question(value);
+	wprintw(msg_content, "Altering reactive cursor of display control of Web Server: %s\n", value);
 	wrefresh(msg_content);
-	send_message(webServer, webPort, question_msg);
-	free(question_json);
 }
 
+/* reveal answer */
 void display_answer_cb(char x, char *value_int)
 {
+	/* alter reactive display control cursor status to true */
+	webserver_update_answer(1);
 	wprintw(msg_content, "Requesting to show answer: \n");
 	wrefresh(msg_content);
-	//send_message(webServer, webPort, "answer:{}");
-	webserver_update_answer(1);
 }
 
 void buzzer_reset_cb(char x, char *value)
