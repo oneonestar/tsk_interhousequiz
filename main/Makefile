@@ -19,7 +19,7 @@ all: utilities.o non_blocking_socket.o buzzer.o link_list.o quiz_server.o json_m
 	$(CC) $(OBJ)/*.o -o $(BIN)/quiz_server $(CFLAGS) $(LDFLAGS) $(CFLAGS) $(GLIB_CFLAGS) $(GLIB_LDFLAGS) $(JSON_CFLAGS) $(JSON_LDFLAGS) $(MONGOC_FLAGS)
 
 webserver_connector.o: src/webserver_connector.c
-	$(CC) -c src/webserver_connector.c -o $(OBJ)/webserver_connector.o $(CFLAGS) $(MONGOC_FLAGS)
+	$(CC) -c src/webserver_connector.c -o $(OBJ)/webserver_connector.o $(CFLAGS) $(MONGOC_FLAGS) $(JSON_CFLAGS) $(JSON_LDFLAGS)
 
 utilities.o: src/utilities.c	
 	$(CC) -c src/utilities.c -o $(OBJ)/utilities.o $(CFLAGS)
@@ -28,7 +28,7 @@ question_db.o: src/question_db.c
 	$(CC) -c src/question_db.c -o $(OBJ)/question_db.o $(CFLAGS) -lsqite3
 
 non_blocking_socket.o: src/non_blocking_socket.c
-	$(CC) -c src/non_blocking_socket.c -o $(OBJ)/non_blocking_socket.o $(CFLAGS)
+	$(CC) -c src/non_blocking_socket.c -o $(OBJ)/non_blocking_socket.o $(CFLAGS) $(CFLAGS) $(MONGOC_FLAGS) $(JSON_CFLAGS) $(JSON_LDFLAGS)
 
 buzzer.o: src/buzzer.c
 	$(CC) -c src/buzzer.c -o $(OBJ)/buzzer.o $(CFLAGS)

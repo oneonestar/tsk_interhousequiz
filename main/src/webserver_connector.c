@@ -2,6 +2,8 @@
 #include <bson.h>
 #include <stdio.h>
 #include <mongoc.h>
+#include <json-glib/json-glib.h>
+
 #include "include/layout.h"	/* <-ncurses.h */
 #include "include/webserver_connector.h"
 
@@ -113,3 +115,55 @@ void webserver_update_score(char **name, int *new_score, int no_of_participants)
 	mongoc_collection_destroy (collection);
 	mongoc_client_destroy (client);
 }
+
+char *retrieve_questions() 
+{
+	// setup client and collection descriptor
+	mongoc_client_t *client = mongoc_client_new(address_str);
+	mongoc_collection_t *collection = mongoc_client_get_collection(client, "meteor", "questions");
+	const bson_t *doc;
+	mongoc_cursor_t *cursor;
+
+	// control_id 1 refers to control of display of answer
+	bson_t *query = bson_new();
+
+	// init json builder and begin array
+	JsonBuilder *builder = json_builder_new();
+	json_builder_begin_object(builder);
+	json_builder_set_member_name(builder, "Questions");
+	json_builder_begin_array(builder);
+
+	// perform query and iterate cursor, add returned json string to array
+	cursor = mongoc_collection_find(collection, MONGOC_QUERY_NONE, 0, 0, 0, query, NULL, NULL);
+	while(mongoc_cursor_next(cursor, &doc)) {
+		char *json = bson_as_json(doc, NULL);
+		json_builder_add_string_value(builder, json);
+		free(json);
+	}
+
+	// end array
+	json_builder_end_array(builder);
+	json_builder_end_object(builder);
+
+	// extract root to get new json generator to return json string
+	JsonGenerator *generator = json_generator_new();
+	JsonNode *root_node = json_builder_get_root(builder);
+	json_generator_set_root(generator, root_node);
+	gchar *str = json_generator_to_data(generator, NULL);
+
+	char *json_str = malloc(sizeof(char*)*strlen(str)+1);
+	sprintf(json_str, "%s\n", str);
+	free(str);
+
+	// cleanup
+	bson_destroy (query);
+	mongoc_cursor_destroy (cursor);
+	mongoc_collection_destroy (collection);
+	mongoc_client_destroy (client);
+	json_node_free (root_node);
+	g_object_unref (generator);
+	g_object_unref (builder);
+
+	return json_str;
+}
+

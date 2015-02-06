@@ -4,6 +4,7 @@
 char address_str[100];
 char collection_str[50];
 
+char *retrieve_questions();
 void webserver_update_answer(int);
 void webserver_update_score(char**, int*, int);
 void webserver_update_question(char*);

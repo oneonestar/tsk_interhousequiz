@@ -8,6 +8,9 @@
 #include <sys/socket.h>
 #include <errno.h>
 
+#include <json-glib/json-glib.h>
+#include "include/webserver_connector.h"
+
 #include "include/non_blocking_socket.h" /* -> event2/util.h + event2/listener.h */
 #include "include/server_cb.h"
 #include "include/layout.h"
@@ -84,6 +87,11 @@ void on_accept_cb(struct evconnlistener *listener, evutil_socket_t fd, struct so
 	/* assign callback functions */
 	bufferevent_setcb(bev, on_read_cb, NULL, on_event_cb, info);
 	bufferevent_enable(bev, EV_READ|EV_WRITE);
+
+	/* retrieve question set and push to client just connected */
+	char *json_str = retrieve_questions();
+	bufferevent_write(bev, json_str, strlen(json_str));
+	free(json_str);
 }
 
 void on_accept_errorcb(struct evconnlistener *listener, void *ptr)
