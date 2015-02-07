@@ -145,11 +145,12 @@ void on_read_cb(struct bufferevent *bev, void *ctx)
 
 	/* parsing variables */
 	/* instruction=command catag, option=action to be taken; value=a char value; data=an int value */
-	char instruction[10], option[10], value[100], data[2];	/* for sscanf */
-	memset(instruction, 0, sizeof(instruction));
-	memset(option, 0, sizeof(option));
-	memset(value, 0, sizeof(value));
-	memset(data, 0, sizeof(data));
+	//char instruction[10], option[10], value[100], data[2];	/* for sscanf */
+	char *instruction, *option, *value, *data;
+	//memset(instruction, 0, sizeof(instruction));
+	//memset(option, 0, sizeof(option));
+	//memset(value, 0, sizeof(value));
+	//memset(data, 0, sizeof(data));
 
 	/* a buffer for storing returned string from functions */
 	char buffer[5000];
@@ -163,7 +164,8 @@ void on_read_cb(struct bufferevent *bev, void *ctx)
 	wrefresh(msg_content);
 
 	/* process instruction */
-	sscanf(recvBuff, "%s %s %s %s", instruction, option, data, value);
+	//sscanf(recvBuff, "%s %s %s %s", instruction, option, data, value);
+	decode_json(recvBuff, &instruction, &option, &data, &value);
 
 	/* free recvBuff after use */
 	free(recvBuff);
@@ -200,4 +202,5 @@ void on_read_cb(struct bufferevent *bev, void *ctx)
 	/* clear information */
 	memset(&recvBuff, 0, sizeof(recvBuff));
 	memset(&buffer, 0, sizeof(buffer));
+	free(instruction); free(option); free(data); free(value);
 }

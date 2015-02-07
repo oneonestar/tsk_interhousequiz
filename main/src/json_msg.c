@@ -2,10 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <json-glib/json-glib.h>
+#include "include/layout.h"
 //#include "include/json_msg.h"	/* ->json_glib/json_glib.h; ->json_glib/json_gobject.h */
 
 /* decode json msg from control panels */
-void decode_json(char *json, char instruction[], char action[], char team[], char value[])
+void decode_json(char *json, char **instruction, char **action, char **team, char **value)
 {
 	/* new parser */
 	JsonParser *parser = json_parser_new();
@@ -15,77 +16,48 @@ void decode_json(char *json, char instruction[], char action[], char team[], cha
 	JsonReader *reader = json_reader_new(json_parser_get_root(parser));
 
 	/* parse individual elements */
-	json_reader_read_member(reader, "Instruction");
-	strcpy(instruction, (char*)json_reader_get_string_value(reader));
-	json_reader_end_member(reader);
-
-	json_reader_read_member(reader, "Action");
-	strcpy(action, (char*)json_reader_get_string_value(reader));
-	json_reader_end_member(reader);
-
-	json_reader_read_member(reader, "Team");
-	strcpy(team, (char*)json_reader_get_string_value(reader));
-	json_reader_end_member(reader);
-
-	json_reader_read_member(reader, "Value");
-	strcpy(value, (char*)json_reader_get_string_value(reader));
-	json_reader_end_member(reader);
-
-	/* free resources */
-	g_object_unref(reader);
-	g_object_unref(parser);
-}
-
-void decode_question(char *json, char **question, char **A, char **B, char **C, char **D, char **path, char **correct)
-{
-	JsonParser *parser = json_parser_new();
-	json_parser_load_from_data(parser, json, -1, NULL);
-	
-	JsonReader *reader = json_reader_new(json_parser_get_root(parser));
-	gint element_count = json_reader_count_members(reader);
-
-	json_reader_read_member(reader, "Question");
-	(*question) = (char*)malloc(sizeof(char)*strlen((char*)json_reader_get_string_value(reader))+1);
-	strcpy(*question, (char*)json_reader_get_string_value(reader));
-	json_reader_end_member(reader);
-
-	json_reader_read_member(reader, "Path");
-	(*path) = (char*)malloc(sizeof(char)*strlen((char*)json_reader_get_string_value(reader))+1);
-	strcpy(*path, (char*)json_reader_get_string_value(reader));
-	json_reader_end_member(reader);
-
-	if(element_count>7) {
-		json_reader_read_member(reader, "Options");
-
-		json_reader_read_element(reader, 0);
-		(*A) = malloc(sizeof(char)*strlen((char*)json_reader_get_string_value(reader))+1);
-		strcpy(*A, (char*)json_reader_get_string_value(reader));
-		json_reader_end_member(reader);
-
-		json_reader_read_element(reader, 1);
-		(*B) = malloc(sizeof(char)*strlen((char*)json_reader_get_string_value(reader))+1);
-		strcpy(*B, (char*)json_reader_get_string_value(reader));
-		json_reader_end_member(reader);
-
-		json_reader_read_element(reader, 2);
-		(*C) = malloc(sizeof(char)*strlen((char*)json_reader_get_string_value(reader))+1);
-		strcpy(*C, (char*)json_reader_get_string_value(reader));
-		json_reader_end_member(reader);
-
-		json_reader_read_element(reader, 3);
-		(*D) = malloc(sizeof(char)*strlen((char*)json_reader_get_string_value((reader))+1));
-		strcpy(*D, (char*)json_reader_get_string_value(reader));
-		json_reader_end_member(reader);
-
-		json_reader_end_member(reader);
+	if(json_reader_read_member(reader, "Instruction")) {
+		gchar *str = json_reader_get_string_value(reader);
+		*instruction = malloc(sizeof(char)*strlen(str)+1);
+		strcpy(*instruction, str);
 	}
 	else {
-		A = NULL; B = NULL; C = NULL; D = NULL;
+		*instruction = malloc(1);
+		strcpy(*instruction, "");
 	}
+	json_reader_end_member(reader);
 
-	json_reader_read_member(reader, "Answer");
-	(*correct) = malloc(sizeof(char)*strlen((char*)json_reader_get_string_value((reader))+1));
-	strcpy(*correct, (char*)json_reader_get_string_value(reader));
+	if(json_reader_read_member(reader, "Action")) {
+		gchar *str = json_reader_get_string_value(reader);
+		*action = malloc(sizeof(char)*strlen(str)+1);
+		strcpy(*action, str);
+	}
+	else {
+		*action = malloc(1);
+		strcpy(*action, "");
+	}
+	json_reader_end_member(reader);
+
+	if(json_reader_read_member(reader, "Team")) {
+		gchar *str = json_reader_get_string_value(reader);
+		*team = malloc(sizeof(char)*strlen(str)+1);
+		strcpy(*team, str);
+	}
+	else {
+		*team = malloc(1);
+		strcpy(*team, "");
+	}
+	json_reader_end_member(reader);
+
+	if(json_reader_read_member(reader, "Value")) {
+		gchar *str = json_reader_get_string_value(reader);
+		*value = malloc(sizeof(char)*strlen(str)+1);
+		strcpy(*value, str);
+	}
+	else {
+		*value = malloc(1);
+		strcpy(*value, "");
+	}
 	json_reader_end_member(reader);
 
 	/* free resources */
@@ -105,17 +77,37 @@ gchar *encode_json(char *instruction, char *action, char *team, char *value, int
 	json_builder_begin_object(builder);
 
 	json_builder_set_member_name(builder, "Instruction");
-	json_builder_add_string_value(builder, instruction);
+	if(instruction[0]=='\0') {
+		json_builder_add_null_value(builder);
+	}
+	else {
+		json_builder_add_string_value(builder, instruction);
+	}
 
 	json_builder_set_member_name(builder, "Action");
-	json_builder_add_string_value(builder, action);
+	if(action[0]=='\0') {
+		json_builder_add_null_value(builder);
+	}
+	else {
+		json_builder_add_string_value(builder, action);
+	}
 
 	json_builder_set_member_name(builder, "Team");
-	json_builder_add_string_value(builder, team);
+	if(team[0]=='\0') {
+		json_builder_add_null_value(builder);
+	}
+	else {
+		json_builder_add_string_value(builder, team);
+	}
 
 	json_builder_set_member_name(builder, "Value");
-	json_builder_add_string_value(builder, value);
-
+	if(value[0]=='\0') {
+		json_builder_add_null_value(builder);
+	}
+	else {
+		json_builder_add_string_value(builder, value);
+	}
+	
 	json_builder_end_object(builder);
 
 	json_builder_set_member_name(builder, "Response");
@@ -134,8 +126,7 @@ gchar *encode_json(char *instruction, char *action, char *team, char *value, int
 
 	/* copy string to heap memory and append null char. */
 	char *json_string = (char*)malloc(strlen(json)+1);
-	strcpy(json_string, json);
-	json_string[strlen(json)] = '\n';
+	sprintf(json_string, "%s\n", json);
 
 	/* free resources */
 	json_node_free(root);
