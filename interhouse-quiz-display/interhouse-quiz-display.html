@@ -5,11 +5,25 @@
 <body>
 	{{> loginButtons}}
 
+</body>
+
+<template name="signin">
+	<p>please sign in</p>
+</template>
+
+<template name="game">
 	{{#if currentUser}}
 		{{> score_board}}
 		{{> question_board}}
 	{{/if}}
-</body>
+</template>
+
+<template name="management">
+	{{#if currentUser}}
+		<!-- place code here-->
+		<p>Management page</p>
+	{{/if}}
+</template>
 
 <template name="score_board">
 	<div class="house_container">

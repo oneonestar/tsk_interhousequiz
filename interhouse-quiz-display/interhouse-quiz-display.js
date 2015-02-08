@@ -97,6 +97,21 @@ if (Meteor.isClient) {
 			}
 		}
 	});
+
+
+	Router.onBeforeAction(function() {
+		if(!Meteor.userId()) {
+			return this.render('signin');
+		}
+		else {
+			this.next();
+		}
+	});
+	Router.map(function() {
+		console.log(Meteor.user());
+		this.route('game', { path: '/' });
+		this.route('management', { path: '/back-stage' });
+	});
 }
 
 // server code
