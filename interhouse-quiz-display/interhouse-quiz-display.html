@@ -21,7 +21,12 @@
 <template name="management">
 	{{#if currentUser}}
 		<!-- place code here-->
-		<p>Management page</p>
+		<p>Backstage Management</p>
+		<ul>
+		{{#each questions}}
+			<li>{{content}}: {{correct}}</li>
+		{{/each}}
+		</ul>
 	{{/if}}
 </template>
 

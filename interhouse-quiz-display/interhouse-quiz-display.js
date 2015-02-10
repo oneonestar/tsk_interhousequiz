@@ -98,6 +98,13 @@ if (Meteor.isClient) {
 		}
 	});
 
+	Template.management.helpers({
+		'questions': function() {
+			Meteor.subscribe('theQuestions', null);
+			return Questions.find();
+		}
+	});
+
 
 	Router.onBeforeAction(function() {
 		if(!Meteor.userId()) {
@@ -155,7 +162,12 @@ if (Meteor.isServer) {
 
 	Meteor.publish('theQuestions', function(qid) {
 		var current_question = Control.findOne({ control_id: 0 }).question_id;
-		if(current_question.catalog==qid.catalog && current_question.group==qid.group && current_question.qid==qid.qid) {
+		/* implement admin database and check for privilege */
+		if(this.userId=='qkfSPu7L3zJfJeFTf' && qid==null) {
+			console.log("okay!");
+			return Questions.find();
+		}
+		else if(current_question.catalog==qid.catalog && current_question.group==qid.group && current_question.qid==qid.qid) {
 			Control.update({ control_id: 1 },{ $set: { answer_status: false } });
 			return Questions.find({ Id: qid });
 		}
