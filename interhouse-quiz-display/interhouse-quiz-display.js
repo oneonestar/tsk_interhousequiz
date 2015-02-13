@@ -98,10 +98,61 @@ if (Meteor.isClient) {
 		}
 	});
 
+	Template.management.events({
+		'click .questionItem': function() {
+			var questionId = this._id;
+			Session.set('selectedQuestion', questionId);
+		}
+	});
+
 	Template.management.helpers({
 		'questions': function() {
 			Meteor.subscribe('theQuestions', null);
+			Questions.find().forEach(function(item) {
+				if(!item.optionA)
+					Session.set(item._id, "disabled");
+				else
+					Session.set(item._id, "enabled");
+			});
 			return Questions.find();
+		},
+		'selectedItem': function() {
+			var selectedItemId = Session.get('selectedQuestion');
+			var questionId = this._id;
+			if(questionId==selectedItemId) {
+				return "selected";
+			}
+		},
+		'optionDisable': function() {
+			var type = Session.get(this._id);
+			if(type=="disabled")
+				return "disabled";
+			else if(type=="enabled")
+				return "enabled";
+		},
+		'mcSelected': function() {
+			var itemId = this._id;
+			var type = Session.get(itemId);
+			if(type=="enabled")
+				return "selected";
+		},
+		'lqSelected': function() {
+			var itemId = this._id;
+			var type = Session.get(itemId);
+			if(type=="disabled")
+				return "selected";
+		}
+	});
+
+	Template.management.events({
+		'change #questionType': function() {
+			var itemId = this._id;
+			console.log(itemId);
+			var currentType = Session.get(itemId);
+			if(currentType=="disabled")
+				Session.set(itemId, "enabled");
+			else if(currentType=="enabled")
+				Session.set(itemId, "disabled");
 		}
 	});
 

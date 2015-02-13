@@ -22,11 +22,25 @@
 	{{#if currentUser}}
 		<!-- place code here-->
 		<p>Backstage Management</p>
-		<ul>
+		<table border="0">
 		{{#each questions}}
-			<li>{{content}}: {{correct}}</li>
+			<tr class="questionItem {{selectedItem}}">
+				<td><input type="text" name="mainContent" value="{{content}}"></td>
+				<td>
+				<select id="questionType">
+					<option value="MC" {{mcSelected}}>MC</option>
+					<option value="LQ" {{lqSelected}}>LQ</option>
+				</select>
+				</td>
+				<td><input type="text" name="optA" value="{{optionA}}" {{optionDisable}}></td>
+				<td><input type="text" name="optB" value="{{optionB}}" {{optionDisable}}></td>
+				<td><input type="text" name="optC" value="{{optionC}}" {{optionDisable}}></td>
+				<td><input type="text" name="optD" value="{{optionD}}" {{optionDisable}}></td>
+				<td><input type="text" name="imgPath" value="{{path}}"></td>
+				<td><input type="text" name="correctAns" value="{{correct}}"></td>
+			</tr>
 		{{/each}}
-		</ul>
+		</table>
 	{{/if}}
 </template>
 
