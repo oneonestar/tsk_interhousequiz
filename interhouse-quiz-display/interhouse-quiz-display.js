@@ -98,21 +98,14 @@ if (Meteor.isClient) {
 		}
 	});
 
-	Template.management.events({
-		'click .questionItem': function() {
-			var questionId = this._id;
-			Session.set('selectedQuestion', questionId);
-		}
-	});
-
 	Template.management.helpers({
 		'questions': function() {
 			Meteor.subscribe('theQuestions', null);
 			Questions.find().forEach(function(item) {
 				if(!item.optionA)
-					Session.set(item._id, "disabled");
+					Session.set(item._id, "LQ");
 				else
-					Session.set(item._id, "enabled");
+					Session.set(item._id, "MC");
 			});
 			return Questions.find();
 		},
@@ -125,21 +118,19 @@ if (Meteor.isClient) {
 		},
 		'optionDisable': function() {
 			var type = Session.get(this._id);
-			if(type=="disabled")
+			if(type=="LQ")
 				return "disabled";
-			else if(type=="enabled")
-				return "enabled";
 		},
 		'mcSelected': function() {
 			var itemId = this._id;
 			var type = Session.get(itemId);
-			if(type=="enabled")
+			if(type=="MC")
 				return "selected";
 		},
 		'lqSelected': function() {
 			var itemId = this._id;
 			var type = Session.get(itemId);
-			if(type=="disabled")
+			if(type=="LQ")
 				return "selected";
 		}
 	});
@@ -149,10 +140,14 @@ if (Meteor.isClient) {
 			var itemId = this._id;
 			console.log(itemId);
 			var currentType = Session.get(itemId);
-			if(currentType=="disabled")
-				Session.set(itemId, "enabled");
-			else if(currentType=="enabled")
-				Session.set(itemId, "disabled");
+			if(currentType=="MC")
+				Session.set(itemId, "LQ");
+			else if(currentType=="LQ")
+				Session.set(itemId, "MC");
+		},
+		'click .questionItem': function() {
+			var questionId = this._id;
+			Session.set('selectedQuestion', questionId);
 		}
 	});
 

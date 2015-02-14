@@ -25,6 +25,9 @@
 		<table border="0">
 		{{#each questions}}
 			<tr class="questionItem {{selectedItem}}">
+				<td>{{Id.catalog}}</td>
+				<td>{{Id.group}}</td>
+				<td>{{Id.qid}}</td>
 				<td><input type="text" name="mainContent" value="{{content}}"></td>
 				<td>
 				<select id="questionType">
@@ -32,10 +35,17 @@
 					<option value="LQ" {{lqSelected}}>LQ</option>
 				</select>
 				</td>
-				<td><input type="text" name="optA" value="{{optionA}}" {{optionDisable}}></td>
-				<td><input type="text" name="optB" value="{{optionB}}" {{optionDisable}}></td>
-				<td><input type="text" name="optC" value="{{optionC}}" {{optionDisable}}></td>
-				<td><input type="text" name="optD" value="{{optionD}}" {{optionDisable}}></td>
+				{{#if optionDisable}}
+					<td>{{optionA}}</td>
+					<td>{{optionB}}</td>
+					<td>{{optionC}}</td>
+					<td>{{optionD}}</td>
+				{{else}}
+					<td><input type="text" name="optA" value="{{optionA}}"></td>
+					<td><input type="text" name="optB" value="{{optionB}}"></td>
+					<td><input type="text" name="optC" value="{{optionC}}"></td>
+					<td><input type="text" name="optD" value="{{optionD}}"></td>
+				{{/if}}
 				<td><input type="text" name="imgPath" value="{{path}}"></td>
 				<td><input type="text" name="correctAns" value="{{correct}}"></td>
 			</tr>
