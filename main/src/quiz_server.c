@@ -122,11 +122,11 @@ int main(int argc, char *argv[])
 	/* install signal handlers */
 	signal_handler_init();
 
+	/* initialize webserver */
+	webserver_init(argv[1], 9001);
+
 	/* setup hash table for server callback functions */
 	hash_table_init();
-
-	/* initialize web server connector */
-	webserver_init(webServer, "3001");
 
 	/*/ initialize ncurses and windows */
 	init_windows();

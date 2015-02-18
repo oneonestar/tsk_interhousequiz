@@ -1,9 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <json-glib/json-glib.h>
 #include "include/layout.h"
-//#include "include/json_msg.h"	/* ->json_glib/json_glib.h; ->json_glib/json_gobject.h */
+#include "include/json_msg.h"	/* ->json_glib/json_glib.h; ->json_glib/json_gobject.h */
 
 /* decode json msg from control panels */
 void decode_json(char *json, char **instruction, char **action, char **team, char **value)
@@ -17,7 +16,7 @@ void decode_json(char *json, char **instruction, char **action, char **team, cha
 
 	/* parse individual elements */
 	if(json_reader_read_member(reader, "Instruction")) {
-		gchar *str = json_reader_get_string_value(reader);
+		const gchar *str = json_reader_get_string_value(reader);
 		*instruction = malloc(sizeof(char)*strlen(str)+1);
 		strcpy(*instruction, str);
 	}
@@ -28,7 +27,7 @@ void decode_json(char *json, char **instruction, char **action, char **team, cha
 	json_reader_end_member(reader);
 
 	if(json_reader_read_member(reader, "Action")) {
-		gchar *str = json_reader_get_string_value(reader);
+		const gchar *str = json_reader_get_string_value(reader);
 		*action = malloc(sizeof(char)*strlen(str)+1);
 		strcpy(*action, str);
 	}
@@ -39,7 +38,7 @@ void decode_json(char *json, char **instruction, char **action, char **team, cha
 	json_reader_end_member(reader);
 
 	if(json_reader_read_member(reader, "Team")) {
-		gchar *str = json_reader_get_string_value(reader);
+		const gchar *str = json_reader_get_string_value(reader);
 		*team = malloc(sizeof(char)*strlen(str)+1);
 		strcpy(*team, str);
 	}
@@ -50,7 +49,7 @@ void decode_json(char *json, char **instruction, char **action, char **team, cha
 	json_reader_end_member(reader);
 
 	if(json_reader_read_member(reader, "Value")) {
-		gchar *str = json_reader_get_string_value(reader);
+		const gchar *str = json_reader_get_string_value(reader);
 		*value = malloc(sizeof(char)*strlen(str)+1);
 		strcpy(*value, str);
 	}
