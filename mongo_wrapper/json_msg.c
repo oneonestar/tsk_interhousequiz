@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <json-glib/json-glib.h>
 #include "json_msg.h"	/* ->json_glib/json_glib.h; ->json_glib/json_gobject.h */
 
 /* decode json msg from control panels */
