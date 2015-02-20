@@ -18,10 +18,6 @@ if (Meteor.isClient) {
 	Session.set("imgState", false);		// session variable to provide info: hide to angular
 	Session.set("optionState", false);	// hide option panels if no option exist
 
-	if(Meteor.userId()=="mt3dkThtxD7Eh8Toc") {
-		Session.set("catalogSelected", "A");
-	}
-
 	/*
 	 * score board helpers
 	 */
@@ -53,7 +49,6 @@ if (Meteor.isClient) {
 		'question': function() {
 			// obtain question id of question set be display now and subscribe
 			var current_qid = Control.findOne({ control_id: 0 });
-			console.log(current_qid.question_id);
 			Meteor.subscribe('theQuestions', current_qid.question_id);
 
 			// load question from db
@@ -106,13 +101,17 @@ if (Meteor.isClient) {
 		'questions': function() {
 			Meteor.subscribe('theQuestions', null);
 			var selectedCatalog = Session.get('catalogSelected');
-			Questions.find().forEach(function(item) {
+			var selectedGroup = Session.get('groupSelected');
+			console.log('display question: '+selectedCatalog+' '+selectedGroup);
+			var questionSet = Questions.find({ "Id.catalog": selectedCatalog, "Id.group": selectedGroup });
+			console.log(questionSet.fetch());
+			questionSet.forEach(function(item) {
 				if(!item.optionA)
 					Session.set(item._id, "LQ");
 				else
 					Session.set(item._id, "MC");
 			});
-			return Questions.find({ "Id.catalog": selectedCatalog });
+			return questionSet;
 		},
 		'selectedItem': function() {
 			var selectedItemId = Session.get('selectedQuestion');
@@ -143,6 +142,11 @@ if (Meteor.isClient) {
 			var selectedItemId = Session.get('selectedQuestion');
 			if(selectedItemId!=itemId)
 				return true;
+		},
+		'latestQid': function() {
+			var catalog = Session.get('catalogSelected');
+			var qid = Questions.findOne({ "Id.catalog": catalog },{ sort: [["Id.qid","desc"]] });
+			return qid.Id.qid;
 		}
 	});
 
@@ -157,9 +161,11 @@ if (Meteor.isClient) {
 					Session.set(itemId, "MC");
 			}
 		},
-		'change #catalog': function(evt) {
+		'click #changeItemGroup': function(evt) {
 			if(Meteor.userId()) {
-				var selectedItem = $(evt.target).val();
+				var selectedItem = $('#catalog').val();
+				var selectedGroup = parseInt($('#group').val());
+				Session.set('groupSelected', selectedGroup);
 				Session.set('catalogSelected', selectedItem);
 			}
 		},
@@ -169,6 +175,28 @@ if (Meteor.isClient) {
 				Session.set('selectedQuestion', questionId);
 			}
 		}
+	});
+
+	Template.addQuestionItem.helpers({
+		'currentCatalog': function() {
+			var catalog = Session.get('catalogSelected');
+			return catalog;
+		},
+		'currentGroup': function() {
+			var group = Session.get('groupSelected');
+			return group;
+		},
+		'newQid': function() {
+			var catalog = Session.get('catalogSelected');
+			var group = Session.get('groupSelected');
+			console.log(catalog+' '+group);
+			var qid = Questions.findOne({ "Id.catalog": catalog, "Id.group": group },{ sort: [["Id.qid","desc"]] });
+			return qid.Id.qid + 1;
+		}
+	});
+
+	Template.addQuestionItem.events({
+
 	});
 
 	Router.onBeforeAction(function() {
