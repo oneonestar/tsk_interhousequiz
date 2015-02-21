@@ -14,7 +14,8 @@ void webserver_rpc(char *host, int port, int service, char *value, char **feedba
 	//setup variables
 	int sock;			//socket
 	char buffer[100];		//buffer
-	char recvBuff[1000];
+	char *recvBuff;
+	int length;
 	struct sockaddr_in serv_addr;	//server address
 
 	sock = socket(AF_INET, SOCK_STREAM, 0);					//new socket stream
@@ -39,7 +40,14 @@ void webserver_rpc(char *host, int port, int service, char *value, char **feedba
 
 	send(sock, buffer, strlen(buffer)+1, 0);
 	if(feedback!=NULL) {
-		recv(sock, recvBuff, sizeof(recvBuff), 0);
+		// check size of string to be returned and allot memory
+		recv(sock, &length, sizeof(int), 0);
+		recvBuff = malloc(sizeof(char)*length+1);
+		wprintw(msg_content, "Msg size: %d\n", length);
+		wrefresh(msg_content);
+
+		// recv actual content
+		recv(sock, recvBuff, sizeof(char)*length+1, 0);
 		*feedback = malloc(sizeof(char)*strlen(recvBuff)+1);
 		strcpy(*feedback, recvBuff);
 	}
