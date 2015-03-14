@@ -5,11 +5,18 @@
 #include "include/json_msg.h"	/* ->json_glib/json_glib.h; ->json_glib/json_gobject.h */
 
 /* decode json msg from control panels */
-void decode_json(char *json, char **instruction, char **action, char **team, char **value)
+unsigned decode_json(char *json, char **instruction, char **action, char **team, char **value)
 {
+	GError *error = NULL;
+
 	/* new parser */
 	JsonParser *parser = json_parser_new();
-	json_parser_load_from_data(parser, json, -1, NULL);
+	if(json_parser_load_from_data(parser, json, -1, &error)==0) {
+		wprintw(msg_content, "%s\n", error->message);
+		wrefresh(msg_content);
+		g_error_free(error);
+		return 1;
+	}
 
 	/* new reader to read streams*/
 	JsonReader *reader = json_reader_new(json_parser_get_root(parser));
@@ -62,6 +69,9 @@ void decode_json(char *json, char **instruction, char **action, char **team, cha
 	/* free resources */
 	g_object_unref(reader);
 	g_object_unref(parser);
+
+	/* return okay */
+	return 0;
 }
 
 /* return an encoded string of json msg intended as ACK to control panel */
@@ -76,7 +86,7 @@ gchar *encode_json(char *instruction, char *action, char *team, char *value, int
 	json_builder_begin_object(builder);
 
 	json_builder_set_member_name(builder, "Instruction");
-	if(instruction[0]=='\0') {
+	if(instruction[0]=='\0' || instruction==NULL) {
 		json_builder_add_null_value(builder);
 	}
 	else {
@@ -84,7 +94,7 @@ gchar *encode_json(char *instruction, char *action, char *team, char *value, int
 	}
 
 	json_builder_set_member_name(builder, "Action");
-	if(action[0]=='\0') {
+	if(action[0]=='\0' || action==NULL) {
 		json_builder_add_null_value(builder);
 	}
 	else {
@@ -92,7 +102,7 @@ gchar *encode_json(char *instruction, char *action, char *team, char *value, int
 	}
 
 	json_builder_set_member_name(builder, "Team");
-	if(team[0]=='\0') {
+	if(team[0]=='\0' || action==NULL) {
 		json_builder_add_null_value(builder);
 	}
 	else {
@@ -100,7 +110,7 @@ gchar *encode_json(char *instruction, char *action, char *team, char *value, int
 	}
 
 	json_builder_set_member_name(builder, "Value");
-	if(value[0]=='\0') {
+	if(value[0]=='\0' || value==NULL) {
 		json_builder_add_null_value(builder);
 	}
 	else {
