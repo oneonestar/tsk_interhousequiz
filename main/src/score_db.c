@@ -123,7 +123,7 @@ int score_db_get(char team)
 	/* init variables */
 	sqlite3 *db;
 	sqlite3_stmt *stmt;
-	int rc, score;
+	int rc, score = 0;
 	char *sql = "select sum(Score) from score_record where Team=?;";	// SQL to extract sum of participant
 	const char *tail;							// unexec portion of sql statement
 
