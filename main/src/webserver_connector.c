@@ -77,9 +77,11 @@ void webserver_update_score(char **name, int *new_score, int no_of_participants)
 	webserver_rpc(webserverAddr, webserverPort, 2, scores, NULL);
 }
 
-char *retrieve_questions() 
+char *retrieve_questions(char *id) 
 {
 	char *recvBuff;
-	webserver_rpc(webserverAddr, webserverPort, 3, NULL, &recvBuff);
+	webserver_rpc(webserverAddr, webserverPort, 3, id, &recvBuff);
+	wprintw(msg_content,"%s",recvBuff);
+	wrefresh(msg_content);
 	return recvBuff;
 }

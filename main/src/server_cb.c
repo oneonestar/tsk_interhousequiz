@@ -52,7 +52,7 @@ void buffrepr(const char * buff, int size, char * result, int resultSize)
 }
 
 /* control which question to display */
-void display_question_cb(char x, char *value)
+void display_question_cb(char x, char *value, struct bufferevent *bev)
 {
 	/* alter reactive cursor controling display of question */
 	webserver_update_question(value);
@@ -61,7 +61,7 @@ void display_question_cb(char x, char *value)
 }
 
 /* reveal answer */
-void display_answer_cb(char x, char *value_int)
+void display_answer_cb(char x, char *value_int, struct bufferevent *bev)
 {
 	/* alter reactive display control cursor status to true */
 	webserver_update_answer(1);
@@ -69,29 +69,35 @@ void display_answer_cb(char x, char *value_int)
 	wrefresh(msg_content);
 }
 
-void buzzer_reset_cb(char x, char *value)
+void buzzer_reset_cb(char x, char *value, struct bufferevent *bev)
 {
 	send_message(buzzerServer, buzzerPort, "0");
 }
 
-void buzzer_enable_cb(char x, char *value)
+void buzzer_enable_cb(char x, char *value, struct bufferevent *bev)
 {
 	send_message(buzzerServer, buzzerPort, "1");
 }
 
-void buzzer_disable_cb(char x, char *value)
+void buzzer_disable_cb(char x, char *value, struct bufferevent *bev)
 {
 	send_message(buzzerServer, buzzerPort, "w");
 }
 
-void ui_show_score_cb(char x, char *value)
+void ui_show_score_cb(char x, char *value, struct bufferevent *bev)
 {
 	send_message(webServer, webPort, "ui:{\"score\":\"show\"}");
 }
 
-void ui_hide_score_cb(char x, char *value)
+void ui_hide_score_cb(char x, char *value, struct bufferevent *bev)
 {
 	send_message(webServer, webPort, "ui:{\"score\":\"hide\"}");
+}
+
+void retrieve_question_group_cb(char x, char *value, struct bufferevent *bev)
+{
+	char *json_str = retrieve_questions(value);
+	bufferevent_write(bev, json_str, strlen(json_str));
 }
 
 /* initialize hash tables and store function pointers */
@@ -114,6 +120,9 @@ void hash_table_init()
 	/* UI operation */
 	g_hash_table_insert(func_table, "UI+Show", ui_show_score_cb);
 	g_hash_table_insert(func_table, "UI+Hide", ui_hide_score_cb);
+
+	/* retrieve question groups */
+	g_hash_table_insert(func_table, "Question+Retrieve", retrieve_question_group_cb);
 }
 
 /* server main loop and call back function to parse instruction from telnet */
@@ -124,7 +133,7 @@ void on_read_cb(struct bufferevent *bev, void *ctx)
 	 * evbuffer created to get input from buffer, obtain lenth of data in buffer with evbuffer_get_length()
 	 * allot memory and call evbuffer_remove() to copy data into recvBuffer and drain data inside buffer
 	 */
-	char *recvBuff;
+	char *recvBuff = NULL;
 	struct evbuffer *input = bufferevent_get_input(bev);	/* read the buffer */
 	struct Info *inf = ctx;					/* get information about the connection */
 	size_t len = evbuffer_get_length(input);		/* get length */
@@ -143,64 +152,62 @@ void on_read_cb(struct bufferevent *bev, void *ctx)
 
 	}
 
-	/* parsing variables */
-	/* instruction=command catag, option=action to be taken; value=a char value; data=an int value */
-	//char instruction[10], option[10], value[100], data[2];	/* for sscanf */
-	char *instruction, *option, *value, *data;
-	//memset(instruction, 0, sizeof(instruction));
-	//memset(option, 0, sizeof(option));
-	//memset(value, 0, sizeof(value));
-	//memset(data, 0, sizeof(data));
-
-	/* a buffer for storing returned string from functions */
-	char buffer[5000];
-
 	/* DEBUG */
 	char printBuffer[5000];
-
 	buffrepr(recvBuff, len, printBuffer, sizeof(printBuffer));
 
 	wprintw(msg_content, "Command Received: %s\n", printBuffer);
 	wrefresh(msg_content);
 
-	/* process instruction */
-	//sscanf(recvBuff, "%s %s %s %s", instruction, option, data, value);
-	decode_json(recvBuff, &instruction, &option, &data, &value);
+	/* instruction=command catag, option=action to be taken; value=a char value; data=an int value */
+	char *instruction, *option, *value, *data;
 
-	/* free recvBuff after use */
-	free(recvBuff);
-
-	/* perform query on hash table */
-	sprintf(buffer, "%s+%s", instruction, option);
-	wprintw(msg_content, "search: %s\n", buffer);
-	wrefresh(msg_content);
-
-	gpointer *found;
-	if((found=g_hash_table_lookup(func_table, buffer)) != NULL) {
-		void (*func)(char, char*) = (void*)found;
-		func(data[0], value);
-
-		/* send latest score to web server */
-		score_publish();
-
-		/* broadcast feedback and ack, free returned json string after use */
-		char *str = encode_json(instruction, option, data, value, 1);
-		wprintw(msg_content, "%s", str);
-		wrefresh(msg_content);
-		listBroadcast(theList, str);
-		free(str);
-	} else {
-		/* show that request is invalid */
-		char *str = encode_json(instruction, option, data, value, 0);
-		wprintw(msg_content, "request %s not found in hash table!\n", buffer);
-		wprintw(msg_content, "%s", str);
-		wrefresh(msg_content);
+	/* Check if received JSON string is valid, proceed if so */
+	if(decode_json(recvBuff, &instruction, &option, &data, &value)!=0) {
+		char *str = encode_json("", "", "", "", 1);
 		listBroadcast(theList, str);
 		free(str);
 	}
+	else {
+		/* parsing variables */
+		/* a buffer for storing key to the hash */
+		char buffer[5000];
 
-	/* clear information */
-	memset(&recvBuff, 0, sizeof(recvBuff));
-	memset(&buffer, 0, sizeof(buffer));
-	free(instruction); free(option); free(data); free(value);
+		/* perform query on hash table */
+		sprintf(buffer, "%s+%s", instruction, option);
+		wprintw(msg_content, "search: %s\n", buffer);
+		wrefresh(msg_content);
+
+		/* begin lookup */
+		gpointer *found;
+		if((found=g_hash_table_lookup(func_table, buffer)) != NULL) {
+			/* if result is found, perform requested function, else return error */
+			void (*func)(char, char*, struct bufferevent*) = (void*)found;
+			func(data[0], value, bev);
+
+			/* send latest score to web server */
+			score_publish();
+
+			/* broadcast feedback and ack, free returned json string after use */
+			char *str = encode_json(instruction, option, data, value, 1);
+			wprintw(msg_content, "%s", str);
+			wrefresh(msg_content);
+			listBroadcast(theList, str);
+			free(str);
+		} else {
+			/* show that request is invalid and broadcast ack */
+			char *str = encode_json(instruction, option, data, value, 0);
+			wprintw(msg_content, "request %s not found in hash table!\n", buffer);
+			wprintw(msg_content, "%s", str);
+			wrefresh(msg_content);
+			listBroadcast(theList, str);
+			free(str);
+		}
+
+		/* clear information */
+		free(instruction); free(option); free(data); free(value);
+	}
+
+	/* free recvBuff after use */
+	free(recvBuff);
 }
