@@ -5,7 +5,28 @@ import socket,select
 import fcntl
 import struct
 import subprocess
+import urllib2
 
+URL = "http://quiz.onestar.moe:3000/private/buzzer?house="
+def house_name(house_char):
+	if house_char == "1":
+		return "Augustin"
+	elif house_char == "2":
+		return "Deusdedit"
+	elif house_char == "3":
+		return "Honorious"
+	elif house_char == "4":
+		return "Justus"
+	elif house_char == "5":
+		return "Laurentius"
+	elif house_char == "6":
+		return "Mellitus"
+
+def sendURL(house_char):
+	full_URL = URL + house_name(house_char)
+	print urllib2.urlopen(full_URL).read()
+	
+sendURL("1")
 #initialization for Arduino
 bus = smbus.SMBus(1)
 address = 0x04
@@ -49,29 +70,29 @@ ss = [s]
 lastSignal = ""
 while True:
 	try:
-		ready_to_read,_,_ = select.select(ss,[],[],0)
-		for i in ready_to_read:
-			if s == i:
-				client, conn_address = i.accept()
-				ss.append(client)
-				print 'connection accepted:' + conn_address[0]
-				Main_HOST = conn_address[0]
-			else:
-				data = i.recv(1000)
-				if data:
-					if data[0]=="0":
-						print ("reset();")
-						writeByte(address,0)
-					elif data[0]=="1":
-						print ("enable();")
-						writeByte(address,1)
-					elif data[0]=="2":
-						print ("disable();")
-						writeByte(address,2)
-				else:
-					print 'connection closed:'
-					ss.remove(i)
-					i.close()
+#		ready_to_read,_,_ = select.select(ss,[],[],0)
+#		for i in ready_to_read:
+#			if s == i:
+#				client, conn_address = i.accept()
+#				ss.append(client)
+#				print 'connection accepted:' + conn_address[0]
+#				Main_HOST = conn_address[0]
+#			else:
+#				data = i.recv(1000)
+#				if data:
+#					if data[0]=="0":
+#						print ("reset();")
+#						writeByte(address,0)
+#					elif data[0]=="1":
+#						print ("enable();")
+#						writeByte(address,1)
+#					elif data[0]=="2":
+#						print ("disable();")
+#						writeByte(address,2)
+#				else:
+#					print 'connection closed:'
+#					ss.remove(i)
+#					i.close()
 		#start listening from client
 #		s.listen(1)
 #		conn, addr = s.accept()
@@ -84,12 +105,13 @@ while True:
 		if signal != lastSignal and signal != "":
 			print("Pressed: " + str(signal));
 			print(repr(signal))
-			for i in ss:
-				if i != s:
-					i.send(signal)
-					print(i.getpeername())
-					print("send: "+signal)
-					print(repr(signal))
+			sendURL(str(signal[-1]))
+#			for i in ss:
+#				if i != s:
+#					i.send(signal)
+#					print(i.getpeername())
+#					print("send: "+signal)
+#					print(repr(signal))
 			print("")
 		lastSignal = signal
 		time.sleep(0.1)
