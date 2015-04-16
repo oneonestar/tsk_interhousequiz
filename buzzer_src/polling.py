@@ -73,13 +73,16 @@ while True:
 					ss.remove(i)
 					i.close()
 		#start listening from client
+#		s.listen(1)
+#		conn, addr = s.accept()
+#		time.sleep(0.5)
 
 		#start polling
 		#read signal from arduino
 		time.sleep(0.1)
 		signal = readByte(address, 1) 
 		if signal != lastSignal and signal != "":
-			print("Pressed: " + signal);
+			print("Pressed: " + str(signal));
 			print(repr(signal))
 			for i in ss:
 				if i != s:
@@ -88,7 +91,6 @@ while True:
 					print("send: "+signal)
 					print(repr(signal))
 			print("")
-                        time.sleep(5)
 		lastSignal = signal
 		time.sleep(0.1)
 
