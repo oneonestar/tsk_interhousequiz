@@ -1,0 +1,171 @@
+<html>
+<!-- <body onload="javascript:document.myform.submit()"> -->
+<head>
+<meta charset="UTF-8">
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<style>
+label { display:block; }
+body{
+margin: 0;
+padding: 0;
+border: 0;
+overflow: hidden;
+height: 100%; 
+max-height: 100%; 
+}
+
+#framecontent{
+position: absolute;
+top: 0;
+bottom: 0; 
+left: 0;
+width: 200px; /*Width of frame div*/
+height: 100%;
+overflow: hidden; /*Disable scrollbars. Set to "scroll" to enable*/
+background: navy;
+color: white;
+}
+
+#maincontent{
+position: fixed;
+top: 0; 
+left: 200px; /*Set left value to WidthOfFrameDiv*/
+right: 0;
+bottom: 0;
+overflow: auto; 
+background: #fff;
+}
+
+.innertube{
+margin: 15px; /*Margins for inner DIV inside each DIV (to provide padding)*/
+}
+
+
+#left {
+border: 1px solid #dddddd;
+padding:10px;
+height: 300px;
+overflow-x:visible;
+overflow-y: scroll;
+-webkit-border-radius: 5px;
+-moz-border-radius: 5px;
+border-radius: 5px;
+margin-bottom:10px;
+font-size:14px;
+}
+
+</style>
+</head>
+<body>
+
+<div id="framecontent">
+<h1>Questions</h1>
+<div class="innertube" id="left">
+</div>
+</div>
+
+
+<div id="maincontent">
+<div class="innertube">
+<form action="form" method="post" name="myform">
+<label for="QuestionID">QuestionID:</label>
+<input name="QuestionID" value="" size="100"/>
+<br />
+<label for="Catalog">Catalog:</label>
+<input name="Catalog" value="" size="100"/>
+<br />
+<label for="Set">Set:</label>
+<input name="Set" size="100"/>
+<br />
+<label for="ID">ID:</label>
+<input name="ID" size="100"/>
+<br />
+<label for="Question">Question:</label>
+<input name="Question" size="100"/>
+<br />
+<label for="OptionA">OptionA:</label>
+<input name="OptionA" size="100"/>
+<br />
+<label for="OptionB">OptionB:</label>
+<input name="OptionB" size="100"/>
+<br />
+<label for="OptionC">OptionC:</label>
+<input name="OptionC" size="100"/>
+<br />
+<label for="OptionD">OptionD:</label>
+<input name="OptionD" size="100"/>
+<br />
+<label for="Answer">Answer:</label>
+<input name="Answer" size="100"/>
+<br />
+<label for="Path">Path:</label>
+<input name="Path" size="100"/>
+<br />
+<input type="submit" value="Submit"/>
+</form>
+<br /><br />
+<hr />
+Format: <br />
+QuestionID:[Catalog]:[Set]:[ID]<br />
+Catalog: A = 齊答題, B = 必答題-基本, C = 必答題-附加, D = 搶答<br />
+Set: 題目集ID eg. 1234567<br />
+A:1    題目集
+B:1    題目集1
+B:2    題目集2
+B:3    題目集3
+B:4    題目集4
+B:5    題目集5
+B:6    題目集6
+B:7    題目集7
+C:1    科學1
+C:2    科學2
+C:3    綜合人文1
+C:4    綜合人文2
+C:5    時事1
+C:6    時事2
+C:7    唔識抵死題（常識）
+<br />
+ID: 題目ID eg. 1234<br />
+</div>
+</div>
+
+
+<script>
+(function() {
+$.ajaxSetup({ scriptCharset: "utf-8" , contentType: "application/json; charset=utf-8"});
+myString = $.getJSON( "/lists")
+.done(function( data ) {
+myData = data;
+console.log(data);
+for (var k in data)
+{
+	$("#left").append("<div class=\"Question_ID\">"+k+"</div>");
+}
+$(".Question_ID").click(function(event){
+	$( "input" ).val("");
+	$( "input[type$='submit']" ).val("Submit");
+	console.log(event.currentTarget.innerHTML);
+	j = $.parseJSON(myData[event.currentTarget.innerHTML])
+	for (var i in j)
+	{
+		if(typeof(j[i]) != "string")
+		{//Options
+			console.log(j[i]);
+			$( "input[name$='OptionA']" ).val( j[i][0] );
+			$( "input[name$='OptionB']" ).val( j[i][1] );
+			$( "input[name$='OptionC']" ).val( j[i][2] );
+			$( "input[name$='OptionD']" ).val( j[i][3] );
+		}
+		$( "input[name$='"+ i +"']" ).val( j[i] );
+	}
+
+	$( "input[name$='QuestionID']" ).val( event.currentTarget.innerHTML );
+	
+})
+return false;
+})
+})();
+</script>
+
+</body>
+</html>

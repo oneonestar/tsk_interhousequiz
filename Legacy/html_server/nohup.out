@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "server.py", line 116, in <module>
+    reactor.listenTCP(args.ctrlport,CtrlConnectionFactory())
+  File "/usr/lib/python2.7/dist-packages/twisted/internet/posixbase.py", line 436, in listenTCP
+    p.startListening()
+  File "/usr/lib/python2.7/dist-packages/twisted/internet/tcp.py", line 641, in startListening
+    raise CannotListenError, (self.interface, self.port, le)
+twisted.internet.error.CannotListenError: Couldn't listen on any:8889: [Errno 98] Address already in use.
